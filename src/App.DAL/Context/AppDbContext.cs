@@ -1,10 +1,7 @@
 ﻿using App.Core.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 
 namespace App.DAL.Context
 {
@@ -26,5 +23,15 @@ namespace App.DAL.Context
         public DbSet<Partner> Partners { get; set; }
         public DbSet<Training> Training { get; set; }
         public DbSet<Video> Videos { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Identity cədvəllərinin konfiqurasiyası üçün vacibdir
+            base.OnModelCreating(modelBuilder);
+
+            // App.DAL assembly-sindəki bütün IEntityTypeConfiguration<T>
+            // implementasiyalarını avtomatik tapır və tətbiq edir
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
     }
 }
