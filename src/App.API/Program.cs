@@ -1,3 +1,5 @@
+using App.DAL.Context;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +41,11 @@ builder.Services.AddSwaggerGen(options =>
                     Array.Empty<string>()
                 }
             });
+});
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 
