@@ -1,7 +1,6 @@
-﻿namespace App.Core.Entities
+﻿namespace App.Core.Entities;
+
+public class Video : BaseEntity
 {
-    public class Video : BaseEntity
-    {
-        public string Link { get; set; }
-    }
+    public string Link { get; set; }
 }
