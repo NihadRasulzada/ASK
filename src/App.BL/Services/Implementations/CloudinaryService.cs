@@ -38,4 +38,18 @@ public class CloudinaryService : ICloudinaryService
 
         return result.SecureUrl.ToString();
     }
+
+    /// <inheritdoc/>
+    public async Task<IList<string>> UploadImagesAsync(IEnumerable<IFormFile> files)
+    {
+        var urls = new List<string>();
+
+        foreach (var file in files)
+        {
+            var url = await UploadImageAsync(file);
+            urls.Add(url);
+        }
+
+        return urls;
+    }
 }
