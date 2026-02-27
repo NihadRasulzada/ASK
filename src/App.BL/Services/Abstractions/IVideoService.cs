@@ -1,6 +1,6 @@
 using App.BL.DTOs;
 
-namespace App.BL.Services;
+namespace App.BL.Services.Abstractions;
 
 public interface IVideoService
 {
