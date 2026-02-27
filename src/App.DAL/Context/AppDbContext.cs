@@ -1,4 +1,5 @@
-﻿using App.Core.Entities;
+using App.Core.Entities;
+using App.Core.Entities.Common;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -32,6 +33,35 @@ namespace App.DAL.Context
             // App.DAL assembly-sindəki bütün IEntityTypeConfiguration<T>
             // implementasiyalarını avtomatik tapır və tətbiq edir
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
+
+        /// <summary>
+        /// AuditableEntity-lər üçün CreatedOn və UpdatedOn sahələrini avtomatik setləyir.
+        /// </summary>
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var now = DateTimeOffset.UtcNow;
+
+            foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreatedOn = now;
+                        entry.Entity.UpdatedOn = now;
+                        // CreatedBy / UpdatedBy: Auth implementasiyasından sonra real Guid doldurulacaq
+                        // entry.Entity.CreatedBy = currentUserId;
+                        // entry.Entity.UpdatedBy = currentUserId;
+                        break;
+
+                    case EntityState.Modified:
+                        entry.Entity.UpdatedOn = now;
+                        // entry.Entity.UpdatedBy = currentUserId;
+                        break;
+                }
+            }
+
+            return await base.SaveChangesAsync(cancellationToken);
         }
     }
 }

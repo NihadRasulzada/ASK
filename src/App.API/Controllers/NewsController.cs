@@ -96,7 +96,8 @@ public class NewsController : ControllerBase
     }
 
     /// <summary>
-    /// Xəbəri identifikator üzrə silir.
+    /// Xəbəri məntiqi olaraq silir (soft delete — IsDeleted = true).
+    /// Xəbər DB-dən silinmir, yalnız gizlədilir.
     /// </summary>
     /// <param name="id">Silinəcək xəbərin unikal identifikatoru.</param>
     /// <returns>Uğur halında məzmun yoxdur.</returns>
@@ -112,5 +113,45 @@ public class NewsController : ControllerBase
             return NotFound();
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Xəbəri aktiv edir (IsActive = true).
+    /// Deaktiv edilmiş xəbərləri yenidən görünən edir.
+    /// </summary>
+    /// <param name="id">Aktivləşdiriləcək xəbərin unikal identifikatoru.</param>
+    /// <returns>Uğur halında 200 OK.</returns>
+    /// <response code="200">Xəbər uğurla aktiv edildi.</response>
+    /// <response code="404">Xəbər tapılmadı.</response>
+    [HttpPatch("{id:guid}/activate")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Activate([FromRoute] Guid id)
+    {
+        var result = await _newsService.ActivateAsync(id);
+        if (!result)
+            return NotFound();
+
+        return Ok();
+    }
+
+    /// <summary>
+    /// Xəbəri deaktiv edir (IsActive = false).
+    /// Xəbər DB-dən silinmir, sadəcə siyahıdan gizlədilir.
+    /// </summary>
+    /// <param name="id">Deaktiv ediləcək xəbərin unikal identifikatoru.</param>
+    /// <returns>Uğur halında 200 OK.</returns>
+    /// <response code="200">Xəbər uğurla deaktiv edildi.</response>
+    /// <response code="404">Xəbər tapılmadı.</response>
+    [HttpPatch("{id:guid}/deactivate")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Deactivate([FromRoute] Guid id)
+    {
+        var result = await _newsService.DeactivateAsync(id);
+        if (!result)
+            return NotFound();
+
+        return Ok();
     }
 }

@@ -35,5 +35,9 @@ public abstract class AuditableEntityConfiguration<T> : IEntityTypeConfiguration
         builder.Property(e => e.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
+
+        // Silinmiş (IsDeleted=true) və ya deaktiv (IsActive=false) olan
+        // entity-lər sorğulardan avtomatik çıxarılır.
+        builder.HasQueryFilter(e => !e.IsDeleted && e.IsActive);
     }
 }
