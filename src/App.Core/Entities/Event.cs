@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace App.Core.Entities;
 
-namespace App.Core.Entities
+public class Event : AuditableEntity
 {
-    public class Event : AuditableEntity
-    {
-        public string Title { get; set; }
-        public string TitleImageUrl { get; set; }
-        public string Text { get; set; }
-    }
+    public string Title { get; set; }
+    public string TitleImageUrl { get; set; }
+    public string Text { get; set; }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace App.Core.Entities
+﻿namespace App.Core.Entities
 {
     public class Partner : BaseEntity
     {
         public string ImageUrl { get; set; }
         public string Site { get; set; }
     }
-}   
+}
