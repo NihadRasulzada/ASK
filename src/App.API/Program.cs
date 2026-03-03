@@ -1,4 +1,5 @@
 using App.API.Filters;
+using App.API.Middleware;
 using App.BL.Services;
 using App.BL.Validators;
 using App.Core.Interfaces;
@@ -74,6 +75,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateVideoDtoValidator>();
 
+// ── Exception Handling ────────────────────────────────────────────────────────
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 // ── Filters ───────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<ValidationFilter>();
 
@@ -86,6 +91,8 @@ builder.Services.AddScoped<IVideoService, VideoService>();
 // ─────────────────────────────────────────────────────────────────────────────
 
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 app.UseSwagger();
 app.UseSwaggerUI();
