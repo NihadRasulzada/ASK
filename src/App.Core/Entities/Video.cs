@@ -1,6 +1,36 @@
-﻿namespace App.Core.Entities;
+namespace App.Core.Entities;
 
 public class Video : BaseEntity
 {
-    public string Link { get; set; }
+    public string Link { get; private set; }
+
+    // EF Core materialization üçün private parameterless constructor
+    private Video()
+    {
+        Link = string.Empty;
+    }
+
+    /// <summary>
+    /// Yeni Video yaradır.
+    /// </summary>
+    /// <param name="link">Videonun URL linki.</param>
+    public Video(string link)
+    {
+        if (string.IsNullOrWhiteSpace(link))
+            throw new ArgumentException("Link boş ola bilməz.", nameof(link));
+
+        Link = link;
+    }
+
+    /// <summary>
+    /// Mövcud Video-nun linkini yeniləyir.
+    /// </summary>
+    /// <param name="link">Yeni URL link.</param>
+    public void Update(string link)
+    {
+        if (string.IsNullOrWhiteSpace(link))
+            throw new ArgumentException("Link boş ola bilməz.", nameof(link));
+
+        Link = link;
+    }
 }
