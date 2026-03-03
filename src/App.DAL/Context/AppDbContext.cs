@@ -22,6 +22,7 @@ namespace App.DAL.Context
         public DbSet<Exhibition> Exhibitions { get; set; }
         public DbSet<Gallery> Galleries { get; set; }
         public DbSet<News> News { get; set; }
+        public DbSet<President> Presidents { get; set; }
         public DbSet<Partner> Partners { get; set; }
         public DbSet<Training> Training { get; set; }
         public DbSet<Video> Videos { get; set; }
