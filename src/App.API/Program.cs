@@ -112,6 +112,7 @@ builder.Services.AddScoped<IVideoRepository, VideoRepository>();
 builder.Services.AddScoped<IPartnerRepository, PartnerRepository>();
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
 builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
+builder.Services.AddScoped<IPresidentRepository, PresidentRepository>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
@@ -119,6 +120,7 @@ builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<IPresidentService, PresidentService>();
 
 // ── Background Jobs ───────────────────────────────────────────────────────────
 builder.Services.AddHostedService<CurrencyBackgroundJob>();
