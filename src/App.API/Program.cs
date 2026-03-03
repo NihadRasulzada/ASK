@@ -1,6 +1,8 @@
 using App.API.Filters;
 using App.API.Middleware;
-using App.BL.Services;
+using App.BL.Services.Abstractions;
+using App.BL.Services.Implementations;
+using App.BL.Settings;
 using App.BL.Validators;
 using App.Core.Interfaces;
 using App.DAL.Context;
@@ -82,11 +84,18 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // ── Filters ───────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<ValidationFilter>();
 
+// ── Cloudinary ────────────────────────────────────────────────────────────────
+builder.Services.Configure<CloudinarySettings>(
+    builder.Configuration.GetSection("CloudinarySettings"));
+
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoRepository, VideoRepository>();
+builder.Services.AddScoped<IPartnerRepository, PartnerRepository>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IPartnerService, PartnerService>();
 
 // ─────────────────────────────────────────────────────────────────────────────
 

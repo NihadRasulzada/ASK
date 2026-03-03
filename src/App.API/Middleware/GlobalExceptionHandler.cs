@@ -19,17 +19,17 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
 
         var (statusCode, title) = exception switch
         {
-            KeyNotFoundException        => (StatusCodes.Status404NotFound,            "Resurs tapılmadı"),
-            ArgumentException           => (StatusCodes.Status400BadRequest,           "Yanlış sorğu"),
-            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized,         "İcazəsiz giriş"),
-            InvalidOperationException   => (StatusCodes.Status400BadRequest,           "Yanlış əməliyyat"),
-            _                           => (StatusCodes.Status500InternalServerError,  "Gözlənilməz xəta baş verdi")
+            KeyNotFoundException => (StatusCodes.Status404NotFound, "Resurs tapılmadı"),
+            ArgumentException => (StatusCodes.Status400BadRequest, "Yanlış sorğu"),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "İcazəsiz giriş"),
+            InvalidOperationException => (StatusCodes.Status400BadRequest, "Yanlış əməliyyat"),
+            _ => (StatusCodes.Status500InternalServerError, "Gözlənilməz xəta baş verdi")
         };
 
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
-            Title  = title,
+            Title = title,
             Detail = exception.Message
         };
 

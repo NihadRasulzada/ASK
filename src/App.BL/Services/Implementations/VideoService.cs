@@ -1,8 +1,9 @@
 using App.BL.DTOs;
+using App.BL.Services.Abstractions;
 using App.Core.Entities;
 using App.Core.Interfaces;
 
-namespace App.BL.Services;
+namespace App.BL.Services.Implementations;
 
 public class VideoService : IVideoService
 {
