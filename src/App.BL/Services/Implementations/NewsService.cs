@@ -79,6 +79,14 @@ public class NewsService : INewsService
         return true;
     }
 
+    /// <inheritdoc/>
+    public Task<bool> ActivateAsync(Guid id)
+        => _newsRepository.SetActiveStatusAsync(id, true);
+
+    /// <inheritdoc/>
+    public Task<bool> DeactivateAsync(Guid id)
+        => _newsRepository.SetActiveStatusAsync(id, false);
+
     private static NewsResponseDto MapToResponseDto(News news)
         => new(news.Id, news.TitleImageUrl, news.NewsText, news.ImageUrls, news.CreatedOn, news.IsActive);
 }
