@@ -1,3 +1,4 @@
+using App.API.BackgroundJobs;
 using App.API.Filters;
 using App.API.Middleware;
 using App.BL.Services.Abstractions;
@@ -10,7 +11,9 @@ using App.DAL.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,20 +87,41 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // ── Filters ───────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<ValidationFilter>();
 
+// ── Memory Cache ──────────────────────────────────────────────────────────────
+builder.Services.AddMemoryCache();
+
 // ── Cloudinary ────────────────────────────────────────────────────────────────
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
+
+// ── ExchangeRate ──────────────────────────────────────────────────────────────
+builder.Services.Configure<ExchangeRateSettings>(
+    builder.Configuration.GetSection("ExchangeRateSettings"));
+
+// ── HTTP Clients ──────────────────────────────────────────────────────────────
+builder.Services.AddHttpClient("ExchangeRate", (sp, client) =>
+{
+    var s = sp.GetRequiredService<IOptions<ExchangeRateSettings>>().Value;
+    client.BaseAddress = new Uri($"{s.BaseUrl}/");
+    client.DefaultRequestHeaders.Accept.Add(
+        new MediaTypeWithQualityHeaderValue("application/json"));
+});
 
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoRepository, VideoRepository>();
 builder.Services.AddScoped<IPartnerRepository, PartnerRepository>();
 builder.Services.AddScoped<INewsRepository, NewsRepository>();
+builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
+
+// ── Background Jobs ───────────────────────────────────────────────────────────
+builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
 // ─────────────────────────────────────────────────────────────────────────────
 

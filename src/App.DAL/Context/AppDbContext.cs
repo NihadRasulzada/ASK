@@ -17,6 +17,7 @@ namespace App.DAL.Context
         }
 
         public DbSet<Announcement> Announcements { get; set; }
+        public DbSet<CurrencyRate> CurrencyRates { get; set; }
         public DbSet<Event> Events { get; set; }
         public DbSet<Exhibition> Exhibitions { get; set; }
         public DbSet<Gallery> Galleries { get; set; }
