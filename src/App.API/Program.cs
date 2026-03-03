@@ -1,3 +1,4 @@
+using App.API.Filters;
 using App.BL.Services;
 using App.BL.Validators;
 using App.Core.Interfaces;
@@ -11,7 +12,14 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Controllers ───────────────────────────────────────────────────────────────
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ValidationFilter>();
+})
+.ConfigureApiBehaviorOptions(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
 // ── Swagger / OpenAPI ─────────────────────────────────────────────────────────
 builder.Services.AddSwaggerGen(options =>
@@ -65,6 +73,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // ── FluentValidation ──────────────────────────────────────────────────────────
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateVideoDtoValidator>();
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+builder.Services.AddScoped<ValidationFilter>();
 
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoRepository, VideoRepository>();
