@@ -91,11 +91,13 @@ builder.Services.Configure<CloudinarySettings>(
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoRepository, VideoRepository>();
 builder.Services.AddScoped<IPartnerRepository, PartnerRepository>();
+builder.Services.AddScoped<INewsRepository, NewsRepository>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IPartnerService, PartnerService>();
+builder.Services.AddScoped<INewsService, NewsService>();
 
 // ─────────────────────────────────────────────────────────────────────────────
 
