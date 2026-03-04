@@ -5,11 +5,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class AnnouncementConfiguration : AuditableEntityConfiguration<Announcement>
+public class AnnouncementConfiguration : IEntityTypeConfiguration<Announcement>
 {
-    public override void Configure(EntityTypeBuilder<Announcement> builder)
+    public void Configure(EntityTypeBuilder<Announcement> builder)
     {
-        base.Configure(builder);
+        builder.HasKey(e => e.Id);
+        builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
         builder.ToTable("Announcements");
 
