@@ -1,9 +1,0 @@
-using App.Core.Entities;
-using App.Core.Interfaces.Common;
-
-namespace App.Core.Interfaces;
-
-public interface IVideoRepository : IRepository<Video>
-{
-    // Video-specific sorğular gələcəkdə buraya əlavə edilə bilər.
-}

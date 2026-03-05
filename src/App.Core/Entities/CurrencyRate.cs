@@ -8,12 +8,12 @@ public class CurrencyRate : BaseEntity
     public decimal Rate { get; private set; }
     public DateOnly RateDate { get; private set; }
 
-    private CurrencyRate()
+    private CurrencyRate() : base(Guid.NewGuid())
     {
         CurrencyCode = string.Empty;
     }
 
-    public CurrencyRate(string currencyCode, decimal rate, DateOnly rateDate)
+    public CurrencyRate(string currencyCode, decimal rate, DateOnly rateDate) : base(Guid.NewGuid())
     {
         CurrencyCode = currencyCode;
         Rate = rate;

@@ -1,6 +1,8 @@
-﻿namespace App.Core.Entities;
+﻿using App.Core.Entities.Common;
 
-public class Event : AuditableEntity
+namespace App.Core.Entities;
+
+public class Event() : SoftDeletableEntity(Guid.NewGuid(), false)
 {
     public string Title { get; set; }
     public string TitleImageUrl { get; set; }

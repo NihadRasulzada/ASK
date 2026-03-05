@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class EventConfiguration : AuditableEntityConfiguration<Event>
+public class EventConfiguration : SoftDeletableEntityConfiguration<Event>
 {
     public override void Configure(EntityTypeBuilder<Event> builder)
     {

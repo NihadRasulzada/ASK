@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace App.Core.Entities.Common;
+﻿namespace App.Core.Entities.Common;
 
 public abstract class SoftDeletableEntity(Guid id, bool isDeactive) : BaseEntity(id)
 {
