@@ -2,6 +2,7 @@ using App.Core.Entities;
 using App.Core.Entities.Common;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace App.DAL.Context
@@ -15,6 +16,8 @@ namespace App.DAL.Context
         protected AppDbContext()
         {
         }
+
+        public bool IgnoreSoftDeleteFilter { get; set; } = false;
 
         public DbSet<Announcement> Announcements { get; set; }
         public DbSet<CurrencyRate> CurrencyRates { get; set; }
@@ -30,41 +33,38 @@ namespace App.DAL.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Identity cədvəllərinin konfiqurasiyası üçün vacibdir
+            ApplySoftDeleteQueryFilters(modelBuilder);
+
             base.OnModelCreating(modelBuilder);
 
-            // App.DAL assembly-sindəki bütün IEntityTypeConfiguration<T>
-            // implementasiyalarını avtomatik tapır və tətbiq edir
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         }
 
-        /// <summary>
-        /// AuditableEntity-lər üçün CreatedOn və UpdatedOn sahələrini avtomatik setləyir.
-        /// </summary>
-        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        private void ApplySoftDeleteQueryFilters(ModelBuilder modelBuilder)
         {
-            var now = DateTimeOffset.UtcNow;
-
-            foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
-                switch (entry.State)
-                {
-                    case EntityState.Added:
-                        entry.Entity.CreatedOn = now;
-                        entry.Entity.UpdatedOn = now;
-                        // CreatedBy / UpdatedBy: Auth implementasiyasından sonra real Guid doldurulacaq
-                        // entry.Entity.CreatedBy = currentUserId;
-                        // entry.Entity.UpdatedBy = currentUserId;
-                        break;
+                if (!typeof(SoftDeletableEntity).IsAssignableFrom(entityType.ClrType))
+                    continue;
 
-                    case EntityState.Modified:
-                        entry.Entity.UpdatedOn = now;
-                        // entry.Entity.UpdatedBy = currentUserId;
-                        break;
-                }
+                var parameter = Expression.Parameter(entityType.ClrType, "e");
+
+                var body = Expression.OrElse(
+                    Expression.Equal(
+                        Expression.Property(parameter, nameof(SoftDeletableEntity.IsDeactive)),
+                        Expression.Constant(false)
+                    ),
+                    Expression.Property(
+                        Expression.Constant(this),
+                        nameof(IgnoreSoftDeleteFilter)
+                    )
+                );
+
+                var lambdaType = typeof(Func<,>).MakeGenericType(entityType.ClrType, typeof(bool));
+                var lambda = Expression.Lambda(lambdaType, body, parameter);
+
+                modelBuilder.Entity(entityType.ClrType).HasQueryFilter(lambda);
             }
-
-            return await base.SaveChangesAsync(cancellationToken);
         }
     }
 }

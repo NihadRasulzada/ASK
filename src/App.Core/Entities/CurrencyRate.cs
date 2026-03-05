@@ -1,3 +1,5 @@
+using App.Core.Entities.Common;
+
 namespace App.Core.Entities;
 
 public class CurrencyRate : BaseEntity

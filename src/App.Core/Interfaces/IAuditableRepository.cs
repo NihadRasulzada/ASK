@@ -1,3 +1,5 @@
+using App.Core.Interfaces.Common;
+
 namespace App.Core.Interfaces;
 
 /// <summary>

@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -5,21 +6,52 @@ namespace App.API.Filters;
 
 public class ValidationFilter : IAsyncActionFilter
 {
-    public async Task OnActionExecutionAsync(
-        ActionExecutingContext context,
-        ActionExecutionDelegate next)
-    {
-        if (!context.ModelState.IsValid)
-        {
-            var errors = context.ModelState
-                .Where(e => e.Value?.Errors.Count > 0)
-                .ToDictionary(
-                    e => e.Key,
-                    e => e.Value!.Errors.Select(x => x.ErrorMessage).ToArray()
-                );
+    private readonly IServiceProvider _serviceProvider;
 
-            context.Result = new BadRequestObjectResult(new ValidationErrorResponse(errors));
-            return;
+    public ValidationFilter(IServiceProvider serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+    }
+
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        // Bütün argumentləri yoxla
+        foreach (var argument in context.ActionArguments)
+        {
+            if (argument.Value == null) continue;
+
+            var argumentType = argument.Value.GetType();
+
+            var validatorType = typeof(IValidator<>).MakeGenericType(argumentType);
+            var validator = _serviceProvider.GetService(validatorType) as IValidator;
+
+            if (validator != null)
+            {
+                var validationContext = new ValidationContext<object>(argument.Value);
+                var validationResult = await validator.ValidateAsync(validationContext);
+
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors
+                        .GroupBy(e => e.PropertyName)
+                        .ToDictionary(
+                            g => g.Key,
+                            g => g.Select(e => e.ErrorMessage).ToArray()
+                        );
+
+                    context.Result = new ObjectResult(new
+                    {
+                        success = false,
+                        message = "Validation failed",
+                        errors = errors
+                    })
+                    {
+                        StatusCode = 422
+                    };
+                    return;
+                }
+
+            }
         }
 
         await next();
