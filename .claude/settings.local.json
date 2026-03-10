@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(dir:*)",
+      "Bash(xargs grep -l \"HttpClient\\\\|RestClient\\\\|ApiClient\\\\|HttpRequest\")",
+      "Bash(xargs grep -l \"HttpClient\\\\|using.*Http\\\\|IHttpClientFactory\")",
+      "Bash(find . -name \"*.csproj\" -not -path \"*/obj/*\" -exec grep -l \"HttpClient\\\\|NuGet\\\\|Package\" {} ;)",
+      "Bash(xargs grep -l \"MemoryCache\\\\|IDistributedCache\\\\|Cache\")",
+      "Bash(xargs grep -l \"Currency\\\\|Converter\\\\|Exchange\")",
+      "Bash(find . -type f -name \"*.cs\" -not -path \"*/obj/*\" -not -path \"*/bin/*\" -exec grep -l \"HttpClient\\\\|IHttpClientFactory\\\\|RemoteService\\\\|ExternalApi\" {} ;)",
+      "Bash(xargs grep -l \"BL\")",
+      "Bash(xargs wc -l)",
+      "Bash(xargs -I {} grep -l \"Partner\\\\|Query\\\\|Filter\" {})",
+      "Bash(xargs ls -la)",
+      "Bash(dotnet ef migrations add AddCurrencyRatesTable --project src/App.DAL --startup-project src/App.API)",
+      "Bash(dotnet ef database update --project src/App.DAL --startup-project src/App.API)",
+      "Bash(dotnet ef migrations add AddPresidentTable --project src/App.DAL --startup-project src/App.API)",
+      "Bash(dotnet ef migrations add AddDirectorTable --project src/App.DAL --startup-project src/App.API)"
+    ]
+  }
+}
