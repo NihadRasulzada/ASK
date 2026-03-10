@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class NewsConfiguration : AuditableEntityConfiguration<News>
+public class NewsConfiguration : SoftDeletableEntityConfiguration<News>
 {
     public override void Configure(EntityTypeBuilder<News> builder)
     {

@@ -1,3 +1,5 @@
+using App.Core.Entities.Common;
+
 namespace App.Core.Entities;
 
 public class President : BaseEntity
@@ -5,19 +7,13 @@ public class President : BaseEntity
     public string ImageUrl { get; private set; }
     public string Text { get; private set; }
 
-    // EF Core materialization üçün private parameterless constructor
-    private President()
+    private President() : base(Guid.Empty)
     {
         ImageUrl = string.Empty;
         Text = string.Empty;
     }
 
-    /// <summary>
-    /// Yeni Prezident məlumatı yaradır.
-    /// </summary>
-    /// <param name="imageUrl">Cloudinary şəkil URL-i.</param>
-    /// <param name="text">Prezident haqqında mətn.</param>
-    public President(string imageUrl, string text)
+    public President(string imageUrl, string text) : base(Guid.NewGuid())
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
@@ -29,11 +25,6 @@ public class President : BaseEntity
         Text = text;
     }
 
-    /// <summary>
-    /// Mövcud Prezident məlumatını yeniləyir.
-    /// </summary>
-    /// <param name="imageUrl">Yeni şəkil URL-i; null olarsa köhnə URL saxlanır.</param>
-    /// <param name="text">Yeni mətn.</param>
     public void Update(string? imageUrl, string text)
     {
         if (string.IsNullOrWhiteSpace(text))

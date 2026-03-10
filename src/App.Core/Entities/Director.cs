@@ -1,26 +1,21 @@
+using App.Core.Entities.Common;
+
 namespace App.Core.Entities;
 
-public class Director : BaseEntity
+public class Director : SoftDeletableEntity
 {
     public string ImageUrl { get; private set; }
     public string FullName { get; private set; }
     public string Duty { get; private set; }
 
-    // EF Core materialization üçün private parameterless constructor
-    private Director()
+    private Director() : base(Guid.Empty, false)
     {
         ImageUrl = string.Empty;
         FullName = string.Empty;
         Duty = string.Empty;
     }
 
-    /// <summary>
-    /// Yeni Direktor yaradır.
-    /// </summary>
-    /// <param name="imageUrl">Cloudinary şəkil URL-i.</param>
-    /// <param name="fullName">Direktorun tam adı.</param>
-    /// <param name="duty">Direktorun vəzifəsi.</param>
-    public Director(string imageUrl, string fullName, string duty)
+    public Director(string imageUrl, string fullName, string duty) : base(Guid.NewGuid(), false)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
@@ -36,12 +31,6 @@ public class Director : BaseEntity
         Duty = duty;
     }
 
-    /// <summary>
-    /// Mövcud Direktorun məlumatlarını yeniləyir.
-    /// </summary>
-    /// <param name="imageUrl">Yeni şəkil URL-i; null olarsa köhnə URL saxlanır.</param>
-    /// <param name="fullName">Yeni tam ad.</param>
-    /// <param name="duty">Yeni vəzifə.</param>
     public void Update(string? imageUrl, string fullName, string duty)
     {
         if (string.IsNullOrWhiteSpace(fullName))

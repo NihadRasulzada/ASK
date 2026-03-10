@@ -18,4 +18,9 @@
     <ProjectReference Include="..\App.DAL\App.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Abstractions\" />
+    <Folder Include="Services\Implementations\" />
+  </ItemGroup>
+
 </Project>

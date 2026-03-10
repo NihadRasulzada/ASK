@@ -1,3 +1,5 @@
+using App.Core.Entities.Common;
+
 namespace App.Core.Entities;
 
 public class Video : BaseEntity
@@ -5,7 +7,7 @@ public class Video : BaseEntity
     public string Link { get; private set; }
 
     // EF Core materialization üçün private parameterless constructor
-    private Video()
+    private Video() : base(Guid.Empty)
     {
         Link = string.Empty;
     }
@@ -14,7 +16,7 @@ public class Video : BaseEntity
     /// Yeni Video yaradır.
     /// </summary>
     /// <param name="link">Videonun URL linki.</param>
-    public Video(string link)
+    public Video(string link) : base(Guid.NewGuid())
     {
         if (string.IsNullOrWhiteSpace(link))
             throw new ArgumentException("Link boş ola bilməz.", nameof(link));

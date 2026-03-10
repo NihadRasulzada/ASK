@@ -1,11 +1,11 @@
 ﻿namespace App.Core.Entities.Common;
 
-public abstract class BaseEntity
+public abstract class BaseEntity(Guid id) : IBaseEntity
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get; private set; } = id;
 
-    protected BaseEntity(Guid id)
+    public override int GetHashCode()
     {
-        Id = id;
+        return Id.GetHashCode();
     }
 }
