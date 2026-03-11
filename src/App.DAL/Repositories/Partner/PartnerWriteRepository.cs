@@ -2,9 +2,6 @@
 using App.Core.Interfaces.Repository.Partner;
 using App.DAL.Context;
 using App.DAL.Repositories.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace App.DAL.Repositories.Partner;
 

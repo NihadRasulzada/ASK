@@ -1,9 +1,6 @@
 ﻿using App.Core.Entities.Common;
 using App.Core.Interfaces.Repository.Common;
 using App.DAL.Context;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace App.DAL.Repositories.Common;
 

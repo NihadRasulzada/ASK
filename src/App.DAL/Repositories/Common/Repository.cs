@@ -2,9 +2,6 @@
 using App.Core.Interfaces.Repository.Common;
 using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace App.DAL.Repositories.Common;
 

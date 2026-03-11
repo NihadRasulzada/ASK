@@ -1,4 +1,3 @@
-using App.Core.Entities;
 using App.Core.Interfaces.Repository.CurrencyRate;
 using App.DAL.Context;
 using App.DAL.Repositories.Common;

@@ -1,4 +1,3 @@
-using App.Core.Entities;
 using App.Core.Interfaces.Repository.News;
 using App.DAL.Context;
 using App.DAL.Repositories.Common;

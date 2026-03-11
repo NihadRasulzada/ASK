@@ -3,10 +3,7 @@ using App.Core.Interfaces.Repository.Common;
 using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace App.DAL.Repositories.Common;
 
