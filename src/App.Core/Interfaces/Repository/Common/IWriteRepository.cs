@@ -1,6 +1,6 @@
 ﻿using App.Core.Entities.Common;
 
-namespace App.Core.Interfaces.Common;
+namespace App.Core.Interfaces.Repository.Common;
 
 public interface IWriteRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
 {

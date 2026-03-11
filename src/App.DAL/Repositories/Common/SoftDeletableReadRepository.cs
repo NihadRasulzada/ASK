@@ -1,5 +1,5 @@
 ﻿using App.Core.Entities.Common;
-using App.Core.Interfaces.Common;
+using App.Core.Interfaces.Repository.Common;
 using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;

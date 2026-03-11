@@ -1,7 +1,7 @@
 ﻿using App.Core.Entities;
 using App.Core.Entities.Common;
 using App.Core.Enums;
-using App.Core.Interfaces.Common;
+using App.Core.Interfaces.Repository.Common;
 using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;

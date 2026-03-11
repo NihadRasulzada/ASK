@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
-namespace App.Core.Interfaces.Common;
+namespace App.Core.Interfaces.Repository.Common;
 
 public interface IReadRepository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
 {
