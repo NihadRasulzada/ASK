@@ -1,13 +1,27 @@
 using App.API.BackgroundJobs;
 using App.API.Filters;
 using App.API.Middleware;
+using App.API.Services;
 using App.BL.Services.Abstractions;
 using App.BL.Services.Implementations;
 using App.BL.Settings;
 using App.BL.Validators;
 using App.Core.Interfaces;
+using App.Core.Interfaces.Repository.CurrencyRate;
+using App.Core.Interfaces.Repository.Director;
+using App.Core.Interfaces.Repository.News;
+using App.Core.Interfaces.Repository.Partner;
+using App.Core.Interfaces.Repository.President;
+using App.Core.Interfaces.Repository.Service;
+using App.Core.Interfaces.Repository.Video;
 using App.DAL.Context;
-using App.DAL.Repositories;
+using App.DAL.Repositories.CurrencyRate;
+using App.DAL.Repositories.Director;
+using App.DAL.Repositories.News;
+using App.DAL.Repositories.Partner;
+using App.DAL.Repositories.President;
+using App.DAL.Repositories.Service;
+using App.DAL.Repositories.Video;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -107,13 +121,21 @@ builder.Services.AddHttpClient("ExchangeRate", (sp, client) =>
         new MediaTypeWithQualityHeaderValue("application/json"));
 });
 
+// ── HttpContextAccessor / CurrentUser ─────────────────────────────────────────
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 // ── Repositories ──────────────────────────────────────────────────────────────
-builder.Services.AddScoped<IVideoRepository, VideoRepository>();
-builder.Services.AddScoped<IPartnerRepository, PartnerRepository>();
-builder.Services.AddScoped<INewsRepository, NewsRepository>();
-builder.Services.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
-builder.Services.AddScoped<IPresidentRepository, PresidentRepository>();
-builder.Services.AddScoped<IDirectorRepository, DirectorRepository>();
+builder.Services.AddScoped<IVideoReadRepository, VideoReadRepository>();
+builder.Services.AddScoped<IPartnerReadRepository, PartnerReadRepository>();
+builder.Services.AddScoped<INewsReadRepository, NewsReadRepository>();
+builder.Services.AddScoped<ICurrencyRateReadRepository, CurrencyRateReadRepository>();
+builder.Services.AddScoped<IPresidentReadRepository, PresidentReadRepository>();
+builder.Services.AddScoped<IDirectorReadRepository, DirectorReadRepository>();
+builder.Services.AddScoped<IServiceReadRepository, ServiceReadRepository>();
+
+// ── Language Service ──────────────────────────────────────────────────────────
+builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
@@ -123,6 +145,7 @@ builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<IPresidentService, PresidentService>();
 builder.Services.AddScoped<IDirectorService, DirectorService>();
+builder.Services.AddScoped<IServiceService, ServiceService>();
 
 // ── Background Jobs ───────────────────────────────────────────────────────────
 builder.Services.AddHostedService<CurrencyBackgroundJob>();
@@ -139,6 +162,8 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseMiddleware<LanguageMiddleware>();
 
 app.MapControllers();
 

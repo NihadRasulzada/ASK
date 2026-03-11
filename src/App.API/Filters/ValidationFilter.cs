@@ -1,3 +1,5 @@
+using App.BL.Resources;
+using App.Core.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -7,15 +9,16 @@ namespace App.API.Filters;
 public class ValidationFilter : IAsyncActionFilter
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILanguageService _languageService;
 
-    public ValidationFilter(IServiceProvider serviceProvider)
+    public ValidationFilter(IServiceProvider serviceProvider, ILanguageService languageService)
     {
         _serviceProvider = serviceProvider;
+        _languageService = languageService;
     }
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        // Bütün argumentləri yoxla
         foreach (var argument in context.ActionArguments)
         {
             if (argument.Value == null) continue;
@@ -42,7 +45,7 @@ public class ValidationFilter : IAsyncActionFilter
                     context.Result = new ObjectResult(new
                     {
                         success = false,
-                        message = "Validation failed",
+                        message = ValidationMessages.ValidationFailed(_languageService.Lang),
                         errors = errors
                     })
                     {
@@ -50,7 +53,6 @@ public class ValidationFilter : IAsyncActionFilter
                     };
                     return;
                 }
-
             }
         }
 
