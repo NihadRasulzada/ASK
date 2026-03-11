@@ -1,14 +1,8 @@
 using App.Core.Entities;
 using App.Core.Entities.Common;
-using App.Core.Enums
-using App.Core.Interfaces;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Security.AccessControl;
 
 namespace App.DAL.Context
 {

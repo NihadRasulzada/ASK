@@ -1,5 +1,4 @@
 ﻿using App.Core.Entities.Common;
-using App.Core.Enums;
 using App.Core.Interfaces.Repository.Common;
 using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
@@ -64,14 +63,14 @@ public class ReadRepository<TEntity>(AppDbContext context) : Repository<TEntity>
         return await query.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 
-    public async Task<IEnumerable<TEntity>> GetByCreatorAsync(string createdBy, CancellationToken cancellationToken)
-    {
-        IQueryable<AuditLog> query = context.Set<AuditLog>().Where(a => a.EntityName == typeof(TEntity).Name && a.ChangeType == AuditAction.Create && a.UserId == createdBy);
+    //public async Task<IEnumerable<TEntity>> GetByCreatorAsync(string createdBy, CancellationToken cancellationToken)
+    //{
+    //    IQueryable<AuditLog> query = context.Set<AuditLog>().Where(a => a.EntityName == typeof(TEntity).Name && a.ChangeType == AuditAction.Create && a.UserId == createdBy);
 
-        var entityIds = query.Select(a => a.EntityId);
+    //    var entityIds = query.Select(a => a.EntityId);
 
-        return await Table.Where(e => entityIds.Contains(e.Id)).ToListAsync(cancellationToken);
-    }
+    //    return await Table.Where(e => entityIds.Contains(e.Id)).ToListAsync(cancellationToken);
+    //}
 
     public async Task<TEntity?> GetByIdAsync(Guid id, bool enableTracking, CancellationToken cancellationToken, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
     {
@@ -86,26 +85,26 @@ public class ReadRepository<TEntity>(AppDbContext context) : Repository<TEntity>
         return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<TEntity>> GetByModifierAsync(string updatedBy, CancellationToken cancellationToken)
-    {
-        IQueryable<AuditLog> query = context.Set<AuditLog>().Where(a => a.EntityName == typeof(TEntity).Name && a.ChangeType == AuditAction.Update && a.UserId == updatedBy);
+    //public async Task<IEnumerable<TEntity>> GetByModifierAsync(string updatedBy, CancellationToken cancellationToken)
+    //{
+    //    IQueryable<AuditLog> query = context.Set<AuditLog>().Where(a => a.EntityName == typeof(TEntity).Name && a.ChangeType == AuditAction.Update && a.UserId == updatedBy);
 
-        var entityIds = query.Select(a => a.EntityId);
-        return await Table.Where(e => entityIds.Contains(e.Id)).ToListAsync(cancellationToken);
-    }
+    //    var entityIds = query.Select(a => a.EntityId);
+    //    return await Table.Where(e => entityIds.Contains(e.Id)).ToListAsync(cancellationToken);
+    //}
 
-    public async Task<IEnumerable<TEntity>> GetCreatedBetweenAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
-    {
-        IQueryable<AuditLog> query = context.Set<AuditLog>().Where(a => a.EntityName == typeof(TEntity).Name && a.ChangeType == AuditAction.Create && a.ChangeDate >= startDate && a.ChangeDate <= endDate);
-        var entityIds = query.Select(a => a.EntityId);
-        return await Table.Where(e => entityIds.Contains(e.Id)).ToListAsync(cancellationToken);
-    }
-    public async Task<IEnumerable<TEntity>> GetModifiedBetweenAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
-    {
-        IQueryable<AuditLog> query = context.Set<AuditLog>().Where(a => a.EntityName == typeof(TEntity).Name && a.ChangeType == AuditAction.Update && a.ChangeDate >= startDate && a.ChangeDate <= endDate);
-        var entityIds = query.Select(a => a.EntityId);
-        return await Table.Where(e => entityIds.Contains(e.Id)).ToListAsync(cancellationToken);
-    }
+    //public async Task<IEnumerable<TEntity>> GetCreatedBetweenAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
+    //{
+    //    IQueryable<AuditLog> query = context.Set<AuditLog>().Where(a => a.EntityName == typeof(TEntity).Name && a.ChangeType == AuditAction.Create && a.ChangeDate >= startDate && a.ChangeDate <= endDate);
+    //    var entityIds = query.Select(a => a.EntityId);
+    //    return await Table.Where(e => entityIds.Contains(e.Id)).ToListAsync(cancellationToken);
+    //}
+    //public async Task<IEnumerable<TEntity>> GetModifiedBetweenAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken)
+    //{
+    //    IQueryable<AuditLog> query = context.Set<AuditLog>().Where(a => a.EntityName == typeof(TEntity).Name && a.ChangeType == AuditAction.Update && a.ChangeDate >= startDate && a.ChangeDate <= endDate);
+    //    var entityIds = query.Select(a => a.EntityId);
+    //    return await Table.Where(e => entityIds.Contains(e.Id)).ToListAsync(cancellationToken);
+    //}
 
     public async Task<(IEnumerable<TEntity> Items, int TotalCount)> GetPagedAsync(bool enableTracking, bool ignoreQueryFilters, int pageIndex, int pageSize, CancellationToken cancellationToken, Expression<Func<TEntity, bool>>? predicate = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null)
     {
