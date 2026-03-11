@@ -1,4 +1,5 @@
 ﻿using App.Core.Entities.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,6 @@ public class SoftDeletableEntityConfiguration<TEntity> : BaseEntityConfiguration
 
         builder.Property(e => e.IsDeactive)
             .IsRequired()
-            .HasDefaultValue(false);
+            .HasDefaultValueSql("0");
     }
 }
