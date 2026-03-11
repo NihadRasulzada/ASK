@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace App.BL.Services.Abstractions;
+namespace App.BL.Services.External;
 
 public interface ICloudinaryService
 {

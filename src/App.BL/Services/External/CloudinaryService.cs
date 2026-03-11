@@ -1,11 +1,10 @@
-using App.BL.Services.Abstractions;
 using App.BL.Settings;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace App.BL.Services.Implementations;
+namespace App.BL.Services.External;
 
 public class CloudinaryService : ICloudinaryService
 {
