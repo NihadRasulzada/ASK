@@ -1,4 +1,6 @@
 using App.BL.DTOs;
+using App.BL.Resources;
+using App.Core.Interfaces;
 using FluentValidation;
 
 namespace App.BL.Validators;
@@ -8,25 +10,25 @@ public class UpdateDirectorDtoValidator : AbstractValidator<UpdateDirectorDto>
     private static readonly string[] AllowedContentTypes =
         ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
-    private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
+    private const long MaxFileSizeBytes = 5 * 1024 * 1024;
 
-    public UpdateDirectorDtoValidator()
+    public UpdateDirectorDtoValidator(ILanguageService languageService)
     {
         When(x => x.Image is not null, () =>
         {
             RuleFor(x => x.Image!)
                 .Must(f => f.Length <= MaxFileSizeBytes)
-                    .WithMessage("Şəklin ölçüsü 5 MB-dan çox ola bilməz.")
+                    .WithMessage(ValidationMessages.ImageTooLarge(languageService.Lang))
                 .Must(f => AllowedContentTypes.Contains(f.ContentType.ToLower()))
-                    .WithMessage("Yalnız JPEG, PNG, GIF və ya WebP formatında şəkil yüklənə bilər.");
+                    .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
         });
 
         RuleFor(x => x.FullName)
-            .NotEmpty().WithMessage("Tam ad mütləq daxil edilməlidir.")
-            .MaximumLength(200).WithMessage("Tam ad 200 simvoldan çox ola bilməz.");
+            .NotEmpty().WithMessage(ValidationMessages.FullNameRequired(languageService.Lang))
+            .MaximumLength(200).WithMessage(ValidationMessages.FullNameTooLong(languageService.Lang));
 
         RuleFor(x => x.Duty)
-            .NotEmpty().WithMessage("Vəzifə mütləq daxil edilməlidir.")
-            .MaximumLength(200).WithMessage("Vəzifə 200 simvoldan çox ola bilməz.");
+            .NotEmpty().WithMessage(ValidationMessages.DutyRequired(languageService.Lang))
+            .MaximumLength(200).WithMessage(ValidationMessages.DutyTooLong(languageService.Lang));
     }
 }

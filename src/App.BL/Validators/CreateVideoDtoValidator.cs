@@ -1,16 +1,18 @@
 using App.BL.DTOs;
+using App.BL.Resources;
+using App.Core.Interfaces;
 using FluentValidation;
 
 namespace App.BL.Validators;
 
 public class CreateVideoDtoValidator : AbstractValidator<CreateVideoDto>
 {
-    public CreateVideoDtoValidator()
+    public CreateVideoDtoValidator(ILanguageService languageService)
     {
         RuleFor(x => x.Link)
-            .NotEmpty().WithMessage("Link mütləq daxil edilməlidir.")
-            .MaximumLength(2048).WithMessage("Link 2048 simvoldan çox ola bilməz.")
-            .Must(BeAValidUrl).WithMessage("Link düzgün bir URL olmalıdır (http və ya https).");
+            .NotEmpty().WithMessage(ValidationMessages.LinkRequired(languageService.Lang))
+            .MaximumLength(2048).WithMessage(ValidationMessages.LinkTooLong(languageService.Lang))
+            .Must(BeAValidUrl).WithMessage(ValidationMessages.LinkInvalidUrl(languageService.Lang));
     }
 
     private static bool BeAValidUrl(string url)

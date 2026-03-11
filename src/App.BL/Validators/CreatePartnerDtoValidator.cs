@@ -1,4 +1,6 @@
 using App.BL.DTOs;
+using App.BL.Resources;
+using App.Core.Interfaces;
 using FluentValidation;
 
 namespace App.BL.Validators;
@@ -8,21 +10,21 @@ public class CreatePartnerDtoValidator : AbstractValidator<CreatePartnerDto>
     private static readonly string[] AllowedContentTypes =
         ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
-    private const long MaxFileSizeBytes = 5 * 1024 * 1024; // 5 MB
+    private const long MaxFileSizeBytes = 5 * 1024 * 1024;
 
-    public CreatePartnerDtoValidator()
+    public CreatePartnerDtoValidator(ILanguageService languageService)
     {
         RuleFor(x => x.Image)
-            .NotNull().WithMessage("Şəkil mütləq daxil edilməlidir.")
+            .NotNull().WithMessage(ValidationMessages.ImageRequired(languageService.Lang))
             .Must(f => f.Length <= MaxFileSizeBytes)
-                .WithMessage("Şəkil ölçüsü 5 MB-dan çox ola bilməz.")
+                .WithMessage(ValidationMessages.ImageTooLarge(languageService.Lang))
             .Must(f => AllowedContentTypes.Contains(f.ContentType.ToLower()))
-                .WithMessage("Yalnız JPEG, PNG, GIF və ya WebP formatında şəkil yüklənə bilər.");
+                .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
 
         RuleFor(x => x.Site)
-            .NotEmpty().WithMessage("Sayt URL-i mütləq daxil edilməlidir.")
-            .MaximumLength(2048).WithMessage("Sayt URL-i 2048 simvoldan çox ola bilməz.")
-            .Must(BeAValidUrl).WithMessage("Sayt URL-i düzgün bir URL olmalıdır (http və ya https).");
+            .NotEmpty().WithMessage(ValidationMessages.SiteRequired(languageService.Lang))
+            .MaximumLength(2048).WithMessage(ValidationMessages.SiteTooLong(languageService.Lang))
+            .Must(BeAValidUrl).WithMessage(ValidationMessages.SiteInvalidUrl(languageService.Lang));
     }
 
     private static bool BeAValidUrl(string url)
