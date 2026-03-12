@@ -28,7 +28,7 @@ public class ServiceConfiguration : IEntityTypeConfiguration<Service>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(e => e.CreatedAt)
+        builder.Property(e => e.ActivateAt)
             .IsRequired();
     }
 }

@@ -45,6 +45,11 @@ public class WriteRepository<TEntity>(AppDbContext context, IReadRepository<TEnt
         )).ContinueWith(_ => Table.RemoveRange(entities), cancellationToken);
     }
 
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
+    {
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
     public void Update(TEntity entity)
     {
         Table.Update(entity);

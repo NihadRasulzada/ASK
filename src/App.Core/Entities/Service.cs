@@ -9,7 +9,7 @@ public class Service : SoftDeletableEntity
     public string NameAz { get; private set; }
     public string NameEn { get; private set; }
     public string NameRu { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public DateTime ActivateAt { get; private set; }
 
     private Service() : base(Guid.Empty, false)
     {
@@ -37,7 +37,7 @@ public class Service : SoftDeletableEntity
         NameAz = nameAz;
         NameEn = nameEn;
         NameRu = nameRu;
-        CreatedAt = DateTime.UtcNow;
+        ActivateAt = DateTime.UtcNow;
     }
 
     public void Update(string? imageUrl, string nameAz, string nameEn, string nameRu)

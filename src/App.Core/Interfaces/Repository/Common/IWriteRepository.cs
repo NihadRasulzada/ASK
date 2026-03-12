@@ -12,4 +12,6 @@ public interface IWriteRepository<TEntity> : IRepository<TEntity> where TEntity 
 
     void Update(TEntity entity);
     void UpdateRange(IEnumerable<TEntity> entities);
+
+    Task SaveChangesAsync(CancellationToken cancellationToken);
 }
