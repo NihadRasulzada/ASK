@@ -16,11 +16,11 @@ public class DirectorConfiguration : IEntityTypeConfiguration<Director>
         builder.Property(e => e.ImageUrl)
             .IsRequired();
 
-        builder.Property(e => e.FullName)
+        builder.Property(e => e.FullNameAz)
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(e => e.Duty)
+        builder.Property(e => e.DutyAz)
             .IsRequired()
             .HasMaxLength(200);
     }

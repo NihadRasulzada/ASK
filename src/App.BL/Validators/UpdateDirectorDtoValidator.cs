@@ -23,11 +23,11 @@ public class UpdateDirectorDtoValidator : AbstractValidator<UpdateDirectorDto>
                     .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
         });
 
-        RuleFor(x => x.FullName)
+        RuleFor(x => x.FullNameAz)
             .NotEmpty().WithMessage(ValidationMessages.FullNameRequired(languageService.Lang))
             .MaximumLength(200).WithMessage(ValidationMessages.FullNameTooLong(languageService.Lang));
 
-        RuleFor(x => x.Duty)
+        RuleFor(x => x.DutyAz)
             .NotEmpty().WithMessage(ValidationMessages.DutyRequired(languageService.Lang))
             .MaximumLength(200).WithMessage(ValidationMessages.DutyTooLong(languageService.Lang));
     }

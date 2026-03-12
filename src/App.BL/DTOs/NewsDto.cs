@@ -8,13 +8,12 @@ namespace App.BL.DTOs;
 /// </summary>
 public class CreateNewsDto
 {
-    /// <summary>Xəbərin başlıq şəkli (məcburi).</summary>
     public IFormFile TitleImage { get; set; } = null!;
 
-    /// <summary>Xəbərin mətni.</summary>
-    public string NewsText { get; set; } = string.Empty;
+    public string NewsTextAz { get; set; } = string.Empty;
+    public string NewsTextEn { get; set; } = string.Empty;
+    public string NewsTextRu { get; set; } = string.Empty;
 
-    /// <summary>Əlavə şəkillər (könüllü).</summary>
     public List<IFormFile>? AdditionalImages { get; set; }
 }
 
@@ -23,13 +22,12 @@ public class CreateNewsDto
 /// </summary>
 public class UpdateNewsDto
 {
-    /// <summary>Yeni başlıq şəkli; null olarsa mövcud şəkil URL-i saxlanır.</summary>
     public IFormFile? TitleImage { get; set; }
 
-    /// <summary>Yeni xəbər mətni.</summary>
-    public string NewsText { get; set; } = string.Empty;
+    public string NewsTextAz { get; set; } = string.Empty;
+    public string NewsTextEn { get; set; } = string.Empty;
+    public string NewsTextRu { get; set; } = string.Empty;
 
-    /// <summary>Yeni əlavə şəkillər; null olarsa mövcud URL siyahısı saxlanır.</summary>
     public List<IFormFile>? AdditionalImages { get; set; }
 }
 
@@ -48,4 +46,4 @@ public record NewsResponseDto(
     string NewsText,
     IList<string> ImageUrls,
     DateTimeOffset CreatedOn,
-    bool IsActive);
+    bool IsDeactive);

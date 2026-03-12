@@ -2,8 +2,11 @@ using App.API.BackgroundJobs;
 using App.API.Filters;
 using App.API.Middleware;
 using App.API.Services;
-using App.BL.Services.Abstractions;
-using App.BL.Services.Implementations;
+using App.BL.Services.Business.CurrencyRate;
+using App.BL.Services.Business.Director;
+using App.BL.Services.Business.News;
+using App.BL.Services.Business.Service;
+using App.BL.Services.External;
 using App.BL.Settings;
 using App.BL.Validators;
 using App.Core.Interfaces;
@@ -123,7 +126,7 @@ builder.Services.AddHttpClient("ExchangeRate", (sp, client) =>
 
 // ── HttpContextAccessor / CurrentUser ─────────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+//builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoReadRepository, VideoReadRepository>();
@@ -138,17 +141,17 @@ builder.Services.AddScoped<IServiceReadRepository, ServiceReadRepository>();
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
-builder.Services.AddScoped<IVideoService, VideoService>();
+//builder.Services.AddScoped<IVideoService, VideoService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-builder.Services.AddScoped<IPartnerService, PartnerService>();
+//builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
-builder.Services.AddScoped<IPresidentService, PresidentService>();
+//builder.Services.AddScoped<IPresidentService, PresidentService>();
 builder.Services.AddScoped<IDirectorService, DirectorService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 
 // ── Background Jobs ───────────────────────────────────────────────────────────
-builder.Services.AddHostedService<CurrencyBackgroundJob>();
+//builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
 // ─────────────────────────────────────────────────────────────────────────────
 

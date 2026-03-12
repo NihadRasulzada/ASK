@@ -16,7 +16,16 @@
       "Bash(dotnet ef migrations add AddCurrencyRatesTable --project src/App.DAL --startup-project src/App.API)",
       "Bash(dotnet ef database update --project src/App.DAL --startup-project src/App.API)",
       "Bash(dotnet ef migrations add AddPresidentTable --project src/App.DAL --startup-project src/App.API)",
-      "Bash(dotnet ef migrations add AddDirectorTable --project src/App.DAL --startup-project src/App.API)"
+      "Bash(dotnet ef migrations add AddDirectorTable --project src/App.DAL --startup-project src/App.API)",
+      "Bash(dotnet ef migrations add AddServicesTable -p src/App.DAL -s src/App.API)",
+      "Bash(dotnet ef database update -p src/App.DAL -s src/App.API)",
+      "Bash(xargs grep -l -i \"setting\")",
+      "Bash(xargs grep -l \"ISettingRepository\\\\|SettingService\\\\|SettingController\")",
+      "Bash(xargs grep -l \"IStringLocalizer\\\\|Locali\")",
+      "Bash(xargs grep -l \"Exception\")",
+      "Bash(xargs grep -l \"IStringLocalizer\\\\|ICurrentUserService\\\\|ILanguageService\")",
+      "Bash(xargs grep -l \"ICurrentUserService\")",
+      "Bash(xargs grep -l \"public interface ICurrentUserService\")"
     ]
   }
 }

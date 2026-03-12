@@ -16,7 +16,7 @@ public class NewsConfiguration : SoftDeletableEntityConfiguration<News>
         builder.Property(n => n.TitleImageUrl)
             .IsRequired();
 
-        builder.Property(n => n.NewsText)
+        builder.Property(n => n.NewsTextAz)
             .IsRequired();
 
         // IEnumerable<string> — EF Core 8+ PrimitiveCollection API ilə

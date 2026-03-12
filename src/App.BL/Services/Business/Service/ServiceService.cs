@@ -2,12 +2,9 @@ using App.BL.DTOs;
 using App.BL.Mapper.Service;
 using App.BL.Services.External;
 using App.Core.Interfaces;
-using App.Core.Interfaces.Repository.Common;
 using App.Core.Interfaces.Repository.Service;
 using App.Core.ResponseObject.Concreate;
 using App.DAL.Context;
-using App.DAL.Extensions;
-using App.DAL.Repositories.Common;
 
 namespace App.BL.Services.Business.Service;
 

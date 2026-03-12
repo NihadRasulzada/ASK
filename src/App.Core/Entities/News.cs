@@ -5,38 +5,65 @@ namespace App.Core.Entities;
 public class News : SoftDeletableEntity
 {
     public string TitleImageUrl { get; private set; }
-    public string NewsText { get; private set; }
+    public string NewsTextAz { get; private set; }
+    public string NewsTextEn { get; private set; }
+    public string NewsTextRu { get; private set; }
     public IList<string> ImageUrls { get; private set; }
 
     private News() : base(Guid.Empty, false)
     {
-        TitleImageUrl = string.Empty;
-        NewsText = string.Empty;
         ImageUrls = new List<string>();
     }
 
-    public News(string titleImageUrl, string newsText, IList<string> imageUrls) : base(Guid.NewGuid(), false)
+    public News(
+        string titleImageUrl,
+        string newsTextAz,
+        string newsTextEn,
+        string newsTextRu,
+        IList<string>? imageUrls)
+        : base(Guid.NewGuid(), false)
     {
         if (string.IsNullOrWhiteSpace(titleImageUrl))
-            throw new ArgumentException("Başlıq şəkli URL-i boş ola bilməz.", nameof(titleImageUrl));
+            throw new ArgumentException("Title image url cannot be empty", nameof(titleImageUrl));
 
-        if (string.IsNullOrWhiteSpace(newsText))
-            throw new ArgumentException("Xəbər mətni boş ola bilməz.", nameof(newsText));
+        if (string.IsNullOrWhiteSpace(newsTextAz))
+            throw new ArgumentException("AZ news text cannot be empty", nameof(newsTextAz));
+
+        if (string.IsNullOrWhiteSpace(newsTextEn))
+            throw new ArgumentException("EN news text cannot be empty", nameof(newsTextEn));
+
+        if (string.IsNullOrWhiteSpace(newsTextRu))
+            throw new ArgumentException("RU news text cannot be empty", nameof(newsTextRu));
 
         TitleImageUrl = titleImageUrl;
-        NewsText = newsText;
+        NewsTextAz = newsTextAz;
+        NewsTextEn = newsTextEn;
+        NewsTextRu = newsTextRu;
         ImageUrls = imageUrls ?? new List<string>();
     }
 
-    public void Update(string? titleImageUrl, string newsText, IList<string>? imageUrls)
+    public void Update(
+        string? titleImageUrl,
+        string newsTextAz,
+        string newsTextEn,
+        string newsTextRu,
+        IList<string>? imageUrls)
     {
-        if (string.IsNullOrWhiteSpace(newsText))
-            throw new ArgumentException("Xəbər mətni boş ola bilməz.", nameof(newsText));
+        if (string.IsNullOrWhiteSpace(newsTextAz))
+            throw new ArgumentException("AZ news text cannot be empty", nameof(newsTextAz));
+
+        if (string.IsNullOrWhiteSpace(newsTextEn))
+            throw new ArgumentException("EN news text cannot be empty", nameof(newsTextEn));
+
+        if (string.IsNullOrWhiteSpace(newsTextRu))
+            throw new ArgumentException("RU news text cannot be empty", nameof(newsTextRu));
 
         if (titleImageUrl is not null)
             TitleImageUrl = titleImageUrl;
 
-        NewsText = newsText;
+        NewsTextAz = newsTextAz;
+        NewsTextEn = newsTextEn;
+        NewsTextRu = newsTextRu;
 
         if (imageUrls is not null)
             ImageUrls = imageUrls;

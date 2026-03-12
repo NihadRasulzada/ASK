@@ -1,10 +1,7 @@
 ﻿using App.DAL.Context;
 using Microsoft.EntityFrameworkCore.Metadata;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 
 namespace App.DAL.Extensions;
 

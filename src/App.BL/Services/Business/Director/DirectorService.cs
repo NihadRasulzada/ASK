@@ -1,11 +1,9 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Director;
 using App.BL.Services.External;
-using App.Core.Entities;
 using App.Core.Interfaces.Repository.Director;
 using App.Core.ResponseObject.Concreate;
 using App.DAL.Context;
-using Microsoft.EntityFrameworkCore;
 
 namespace App.BL.Services.Business.Director;
 

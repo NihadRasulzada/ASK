@@ -23,7 +23,7 @@ public class UpdateNewsDtoValidator : AbstractValidator<UpdateNewsDto>
                     .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
         });
 
-        RuleFor(x => x.NewsText)
+        RuleFor(x => x.NewsTextAz)
             .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
             .MaximumLength(10000).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));
 
