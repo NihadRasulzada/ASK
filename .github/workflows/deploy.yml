@@ -29,30 +29,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH with password
+
+      - name: Deploy to server
         uses: appleboy/ssh-action@v1
-        env:
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_CONNECTION: ${{ secrets.DB_CONNECTION }}
-          CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}
-          CLOUDINARY_KEY: ${{ secrets.CLOUDINARY_KEY }}
-          CLOUDINARY_SECRET: ${{ secrets.CLOUDINARY_SECRET }}
-          EXCHANGE_API_KEY: ${{ secrets.EXCHANGE_API_KEY }}
+
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}   # <-- buraya password verirsen
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: 22
+
           script: |
             cd /home/app
-
-            export DB_PASSWORD=$DB_PASSWORD
-            export DB_CONNECTION="$DB_CONNECTION"
-
-            export CLOUDINARY_NAME=$CLOUDINARY_NAME
-            export CLOUDINARY_KEY=$CLOUDINARY_KEY
-            export CLOUDINARY_SECRET=$CLOUDINARY_SECRET
-
-            export EXCHANGE_API_KEY=$EXCHANGE_API_KEY
-
             docker compose pull
             docker compose up -d

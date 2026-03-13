@@ -228,6 +228,11 @@ builder.Services.AddScoped<IServiceService, ServiceService>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+}
+
 app.UseExceptionHandler();
 
 app.UseSwagger();
