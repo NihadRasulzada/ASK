@@ -1,0 +1,100 @@
+using App.BL.DTOs;
+using App.BL.Mapper.NewsImage;
+using App.BL.NewsImages.Business.NewsIamge;
+using App.BL.Services.External;
+using App.Core.Interfaces.Repository.NewsImage;
+using App.Core.ResponseObject.Concreate;
+
+namespace App.BL.Services.Business.NewsIamge;
+
+public class NewsImageService : INewsImageService
+{
+    private readonly ICloudinaryService cloudinaryService;
+    private readonly INewsImageWriteRepository writeRepository;
+    private readonly INewsImageReadRepository readRepository;
+    private readonly INewsImageMapper mapper;
+
+    public NewsImageService(ICloudinaryService cloudinaryService, INewsImageWriteRepository writeRepository, INewsImageReadRepository readRepository, INewsImageMapper mapper)
+    {
+        this.cloudinaryService = cloudinaryService;
+        this.writeRepository = writeRepository;
+        this.readRepository = readRepository;
+        this.mapper = mapper;
+    }
+
+    public async Task<Response> CreateAsync(CreateNewsImageDto dto, CancellationToken cancellationToken = default)
+    {
+        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+
+        Core.Entities.NewsImage entity = mapper.CreateDtoToDomain(dto, imageUrl);
+
+        await writeRepository.AddAsync(entity, cancellationToken);
+        await writeRepository.SaveChangesAsync(cancellationToken);
+
+        return Response.Success("News image created successfully");
+    }
+
+    public async Task<Response> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        //cloudinarydana silimmelidir
+        Core.Entities.NewsImage? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
+
+        if (entity == null)
+            return Response.NotFound("News image not found");
+
+        await writeRepository.HardDeleteAsync(id, cancellationToken);
+        await writeRepository.SaveChangesAsync(cancellationToken);
+
+        return Response.Success("News image deleted successfully");
+    }
+
+    public async Task<Response<IEnumerable<NewsImageResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Core.Entities.NewsImage> entities = await readRepository.GetAllAsync(false, cancellationToken, false);
+
+        if (!entities.Any())
+            return Response<IEnumerable<NewsImageResponseDto>>
+                .Success(Enumerable.Empty<NewsImageResponseDto>(), "No news images found");
+
+        IEnumerable<NewsImageResponseDto> result = entities.Select(x => mapper.DomainToResponseDto(x));
+
+        return Response<IEnumerable<NewsImageResponseDto>>
+            .Success(result, $"{result.Count()} news images retrieved successfully");
+    }
+
+    public async Task<Response<NewsImageResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        Core.Entities.NewsImage? entity = await readRepository.GetByIdAsync(id, false, cancellationToken);
+
+        if (entity == null)
+            return Response<NewsImageResponseDto?>.NotFound("News image not found");
+
+        NewsImageResponseDto dto = mapper.DomainToResponseDto(entity);
+
+        return Response<NewsImageResponseDto?>.Success(dto, "News image retrieved successfully");
+    }
+
+    public async Task<Response<NewsImageResponseDto?>> UpdateAsync(UpdateNewsImageDto dto, CancellationToken cancellationToken = default)
+    {
+        Core.Entities.NewsImage? entity = await readRepository.GetByIdAsync(dto.Id, true, cancellationToken);
+
+        if (entity == null)
+            return Response<NewsImageResponseDto?>.NotFound("News image not found");
+
+        string imageUrl = entity.ImageUrl;
+
+        if (dto.Image != null)
+        {
+            imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        }
+
+        mapper.UpdateDtoToDomain(entity, dto, imageUrl);
+
+        writeRepository.Update(entity);
+        await writeRepository.SaveChangesAsync(cancellationToken);
+
+        NewsImageResponseDto response = mapper.DomainToResponseDto(entity);
+
+        return Response<NewsImageResponseDto?>.Success(response, "News image updated successfully");
+    }
+}

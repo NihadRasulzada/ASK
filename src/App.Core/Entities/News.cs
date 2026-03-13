@@ -8,19 +8,17 @@ public class News : SoftDeletableEntity
     public string NewsTextAz { get; private set; }
     public string NewsTextEn { get; private set; }
     public string NewsTextRu { get; private set; }
-    public IList<string> ImageUrls { get; private set; }
+    public ICollection<string> ImageUrls { get; set; }
 
     private News() : base(Guid.Empty, false)
     {
-        ImageUrls = new List<string>();
     }
 
     public News(
         string titleImageUrl,
         string newsTextAz,
         string newsTextEn,
-        string newsTextRu,
-        IList<string>? imageUrls)
+        string newsTextRu)
         : base(Guid.NewGuid(), false)
     {
         if (string.IsNullOrWhiteSpace(titleImageUrl))
@@ -39,15 +37,12 @@ public class News : SoftDeletableEntity
         NewsTextAz = newsTextAz;
         NewsTextEn = newsTextEn;
         NewsTextRu = newsTextRu;
-        ImageUrls = imageUrls ?? new List<string>();
     }
 
     public void Update(
-        string? titleImageUrl,
         string newsTextAz,
         string newsTextEn,
-        string newsTextRu,
-        IList<string>? imageUrls)
+        string newsTextRu)
     {
         if (string.IsNullOrWhiteSpace(newsTextAz))
             throw new ArgumentException("AZ news text cannot be empty", nameof(newsTextAz));
@@ -58,14 +53,8 @@ public class News : SoftDeletableEntity
         if (string.IsNullOrWhiteSpace(newsTextRu))
             throw new ArgumentException("RU news text cannot be empty", nameof(newsTextRu));
 
-        if (titleImageUrl is not null)
-            TitleImageUrl = titleImageUrl;
-
         NewsTextAz = newsTextAz;
         NewsTextEn = newsTextEn;
         NewsTextRu = newsTextRu;
-
-        if (imageUrls is not null)
-            ImageUrls = imageUrls;
     }
 }
