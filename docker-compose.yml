@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ask-sqlserver
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1433:1433"
+    networks:
+      - ask-network
+
+
+  api:
+    build:
+      context: .
+      dockerfile: App.API/Dockerfile   # <-- project-root içində Dockerfile yeri
+    image: ghcr.io/YOUR_USERNAME/ask-api:latest
+    container_name: ask-api
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: ${DB_CONNECTION}
+      CloudinarySettings__CloudName: ${CLOUDINARY_NAME}
+      CloudinarySettings__ApiKey: ${CLOUDINARY_KEY}
+      CloudinarySettings__ApiSecret: ${CLOUDINARY_SECRET}
+      ExchangeRateSettings__ApiKey: ${EXCHANGE_API_KEY}
+    ports:
+      - "8080:8080"
+    networks:
+      - ask-network
+
+networks:
+  ask-network:
+    driver: bridge
