@@ -18,10 +18,10 @@ jobs:
 
       - name: Build Image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/ask-api:latest -f src/App.API/Dockerfile src
+          docker build -t ghcr.io/nihadrasulzada/ask/ask-api:latest -f src/App.API/Dockerfile src
 
       - name: Push Image
-        run: docker push ghcr.io/${{ github.repository }}/ask-api:latest
+        run: docker push ghcr.io/nihadrasulzada/ask/ask-api:latest
 
 
   deploy:
