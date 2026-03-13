@@ -18,7 +18,7 @@ services:
     build:
       context: .
       dockerfile: App.API/Dockerfile   # <-- project-root içində Dockerfile yeri
-    image: ghcr.io/YOUR_USERNAME/ask-api:latest
+    image: ghcr.io/nihadrasulzada/ask-api:latest
     container_name: ask-api
     depends_on:
       - db
