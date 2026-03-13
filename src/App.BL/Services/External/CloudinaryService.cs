@@ -27,7 +27,8 @@ public class CloudinaryService : ICloudinaryService
             File = new FileDescription(file.FileName, stream),
             UseFilename = true,
             UniqueFilename = true,
-            Overwrite = false
+            Overwrite = false,
+            Transformation = new Transformation().Quality("auto:best")
         };
 
         var result = await _cloudinary.UploadAsync(uploadParams);
