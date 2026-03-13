@@ -14,6 +14,7 @@ using App.Core.Interfaces;
 using App.Core.Interfaces.Repository.Common;
 using App.Core.Interfaces.Repository.CurrencyRate;
 using App.Core.Interfaces.Repository.Director;
+using App.Core.Interfaces.Repository.Gallery;
 using App.Core.Interfaces.Repository.News;
 using App.Core.Interfaces.Repository.NewsImage;
 using App.Core.Interfaces.Repository.Partner;
@@ -24,6 +25,7 @@ using App.DAL.Context;
 using App.DAL.Repositories.Common;
 using App.DAL.Repositories.CurrencyRate;
 using App.DAL.Repositories.Director;
+using App.DAL.Repositories.Gallery;
 using App.DAL.Repositories.News;
 using App.DAL.Repositories.NewsImage;
 using App.DAL.Repositories.Partner;
@@ -135,8 +137,12 @@ builder.Services.AddHttpContextAccessor();
 
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoReadRepository, VideoReadRepository>();
+builder.Services.AddScoped<IVideoWriteRepository, VideoWriteRepository>();
+
 builder.Services.AddScoped<IPartnerReadRepository, PartnerReadRepository>();
+
 builder.Services.AddScoped<ICurrencyRateReadRepository, CurrencyRateReadRepository>();
+
 builder.Services.AddScoped<IPresidentReadRepository, PresidentReadRepository>();
 
 builder.Services.AddScoped<INewsReadRepository, NewsReadRepository>();
@@ -151,7 +157,9 @@ builder.Services.AddScoped<IDirectorWriteRepository, DirectorWriteRepository>();
 builder.Services.AddScoped<IServiceReadRepository, ServiceReadRepository>();
 builder.Services.AddScoped<IServiceWriteRepository, ServiceWriteRepository>();
 
-// ── Language Service ──────────────────────────────────────────────────────────
+builder.Services.AddScoped<IGalleryReadRepository, GalleryReadRepository>();
+builder.Services.AddScoped<IGalleryWriteRepository, GalleryWriteRepository>();
+
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -160,9 +168,11 @@ builder.Services.AddScoped<App.BL.Mapper.NewsImage.INewsImageMapper, App.BL.Mapp
 builder.Services.AddScoped<App.BL.Mapper.Director.IDirectorMapper, App.BL.Mapper.Director.DirectorMapper>();
 builder.Services.AddScoped<App.BL.Mapper.Service.IServiceMapper, App.BL.Mapper.Service.ServiceMapper>();
 builder.Services.AddScoped<App.BL.Mapper.Video.IVideoMapper, App.BL.Mapper.Video.VideoMapper>();
+builder.Services.AddScoped<App.BL.Mapper.Gallery.IGalleryMapper, App.BL.Mapper.Gallery.GalleryMapper>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<App.BL.Services.Business.Video.IVideoService, App.BL.Services.Business.Video.VideoService>();
+builder.Services.AddScoped<App.BL.Services.Business.Gallery.IGalleryService, App.BL.Services.Business.Gallery.GalleryService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 //builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<INewsService, NewsService>();
