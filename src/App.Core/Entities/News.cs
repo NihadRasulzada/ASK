@@ -40,10 +40,14 @@ public class News : SoftDeletableEntity
     }
 
     public void Update(
+        string titleImageUrl,
         string newsTextAz,
         string newsTextEn,
         string newsTextRu)
     {
+        if (string.IsNullOrWhiteSpace(titleImageUrl))
+            throw new ArgumentException("Title image url cannot be empty", nameof(titleImageUrl));
+
         if (string.IsNullOrWhiteSpace(newsTextAz))
             throw new ArgumentException("AZ news text cannot be empty", nameof(newsTextAz));
 
@@ -53,6 +57,7 @@ public class News : SoftDeletableEntity
         if (string.IsNullOrWhiteSpace(newsTextRu))
             throw new ArgumentException("RU news text cannot be empty", nameof(newsTextRu));
 
+        TitleImageUrl = titleImageUrl;
         NewsTextAz = newsTextAz;
         NewsTextEn = newsTextEn;
         NewsTextRu = newsTextRu;

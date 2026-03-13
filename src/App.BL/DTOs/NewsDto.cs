@@ -45,5 +45,4 @@ public record NewsResponseDto(
     string TitleImageUrl,
     string NewsText,
     IList<string> ImageUrls,
-    DateTimeOffset CreatedOn,
     bool IsDeactive);

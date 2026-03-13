@@ -11,158 +11,157 @@ public class NewsService(
     INewsReadRepository readRepository,
     INewsWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    INewsMapper newsMapper,
-    AppDbContext context) : INewsService
+    INewsMapper newsMapper) : INewsService
 {
 
-    //public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
-    //{
-    //    News? entity = await readRepository.GetByIdIncludingDeletedAsync(id, true, cancellationToken);
+    public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        Core.Entities.News? entity = await readRepository.GetByIdIncludingDeletedAsync(id, true, cancellationToken);
 
-    //    if (entity == null)
-    //        return Response.NotFound("News not found");
+        if (entity == null)
+            return Response.NotFound("News not found");
 
-    //    if (!entity.IsDeactive)
-    //        return Response.BadRequest("News is already active");
+        if (!entity.IsDeactive)
+            return Response.BadRequest("News is already active");
 
-    //    entity.Activate();
+        entity.Activate();
 
-    //    await writeRepository.SaveChangesAsync(cancellationToken);
+        await writeRepository.SaveChangesAsync(cancellationToken);
 
-    //    return Response.Success("News activated successfully");
-    //}
+        return Response.Success("News activated successfully");
+    }
 
-    //public async Task<Response<NewsResponseDto>> CreateAsync(CreateNewsDto dto, CancellationToken cancellationToken = default)
-    //{
-    //    string titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
+    public async Task<Response<NewsResponseDto>> CreateAsync(CreateNewsDto dto, CancellationToken cancellationToken = default)
+    {
+        string titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
 
-    //    List<string> imageUrls = new();
+        List<string> imageUrls = new();
 
-    //    if (dto.AdditionalImages != null && dto.AdditionalImages.Any())
-    //    {
-    //        foreach (var image in dto.AdditionalImages)
-    //        {
-    //            string url = await cloudinaryService.UploadImageAsync(image);
-    //            imageUrls.Add(url);
-    //        }
-    //    }
+        if (dto.AdditionalImages != null && dto.AdditionalImages.Any())
+        {
+            foreach (var image in dto.AdditionalImages)
+            {
+                string url = await cloudinaryService.UploadImageAsync(image);
+                imageUrls.Add(url);
+            }
+        }
 
-    //    News entity = newsMapper.CreateDtoToDomain(dto, titleImageUrl, imageUrls);
+        Core.Entities.News entity = newsMapper.CreateDtoToDomain(dto, titleImageUrl, imageUrls);
 
-    //    await writeRepository.AddAsync(entity, cancellationToken);
-    //    await writeRepository.SaveChangesAsync(cancellationToken);
+        await writeRepository.AddAsync(entity, cancellationToken);
+        await writeRepository.SaveChangesAsync(cancellationToken);
 
-    //    NewsResponseDto response = newsMapper.DomainToResponseDto(entity);
+        NewsResponseDto response = newsMapper.DomainToResponseDto(entity);
 
-    //    return Response<NewsResponseDto>.Success(response, "News created successfully");
-    //}
+        return Response<NewsResponseDto>.Success(response, "News created successfully");
+    }
 
-    //public async Task<Response> DeActivateAsync(Guid id, CancellationToken cancellationToken = default)
-    //{
-    //    News? entity = await readRepository.GetByIdIncludingDeletedAsync(id, true, cancellationToken);
+    public async Task<Response> DeActivateAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        Core.Entities.News? entity = await readRepository.GetByIdIncludingDeletedAsync(id, true, cancellationToken);
 
-    //    if (entity == null)
-    //        return Response.NotFound("News not found");
+        if (entity == null)
+            return Response.NotFound("News not found");
 
-    //    if (entity.IsDeactive)
-    //        return Response.BadRequest("News is already deactive");
+        if (entity.IsDeactive)
+            return Response.BadRequest("News is already deactive");
 
-    //    entity.Deactivate();
+        entity.Deactivate();
 
-    //    await writeRepository.SaveChangesAsync(cancellationToken);
+        await writeRepository.SaveChangesAsync(cancellationToken);
 
-    //    return Response.Success("News deactivated successfully");
-    //}
+        return Response.Success("News deactivated successfully");
+    }
 
-    //public async Task<Response<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
-    //{
-    //    News? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
+    public async Task<Response<bool>> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        Core.Entities.News? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
 
-    //    if (entity == null)
-    //        return Response<bool>.NotFound("News not found");
+        if (entity == null)
+            return Response<bool>.NotFound("News not found");
 
-    //    await writeRepository.HardDeleteAsync(id, cancellationToken);
-    //    await writeRepository.SaveChangesAsync(cancellationToken);
+        await writeRepository.HardDeleteAsync(id, cancellationToken);
+        await writeRepository.SaveChangesAsync(cancellationToken);
 
-    //    return Response<bool>.Success(true, "News deleted successfully");
-    //}
+        return Response<bool>.Success(true, "News deleted successfully");
+    }
 
-    //public async Task<Response<IEnumerable<NewsResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
-    //{
-    //    IEnumerable<News> entities = await readRepository.GetAllAsync(false, cancellationToken, false);
+    public async Task<Response<IEnumerable<NewsResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Core.Entities.News> entities = await readRepository.GetAllAsync(false, cancellationToken, false);
 
-    //    if (!entities.Any())
-    //        return Response<IEnumerable<NewsResponseDto>>
-    //            .Success(Enumerable.Empty<NewsResponseDto>(), "No news found");
+        if (!entities.Any())
+            return Response<IEnumerable<NewsResponseDto>>
+                .Success(Enumerable.Empty<NewsResponseDto>(), "No news found");
 
-    //    IEnumerable<NewsResponseDto> result =
-    //        entities.Select(x => newsMapper.DomainToResponseDto(x));
+        IEnumerable<NewsResponseDto> result =
+            entities.Select(x => newsMapper.DomainToResponseDto(x));
 
-    //    return Response<IEnumerable<NewsResponseDto>>
-    //        .Success(result, $"{result.Count()} news retrieved successfully");
-    //}
+        return Response<IEnumerable<NewsResponseDto>>
+            .Success(result, $"{result.Count()} news retrieved successfully");
+    }
 
-    //public async Task<Response<IEnumerable<NewsResponseDto>>> GetAllIncludingDeletedAsync(CancellationToken cancellationToken = default)
-    //{
-    //    IEnumerable<News> entities = await readRepository.GetAllIncludingDeletedAsync(cancellationToken);
+    public async Task<Response<IEnumerable<NewsResponseDto>>> GetAllIncludingDeletedAsync(CancellationToken cancellationToken = default)
+    {
+        IEnumerable<Core.Entities.News> entities = await readRepository.GetAllIncludingDeletedAsync(cancellationToken);
 
-    //    if (!entities.Any())
-    //        return Response<IEnumerable<NewsResponseDto>>
-    //            .Success(Enumerable.Empty<NewsResponseDto>(), "No news found");
+        if (!entities.Any())
+            return Response<IEnumerable<NewsResponseDto>>
+                .Success(Enumerable.Empty<NewsResponseDto>(), "No news found");
 
-    //    IEnumerable<NewsResponseDto> result =
-    //        entities.Select(x => newsMapper.DomainToResponseDto(x));
+        IEnumerable<NewsResponseDto> result =
+            entities.Select(x => newsMapper.DomainToResponseDto(x));
 
-    //    return Response<IEnumerable<NewsResponseDto>>
-    //        .Success(result, $"{result.Count()} news retrieved successfully");
-    //}
+        return Response<IEnumerable<NewsResponseDto>>
+            .Success(result, $"{result.Count()} news retrieved successfully");
+    }
 
-    //public async Task<Response<NewsResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-    //{
-    //    News? entity = await readRepository.GetByIdAsync(id, false, cancellationToken);
+    public async Task<Response<NewsResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        Core.Entities.News? entity = await readRepository.GetByIdAsync(id, false, cancellationToken);
 
-    //    if (entity == null)
-    //        return Response<NewsResponseDto?>.NotFound("News not found");
+        if (entity == null)
+            return Response<NewsResponseDto?>.NotFound("News not found");
 
-    //    NewsResponseDto dto = newsMapper.DomainToResponseDto(entity);
+        NewsResponseDto dto = newsMapper.DomainToResponseDto(entity);
 
-    //    return Response<NewsResponseDto?>.Success(dto, "News retrieved successfully");
-    //}
+        return Response<NewsResponseDto?>.Success(dto, "News retrieved successfully");
+    }
 
-    //public async Task<Response<NewsResponseDto?>> UpdateAsync(Guid id, UpdateNewsDto dto, CancellationToken cancellationToken = default)
-    //{
-    //    News? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
+    public async Task<Response<NewsResponseDto?>> UpdateAsync(Guid id, UpdateNewsDto dto, CancellationToken cancellationToken = default)
+    {
+        Core.Entities.News? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
 
-    //    if (entity == null)
-    //        return Response<NewsResponseDto?>.NotFound("News not found");
+        if (entity == null)
+            return Response<NewsResponseDto?>.NotFound("News not found");
 
-    //    string titleImageUrl = entity.TitleImageUrl;
+        string titleImageUrl = entity.TitleImageUrl;
 
-    //    if (dto.TitleImage != null)
-    //    {
-    //        titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
-    //    }
+        if (dto.TitleImage != null)
+        {
+            titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
+        }
 
-    //    List<string> imageUrls = entity.ImageUrls.ToList();
+        List<string> imageUrls = entity.ImageUrls?.ToList() ?? new List<string>();
 
-    //    if (dto.AdditionalImages != null && dto.AdditionalImages.Any())
-    //    {
-    //        imageUrls = new();
+        if (dto.AdditionalImages != null && dto.AdditionalImages.Any())
+        {
+            imageUrls.Clear();
 
-    //        foreach (var image in dto.AdditionalImages)
-    //        {
-    //            string url = await cloudinaryService.UploadImageAsync(image);
-    //            imageUrls.Add(url);
-    //        }
-    //    }
+            foreach (var image in dto.AdditionalImages)
+            {
+                string url = await cloudinaryService.UploadImageAsync(image);
+                imageUrls.Add(url);
+            }
+        }
 
-    //    newsMapper.UpdateDtoToDomain(entity, dto, titleImageUrl, imageUrls);
+        newsMapper.UpdateDtoToDomain(entity, dto, titleImageUrl, imageUrls);
 
-    //    writeRepository.Update(entity);
-    //    await writeRepository.SaveChangesAsync(cancellationToken);
+        writeRepository.Update(entity);
+        await writeRepository.SaveChangesAsync(cancellationToken);
 
-    //    NewsResponseDto response = newsMapper.DomainToResponseDto(entity);
+        NewsResponseDto response = newsMapper.DomainToResponseDto(entity);
 
-    //    return Response<NewsResponseDto?>.Success(response, "News updated successfully");
-    //}
+        return Response<NewsResponseDto?>.Success(response, "News updated successfully");
+    }
 }
