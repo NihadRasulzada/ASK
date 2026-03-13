@@ -160,6 +160,9 @@ builder.Services.AddScoped<IServiceWriteRepository, ServiceWriteRepository>();
 builder.Services.AddScoped<IGalleryReadRepository, GalleryReadRepository>();
 builder.Services.AddScoped<IGalleryWriteRepository, GalleryWriteRepository>();
 
+builder.Services.AddScoped<App.Core.Interfaces.Repository.Announcement.IAnnouncementReadRepository, App.DAL.Repositories.Announcement.AnnouncementReadRepository>();
+builder.Services.AddScoped<App.Core.Interfaces.Repository.Announcement.IAnnouncementWriteRepository, App.DAL.Repositories.Announcement.AnnouncementWriteRepository>();
+
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -169,10 +172,12 @@ builder.Services.AddScoped<App.BL.Mapper.Director.IDirectorMapper, App.BL.Mapper
 builder.Services.AddScoped<App.BL.Mapper.Service.IServiceMapper, App.BL.Mapper.Service.ServiceMapper>();
 builder.Services.AddScoped<App.BL.Mapper.Video.IVideoMapper, App.BL.Mapper.Video.VideoMapper>();
 builder.Services.AddScoped<App.BL.Mapper.Gallery.IGalleryMapper, App.BL.Mapper.Gallery.GalleryMapper>();
+builder.Services.AddScoped<App.BL.Mapper.Announcement.IAnnouncementMapper, App.BL.Mapper.Announcement.AnnouncementMapper>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<App.BL.Services.Business.Video.IVideoService, App.BL.Services.Business.Video.VideoService>();
 builder.Services.AddScoped<App.BL.Services.Business.Gallery.IGalleryService, App.BL.Services.Business.Gallery.GalleryService>();
+builder.Services.AddScoped<App.BL.Services.Business.Announcement.IAnnouncementService, App.BL.Services.Business.Announcement.AnnouncementService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 //builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<INewsService, NewsService>();
