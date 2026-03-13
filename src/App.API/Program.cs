@@ -21,6 +21,8 @@ using App.Core.Interfaces.Repository.Partner;
 using App.Core.Interfaces.Repository.President;
 using App.Core.Interfaces.Repository.Service;
 using App.Core.Interfaces.Repository.Video;
+using App.Core.Interfaces.Repository.Training;
+using App.Core.Interfaces.Repository.Exhibition;
 using App.DAL.Context;
 using App.DAL.Repositories.Common;
 using App.DAL.Repositories.CurrencyRate;
@@ -32,6 +34,24 @@ using App.DAL.Repositories.Partner;
 using App.DAL.Repositories.President;
 using App.DAL.Repositories.Service;
 using App.DAL.Repositories.Video;
+using App.DAL.Repositories.Training;
+using App.DAL.Repositories.Exhibition;
+using App.BL.Services.Business.Video;
+using App.BL.Services.Business.Gallery;
+using App.BL.Services.Business.Announcement;
+using App.BL.Services.Business.Partner;
+using App.BL.Services.Business.President;
+using App.BL.Services.Business.Training;
+using App.BL.Services.Business.Exhibition;
+using App.BL.Mapper.Video;
+using App.BL.Mapper.Gallery;
+using App.BL.Mapper.Announcement;
+using App.BL.Mapper.Partner;
+using App.BL.Mapper.President;
+using App.BL.Mapper.Training;
+using App.BL.Mapper.Exhibition;
+using App.BL.Mapper.Director;
+using App.BL.Mapper.Service;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -142,9 +162,14 @@ builder.Services.AddScoped<IVideoWriteRepository, VideoWriteRepository>();
 builder.Services.AddScoped<IPartnerReadRepository, PartnerReadRepository>();
 builder.Services.AddScoped<IPartnerWriteRepository, PartnerWriteRepository>();
 
-builder.Services.AddScoped<ICurrencyRateReadRepository, CurrencyRateReadRepository>();
-
 builder.Services.AddScoped<IPresidentReadRepository, PresidentReadRepository>();
+builder.Services.AddScoped<IPresidentWriteRepository, PresidentWriteRepository>();
+
+builder.Services.AddScoped<ITrainingReadRepository, TrainingReadRepository>();
+builder.Services.AddScoped<ITrainingWriteRepository, TrainingWriteRepository>();
+
+builder.Services.AddScoped<IExhibitionReadRepository, ExhibitionReadRepository>();
+builder.Services.AddScoped<IExhibitionWriteRepository, ExhibitionWriteRepository>();
 
 builder.Services.AddScoped<INewsReadRepository, NewsReadRepository>();
 builder.Services.AddScoped<INewsWriteRepository, NewsWriteRepository>();
@@ -164,29 +189,35 @@ builder.Services.AddScoped<IGalleryWriteRepository, GalleryWriteRepository>();
 builder.Services.AddScoped<App.Core.Interfaces.Repository.Announcement.IAnnouncementReadRepository, App.DAL.Repositories.Announcement.AnnouncementReadRepository>();
 builder.Services.AddScoped<App.Core.Interfaces.Repository.Announcement.IAnnouncementWriteRepository, App.DAL.Repositories.Announcement.AnnouncementWriteRepository>();
 
+builder.Services.AddScoped<ICurrencyRateReadRepository, CurrencyRateReadRepository>();
+
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<App.BL.Mapper.News.INewsMapper, App.BL.Mapper.News.NewsMapper>();
 builder.Services.AddScoped<App.BL.Mapper.NewsImage.INewsImageMapper, App.BL.Mapper.NewsImage.NewsImageMapper>();
-builder.Services.AddScoped<App.BL.Mapper.Director.IDirectorMapper, App.BL.Mapper.Director.DirectorMapper>();
-builder.Services.AddScoped<App.BL.Mapper.Service.IServiceMapper, App.BL.Mapper.Service.ServiceMapper>();
-builder.Services.AddScoped<App.BL.Mapper.Video.IVideoMapper, App.BL.Mapper.Video.VideoMapper>();
-builder.Services.AddScoped<App.BL.Mapper.Gallery.IGalleryMapper, App.BL.Mapper.Gallery.GalleryMapper>();
-builder.Services.AddScoped<App.BL.Mapper.Announcement.IAnnouncementMapper, App.BL.Mapper.Announcement.AnnouncementMapper>();
-builder.Services.AddScoped<App.BL.Mapper.Partner.IPartnerMapper, App.BL.Mapper.Partner.PartnerMapper>();
+builder.Services.AddScoped<IDirectorMapper, App.BL.Mapper.Director.DirectorMapper>();
+builder.Services.AddScoped<IServiceMapper, App.BL.Mapper.Service.ServiceMapper>();
+builder.Services.AddScoped<IVideoMapper, VideoMapper>();
+builder.Services.AddScoped<IGalleryMapper, GalleryMapper>();
+builder.Services.AddScoped<IAnnouncementMapper, AnnouncementMapper>();
+builder.Services.AddScoped<IPartnerMapper, PartnerMapper>();
+builder.Services.AddScoped<IPresidentMapper, PresidentMapper>();
+builder.Services.AddScoped<ITrainingMapper, TrainingMapper>();
+builder.Services.AddScoped<IExhibitionMapper, ExhibitionMapper>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
-builder.Services.AddScoped<App.BL.Services.Business.Video.IVideoService, App.BL.Services.Business.Video.VideoService>();
-builder.Services.AddScoped<App.BL.Services.Business.Gallery.IGalleryService, App.BL.Services.Business.Gallery.GalleryService>();
-builder.Services.AddScoped<App.BL.Services.Business.Announcement.IAnnouncementService, App.BL.Services.Business.Announcement.AnnouncementService>();
-builder.Services.AddScoped<App.BL.Services.Business.Partner.IPartnerService, App.BL.Services.Business.Partner.PartnerService>();
+builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<IGalleryService, GalleryService>();
+builder.Services.AddScoped<IAnnouncementService, AnnouncementService>();
+builder.Services.AddScoped<IPartnerService, PartnerService>();
+builder.Services.AddScoped<IPresidentService, PresidentService>();
+builder.Services.AddScoped<ITrainingService, TrainingService>();
+builder.Services.AddScoped<IExhibitionService, ExhibitionService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-//builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddScoped<App.BL.NewsImages.Business.NewsIamge.INewsImageService, App.BL.Services.Business.NewsIamge.NewsImageService>();
 builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
-//builder.Services.AddScoped<IPresidentService, PresidentService>();
 builder.Services.AddScoped<IDirectorService, DirectorService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
 
