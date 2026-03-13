@@ -7,7 +7,7 @@ namespace App.DAL.Repositories.Service;
 
 public class ServiceWriteRepository : SoftDeletableWriteRepository<Core.Entities.Service>, IServiceWriteRepository
 {
-    public ServiceWriteRepository(AppDbContext context, ISoftDeletableReadRepository<Core.Entities.Service> readRepository) : base(context, readRepository)
+    public ServiceWriteRepository(AppDbContext context, IServiceReadRepository readRepository) : base(context, readRepository)
     {
     }
 }

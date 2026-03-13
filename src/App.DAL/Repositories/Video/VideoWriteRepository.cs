@@ -7,7 +7,7 @@ namespace App.DAL.Repositories.Video;
 
 public class VideoWriteRepository : WriteRepository<Core.Entities.Video>, IVideoWriteRepository
 {
-    public VideoWriteRepository(AppDbContext context, IReadRepository<Core.Entities.Video> readRepository) : base(context, readRepository)
+    public VideoWriteRepository(AppDbContext context, IVideoReadRepository readRepository) : base(context, readRepository)
     {
     }
 }

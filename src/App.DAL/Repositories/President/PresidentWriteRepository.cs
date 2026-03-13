@@ -7,7 +7,7 @@ namespace App.DAL.Repositories.President;
 
 public class PresidentWriteRepository : WriteRepository<Core.Entities.President>, IPresidentWriteRepository
 {
-    public PresidentWriteRepository(AppDbContext context, IReadRepository<Core.Entities.President> readRepository) : base(context, readRepository)
+    public PresidentWriteRepository(AppDbContext context, IPresidentReadRepository readRepository) : base(context, readRepository)
     {
     }
 }

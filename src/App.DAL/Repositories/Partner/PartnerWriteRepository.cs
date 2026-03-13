@@ -7,7 +7,7 @@ namespace App.DAL.Repositories.Partner;
 
 public class PartnerWriteRepository : WriteRepository<Core.Entities.Partner>, IPartnerWriteRepository
 {
-    public PartnerWriteRepository(AppDbContext context, IReadRepository<Core.Entities.Partner> readRepository) : base(context, readRepository)
+    public PartnerWriteRepository(AppDbContext context, IPartnerReadRepository readRepository) : base(context, readRepository)
     {
     }
 }

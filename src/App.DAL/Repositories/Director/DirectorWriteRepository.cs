@@ -7,7 +7,7 @@ namespace App.DAL.Repositories.Director;
 
 public class DirectorWriteRepository : SoftDeletableWriteRepository<Core.Entities.Director>, IDirectorWriteRepository
 {
-    public DirectorWriteRepository(AppDbContext context, ISoftDeletableReadRepository<Core.Entities.Director> softDeletableReadRepository) : base(context, softDeletableReadRepository)
+    public DirectorWriteRepository(AppDbContext context, IDirectorReadRepository readRepository) : base(context, readRepository)
     {
     }
 }

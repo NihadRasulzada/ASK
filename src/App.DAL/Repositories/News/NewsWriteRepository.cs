@@ -7,7 +7,7 @@ namespace App.DAL.Repositories.News;
 
 public class NewsWriteRepository : SoftDeletableWriteRepository<Core.Entities.News>, INewsWriteRepository
 {
-    public NewsWriteRepository(AppDbContext context, ISoftDeletableReadRepository<Core.Entities.News> softDeletableReadRepository) : base(context, softDeletableReadRepository)
+    public NewsWriteRepository(AppDbContext context, INewsReadRepository readRepository) : base(context, readRepository)
     {
     }
 }

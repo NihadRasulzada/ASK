@@ -3,7 +3,7 @@ using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Director;
 
-internal class DirectorMapper : IDirectorMapper
+public class DirectorMapper : IDirectorMapper
 {
     private readonly ILanguageService languageService;
 

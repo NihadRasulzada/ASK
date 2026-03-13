@@ -9,18 +9,23 @@ using App.BL.Services.Business.Service;
 using App.BL.Services.External;
 using App.BL.Settings;
 using App.BL.Validators;
+using App.Core.Entities;
 using App.Core.Interfaces;
+using App.Core.Interfaces.Repository.Common;
 using App.Core.Interfaces.Repository.CurrencyRate;
 using App.Core.Interfaces.Repository.Director;
 using App.Core.Interfaces.Repository.News;
+using App.Core.Interfaces.Repository.NewsImage;
 using App.Core.Interfaces.Repository.Partner;
 using App.Core.Interfaces.Repository.President;
 using App.Core.Interfaces.Repository.Service;
 using App.Core.Interfaces.Repository.Video;
 using App.DAL.Context;
+using App.DAL.Repositories.Common;
 using App.DAL.Repositories.CurrencyRate;
 using App.DAL.Repositories.Director;
 using App.DAL.Repositories.News;
+using App.DAL.Repositories.NewsImage;
 using App.DAL.Repositories.Partner;
 using App.DAL.Repositories.President;
 using App.DAL.Repositories.Service;
@@ -131,20 +136,37 @@ builder.Services.AddHttpContextAccessor();
 // ── Repositories ──────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoReadRepository, VideoReadRepository>();
 builder.Services.AddScoped<IPartnerReadRepository, PartnerReadRepository>();
-builder.Services.AddScoped<INewsReadRepository, NewsReadRepository>();
 builder.Services.AddScoped<ICurrencyRateReadRepository, CurrencyRateReadRepository>();
 builder.Services.AddScoped<IPresidentReadRepository, PresidentReadRepository>();
+
+builder.Services.AddScoped<INewsReadRepository, NewsReadRepository>();
+builder.Services.AddScoped<INewsWriteRepository, NewsWriteRepository>();
+
+builder.Services.AddScoped<INewsImageReadRepository, NewsImageReadRepository>();
+builder.Services.AddScoped<INewsImageWriteRepository, NewsImageWriteRepository>();
+
 builder.Services.AddScoped<IDirectorReadRepository, DirectorReadRepository>();
+builder.Services.AddScoped<IDirectorWriteRepository, DirectorWriteRepository>();
+
 builder.Services.AddScoped<IServiceReadRepository, ServiceReadRepository>();
+builder.Services.AddScoped<IServiceWriteRepository, ServiceWriteRepository>();
 
 // ── Language Service ──────────────────────────────────────────────────────────
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
+// ── Mappers ───────────────────────────────────────────────────────────────────
+builder.Services.AddScoped<App.BL.Mapper.News.INewsMapper, App.BL.Mapper.News.NewsMapper>();
+builder.Services.AddScoped<App.BL.Mapper.NewsImage.INewsImageMapper, App.BL.Mapper.NewsImage.NewsImageMapper>();
+builder.Services.AddScoped<App.BL.Mapper.Director.IDirectorMapper, App.BL.Mapper.Director.DirectorMapper>();
+builder.Services.AddScoped<App.BL.Mapper.Service.IServiceMapper, App.BL.Mapper.Service.ServiceMapper>();
+builder.Services.AddScoped<App.BL.Mapper.Video.IVideoMapper, App.BL.Mapper.Video.VideoMapper>();
+
 // ── Services ──────────────────────────────────────────────────────────────────
-//builder.Services.AddScoped<IVideoService, VideoService>();
+builder.Services.AddScoped<App.BL.Services.Business.Video.IVideoService, App.BL.Services.Business.Video.VideoService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 //builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.AddScoped<App.BL.NewsImages.Business.NewsIamge.INewsImageService, App.BL.Services.Business.NewsIamge.NewsImageService>();
 builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
 //builder.Services.AddScoped<IPresidentService, PresidentService>();
 builder.Services.AddScoped<IDirectorService, DirectorService>();

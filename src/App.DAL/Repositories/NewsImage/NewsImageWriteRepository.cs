@@ -7,7 +7,7 @@ namespace App.DAL.Repositories.NewsImage;
 
 public class NewsImageWriteRepository : WriteRepository<Core.Entities.NewsImage>, INewsImageWriteRepository
 {
-    public NewsImageWriteRepository(AppDbContext context, IReadRepository<Core.Entities.NewsImage> readRepository) : base(context, readRepository)
+    public NewsImageWriteRepository(AppDbContext context, INewsImageReadRepository readRepository) : base(context, readRepository)
     {
     }
 }
