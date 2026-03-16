@@ -61,6 +61,17 @@ using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ── CORS ──────────────────────────────────────────────────────────────────────
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 // ── Controllers ───────────────────────────────────────────────────────────────
 builder.Services.AddControllers(options =>
 {
@@ -243,6 +254,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.UseMiddleware<LanguageMiddleware>();
+
+app.UseCors("AllowAll");
 
 app.MapControllers();
 
