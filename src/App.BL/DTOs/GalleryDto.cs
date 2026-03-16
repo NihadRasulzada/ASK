@@ -2,21 +2,15 @@ using Microsoft.AspNetCore.Http;
 
 namespace App.BL.DTOs;
 
-/// <summary>
-/// Gallery yaratmaq üçün istifadə olunan DTO.
-/// </summary>
-/// <param name="Image">Yüklənəcək şəkil faylı.</param>
-public record CreateGalleryDto(IFormFile Image);
+// FIX: IFormFile saxladığı üçün class (record deyil)
+public class CreateGalleryDto
+{
+    public IFormFile Image { get; set; } = null!;
+}
 
-/// <summary>
-/// Gallery yeniləmək üçün istifadə olunan DTO.
-/// </summary>
-/// <param name="Image">Yeni şəkil faylı (istəyə bağlı).</param>
-public record UpdateGalleryDto(IFormFile? Image);
+public class UpdateGalleryDto
+{
+    public IFormFile? Image { get; set; }
+}
 
-/// <summary>
-/// Client-ə qaytarılan Gallery məlumatı.
-/// </summary>
-/// <param name="Id">Qalereya şəklinin unikal identifikatoru.</param>
-/// <param name="ImageUrl">Şəklin URL linki.</param>
 public record GalleryResponseDto(Guid Id, string ImageUrl);

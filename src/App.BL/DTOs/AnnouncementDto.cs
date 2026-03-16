@@ -2,6 +2,20 @@
 
 namespace App.BL.DTOs;
 
-public record CreateAnnouncementDto(string Title, IFormFile TitleImage, string Text);
-public record UpdateAnnouncementDto(Guid Id, string Title, IFormFile TitleImage, string Text);
+// FIX: IFormFile saxladığı üçün class (record deyil)
+// FIX: UpdateAnnouncementDto-dan Guid Id silindi — route-dan gəlməlidir
+public class CreateAnnouncementDto
+{
+    public string Title { get; set; } = string.Empty;
+    public IFormFile TitleImage { get; set; } = null!;
+    public string Text { get; set; } = string.Empty;
+}
+
+public class UpdateAnnouncementDto
+{
+    public string Title { get; set; } = string.Empty;
+    public IFormFile? TitleImage { get; set; }
+    public string Text { get; set; } = string.Empty;
+}
+
 public record AnnouncementResponseDto(Guid Id, string Title, string TitleImageUrl, string Text);

@@ -5,6 +5,14 @@ using System.Text;
 
 namespace App.BL.DTOs;
 
-public record UpdateNewsImageDto(Guid Id, IFormFile Image);
-public record CreateNewsImageDto(IFormFile Image, Guid NewsId);
+public class UpdateNewsImageDto
+{
+    public Guid Id { get; set; }
+    public IFormFile Image { get; set; }
+};
+public class CreateNewsImageDto
+{
+    public Guid NewsId { get; set; }
+    public IFormFile Image { get; set; }
+};
 public record NewsImageResponseDto(Guid Id, string ImageUrl);

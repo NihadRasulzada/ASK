@@ -74,9 +74,9 @@ public class NewsImageService : INewsImageService
         return Response<NewsImageResponseDto?>.Success(dto, "News image retrieved successfully");
     }
 
-    public async Task<Response<NewsImageResponseDto?>> UpdateAsync(UpdateNewsImageDto dto, CancellationToken cancellationToken = default)
+    public async Task<Response<NewsImageResponseDto?>> UpdateAsync(Guid id,UpdateNewsImageDto dto, CancellationToken cancellationToken = default)
     {
-        Core.Entities.NewsImage? entity = await readRepository.GetByIdAsync(dto.Id, true, cancellationToken);
+        Core.Entities.NewsImage? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
 
         if (entity == null)
             return Response<NewsImageResponseDto?>.NotFound("News image not found");

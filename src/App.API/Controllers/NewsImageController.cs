@@ -96,9 +96,9 @@ public class NewsImageController : ControllerBase
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> Update([FromForm] UpdateNewsImageDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> Update(Guid id, [FromForm] UpdateNewsImageDto dto, CancellationToken cancellationToken = default)
     {
-        var response = await _newsImageService.UpdateAsync(dto, cancellationToken);
+        var response = await _newsImageService.UpdateAsync(id, dto, cancellationToken);
         return this.HandleServiceResponse(response);
     }
 

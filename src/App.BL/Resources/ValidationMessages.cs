@@ -17,6 +17,20 @@ public static class ValidationMessages
         _ => "Gözlənilməz xəta baş verdi."
     };
 
+    public static string IdRequired(string lang) => lang switch
+    {
+        "en" => "Id is required.",
+        "ru" => "Идентификатор обязателен.",
+        _ => "Id mütləq daxil edilməlidir."
+    };
+
+    public static string NewsIdRequired(string lang) => lang switch
+    {
+        "en" => "News Id is required.",
+        "ru" => "Идентификатор новости обязателен.",
+        _ => "Xəbər Id-si mütləq daxil edilməlidir."
+    };
+
     // ── Image ─────────────────────────────────────────────────────────────────
     public static string ImageRequired(string lang) => lang switch
     {
@@ -204,5 +218,20 @@ public static class ValidationMessages
         "en" => "Link must be a valid URL (http or https).",
         "ru" => "Ссылка должна быть корректным URL (http или https).",
         _ => "Link düzgün bir URL olmalıdır (http və ya https)."
+    };
+
+    // ── Title ─────────────────────────────────────────────────────────────────
+    public static string TitleRequired(string lang) => lang switch
+    {
+        "en" => "Title is required.",
+        "ru" => "Заголовок обязателен.",
+        _ => "Başlıq mütləq daxil edilməlidir."
+    };
+
+    public static string TitleTooLong(string lang) => lang switch
+    {
+        "en" => "Title cannot exceed 500 characters.",
+        "ru" => "Заголовок не может превышать 500 символов.",
+        _ => "Başlıq 500 simvoldan çox ola bilməz."
     };
 }

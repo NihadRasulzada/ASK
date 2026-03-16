@@ -11,6 +11,6 @@ public interface INewsImageService
     Task<Response<IEnumerable<NewsImageResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<Response<NewsImageResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Response> CreateAsync(CreateNewsImageDto dto, CancellationToken cancellationToken = default);
-    Task<Response<NewsImageResponseDto?>> UpdateAsync(UpdateNewsImageDto dto, CancellationToken cancellationToken = default);
+    Task<Response<NewsImageResponseDto?>> UpdateAsync(Guid id,UpdateNewsImageDto dto, CancellationToken cancellationToken = default);
     Task<Response> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }
