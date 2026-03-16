@@ -131,9 +131,9 @@ public class ServiceService(
         return Response<ServiceResponseDto?>.Success(viewModel, $"{nameof(Core.Entities.Service)} retrieved successfully");
     }
 
-    public async Task<Response<ServiceResponseDto?>> UpdateAsync(UpdateServiceDto dto, CancellationToken cancellationToken = default)
+    public async Task<Response<ServiceResponseDto?>> UpdateAsync(Guid id,UpdateServiceDto dto, CancellationToken cancellationToken = default)
     {
-        Core.Entities.Service? entity = await readRepository.GetByIdAsync(dto.Id, true, cancellationToken);
+        Core.Entities.Service? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
 
         if (entity == null)
         {

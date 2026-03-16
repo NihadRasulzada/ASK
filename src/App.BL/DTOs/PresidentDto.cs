@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Http;
 
 namespace App.BL.DTOs;
 
-public record CreatePresidentDto
+// FIX: IFormFile saxlayan DTO record deyil, class olmalıdır
+public class CreatePresidentDto
 {
     public IFormFile Image { get; set; } = null!;
     public string Text { get; set; } = string.Empty;
 }
 
-public record UpdatePresidentDto
+public class UpdatePresidentDto
 {
     public IFormFile? Image { get; set; }
     public string Text { get; set; } = string.Empty;

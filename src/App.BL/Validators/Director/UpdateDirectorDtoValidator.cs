@@ -23,11 +23,28 @@ public class UpdateDirectorDtoValidator : AbstractValidator<UpdateDirectorDto>
                     .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
         });
 
+        // FIX: En və Ru sahələri əlavə edildi
         RuleFor(x => x.FullNameAz)
             .NotEmpty().WithMessage(ValidationMessages.FullNameRequired(languageService.Lang))
             .MaximumLength(200).WithMessage(ValidationMessages.FullNameTooLong(languageService.Lang));
 
+        RuleFor(x => x.FullNameEn)
+            .NotEmpty().WithMessage(ValidationMessages.FullNameRequired(languageService.Lang))
+            .MaximumLength(200).WithMessage(ValidationMessages.FullNameTooLong(languageService.Lang));
+
+        RuleFor(x => x.FullNameRu)
+            .NotEmpty().WithMessage(ValidationMessages.FullNameRequired(languageService.Lang))
+            .MaximumLength(200).WithMessage(ValidationMessages.FullNameTooLong(languageService.Lang));
+
         RuleFor(x => x.DutyAz)
+            .NotEmpty().WithMessage(ValidationMessages.DutyRequired(languageService.Lang))
+            .MaximumLength(200).WithMessage(ValidationMessages.DutyTooLong(languageService.Lang));
+
+        RuleFor(x => x.DutyEn)
+            .NotEmpty().WithMessage(ValidationMessages.DutyRequired(languageService.Lang))
+            .MaximumLength(200).WithMessage(ValidationMessages.DutyTooLong(languageService.Lang));
+
+        RuleFor(x => x.DutyRu)
             .NotEmpty().WithMessage(ValidationMessages.DutyRequired(languageService.Lang))
             .MaximumLength(200).WithMessage(ValidationMessages.DutyTooLong(languageService.Lang));
     }

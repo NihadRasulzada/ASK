@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Http;
 
 namespace App.BL.DTOs;
 
-public record CreateDirectorDto
+// FIX: IFormFile saxlayan DTO record deyil, class olmalıdır.
+//      Record-un value semantics-i + IFormFile (reference type stream) uyğunsuzluq yaradır;
+//      həmçinin bəzi model binding middleware-ləri class tələb edir.
+public class CreateDirectorDto
 {
     public IFormFile Image { get; set; } = null!;
     public string FullNameAz { get; set; } = string.Empty;
@@ -13,7 +16,7 @@ public record CreateDirectorDto
     public string DutyRu { get; set; } = string.Empty;
 }
 
-public record UpdateDirectorDto
+public class UpdateDirectorDto
 {
     public IFormFile? Image { get; set; }
     public string FullNameAz { get; set; } = string.Empty;

@@ -14,14 +14,29 @@ public class CreateNewsDtoValidator : AbstractValidator<CreateNewsDto>
 
     public CreateNewsDtoValidator(ILanguageService languageService)
     {
+        // FIX: NotNull() ayrı; size/type yoxlaması When() bloku içindədir
         RuleFor(x => x.TitleImage)
-            .NotNull().WithMessage(ValidationMessages.TitleImageRequired(languageService.Lang))
-            .Must(f => f.Length <= MaxFileSizeBytes)
-                .WithMessage(ValidationMessages.TitleImageTooLarge(languageService.Lang))
-            .Must(f => AllowedContentTypes.Contains(f.ContentType.ToLower()))
-                .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
+            .NotNull().WithMessage(ValidationMessages.TitleImageRequired(languageService.Lang));
 
+        When(x => x.TitleImage is not null, () =>
+        {
+            RuleFor(x => x.TitleImage!)
+                .Must(f => f.Length <= MaxFileSizeBytes)
+                    .WithMessage(ValidationMessages.TitleImageTooLarge(languageService.Lang))
+                .Must(f => AllowedContentTypes.Contains(f.ContentType.ToLower()))
+                    .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
+        });
+
+        // FIX: Yalnız Az deyil, En və Ru sahələri də validasiya edilir
         RuleFor(x => x.NewsTextAz)
+            .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
+            .MaximumLength(10000).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));
+
+        RuleFor(x => x.NewsTextEn)
+            .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
+            .MaximumLength(10000).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));
+
+        RuleFor(x => x.NewsTextRu)
             .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
             .MaximumLength(10000).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));
     }
