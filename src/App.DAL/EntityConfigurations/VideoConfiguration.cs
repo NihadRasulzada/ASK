@@ -1,21 +1,19 @@
 using App.Core.Entities;
+using App.DAL.EntityConfigurations.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class VideoConfiguration : IEntityTypeConfiguration<Video>
+// FIX: BaseEntityConfiguration-dan inherit edir
+public class VideoConfiguration : BaseEntityConfiguration<Video>
 {
-    public void Configure(EntityTypeBuilder<Video> builder)
+    public override void Configure(EntityTypeBuilder<Video> builder)
     {
-        builder.HasKey(v => v.Id);
-
-        builder.Property(v => v.Id)
-            .ValueGeneratedOnAdd();
+        base.Configure(builder);
 
         builder.ToTable("Videos");
 
-        builder.Property(v => v.Link)
-            .IsRequired();
+        builder.Property(v => v.Link).IsRequired();
     }
 }

@@ -8,7 +8,6 @@ using App.BL.Services.Business.News;
 using App.BL.Services.Business.Service;
 using App.BL.Services.External;
 using App.BL.Settings;
-using App.BL.Validators;
 using App.Core.Entities;
 using App.Core.Interfaces;
 using App.Core.Interfaces.Repository.Common;
@@ -58,6 +57,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Net.Http.Headers;
+using App.BL.Validators.Video;
 
 var builder = WebApplication.CreateBuilder(args);
 

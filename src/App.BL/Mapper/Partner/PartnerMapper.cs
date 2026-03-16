@@ -16,7 +16,9 @@ public class PartnerMapper : IPartnerMapper
 
     public Core.Entities.Partner UpdateDtoToDomain(Core.Entities.Partner entity, UpdatePartnerDto dto, string? imageUrl = null)
     {
-        entity.Update(imageUrl, dto.Site);
+        entity.Update(dto.Site);
+        if(imageUrl is not null) 
+            entity.UpdateImageUrl(imageUrl);
         return entity;
     }
 }

@@ -6,10 +6,7 @@ public class GalleryMapper : IGalleryMapper
 {
     public Core.Entities.Gallery CreateDtoToDomain(CreateGalleryDto dto, string imageUrl)
     {
-        return new Core.Entities.Gallery
-        {
-            ImageUrl = imageUrl
-        };
+        return new Core.Entities.Gallery(imageUrl);
     }
 
     public GalleryResponseDto DomainToResponseDto(Core.Entities.Gallery entity)
@@ -17,12 +14,9 @@ public class GalleryMapper : IGalleryMapper
         return new GalleryResponseDto(entity.Id, entity.ImageUrl);
     }
 
-    public Core.Entities.Gallery UpdateDtoToDomain(Core.Entities.Gallery entity, UpdateGalleryDto dto, string? imageUrl = null)
+    public Core.Entities.Gallery UpdateDtoToDomain(Core.Entities.Gallery entity, UpdateGalleryDto dto, string imageUrl)
     {
-        if (!string.IsNullOrWhiteSpace(imageUrl))
-        {
-            entity.ImageUrl = imageUrl;
-        }
+        entity.Update(imageUrl);
 
         return entity;
     }

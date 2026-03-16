@@ -11,8 +11,10 @@ public class SoftDeletableEntityConfiguration<TEntity> : BaseEntityConfiguration
     {
         base.Configure(builder);
 
+        // FIX: HasDefaultValueSql("0") əvəzinə HasDefaultValue(false) —
+        //      DB-agnostic və type-safe.
         builder.Property(e => e.IsDeactive)
             .IsRequired()
-            .HasDefaultValueSql("0");
+            .HasDefaultValue(false);
     }
 }

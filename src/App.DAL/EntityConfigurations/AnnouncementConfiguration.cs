@@ -1,17 +1,22 @@
 using App.Core.Entities;
+using App.DAL.EntityConfigurations.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class AnnouncementConfiguration : IEntityTypeConfiguration<Announcement>
+// FIX: BaseEntityConfiguration-dan inherit edir — key setup təkrarlanmır
+public class AnnouncementConfiguration : BaseEntityConfiguration<Announcement>
 {
-    public void Configure(EntityTypeBuilder<Announcement> builder)
+    public override void Configure(EntityTypeBuilder<Announcement> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).ValueGeneratedOnAdd();
+        base.Configure(builder);
 
         builder.ToTable("Announcements");
+
+        builder.Property(a => a.Title)
+            .IsRequired()
+            .HasMaxLength(500);
 
         builder.Property(a => a.TitleImageUrl)
             .IsRequired();

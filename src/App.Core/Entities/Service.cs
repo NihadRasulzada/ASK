@@ -4,7 +4,6 @@ namespace App.Core.Entities;
 
 public class Service : SoftDeletableEntity
 {
-    //TODO: dil mentiqi
     public string ImageUrl { get; private set; }
     public string NameAz { get; private set; }
     public string NameEn { get; private set; }
@@ -19,17 +18,15 @@ public class Service : SoftDeletableEntity
         NameRu = string.Empty;
     }
 
-    public Service(string imageUrl, string nameAz, string nameEn, string nameRu) : base(Guid.NewGuid(), false)
+    public Service(string imageUrl, string nameAz, string nameEn, string nameRu)
+        : base(Guid.NewGuid(), false)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
-
         if (string.IsNullOrWhiteSpace(nameAz))
             throw new ArgumentException("Az dili adı boş ola bilməz.", nameof(nameAz));
-
         if (string.IsNullOrWhiteSpace(nameEn))
             throw new ArgumentException("En dili adı boş ola bilməz.", nameof(nameEn));
-
         if (string.IsNullOrWhiteSpace(nameRu))
             throw new ArgumentException("Ru dili adı boş ola bilməz.", nameof(nameRu));
 
@@ -40,22 +37,25 @@ public class Service : SoftDeletableEntity
         ActivateAt = DateTime.UtcNow;
     }
 
-    public void Update(string? imageUrl, string nameAz, string nameEn, string nameRu)
+    /// <param name="imageUrl">Null ötürülərsə mövcud dəyər saxlanılır.</param>
+    public void Update(string nameAz, string nameEn, string nameRu)
     {
         if (string.IsNullOrWhiteSpace(nameAz))
             throw new ArgumentException("Az dili adı boş ola bilməz.", nameof(nameAz));
-
         if (string.IsNullOrWhiteSpace(nameEn))
             throw new ArgumentException("En dili adı boş ola bilməz.", nameof(nameEn));
-
         if (string.IsNullOrWhiteSpace(nameRu))
             throw new ArgumentException("Ru dili adı boş ola bilməz.", nameof(nameRu));
-
-        if (imageUrl is not null)
-            ImageUrl = imageUrl;
 
         NameAz = nameAz;
         NameEn = nameEn;
         NameRu = nameRu;
+    }
+    public void UpdateImageUrl(string imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
+
+        ImageUrl = imageUrl;
     }
 }

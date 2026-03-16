@@ -3,7 +3,7 @@ using App.BL.Resources;
 using App.Core.Interfaces;
 using FluentValidation;
 
-namespace App.BL.Validators;
+namespace App.BL.Validators.Partner;
 
 public class UpdatePartnerDtoValidator : AbstractValidator<UpdatePartnerDto>
 {

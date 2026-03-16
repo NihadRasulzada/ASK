@@ -1,38 +1,56 @@
 ﻿using App.Core.Entities.Common;
 
-namespace App.Core.Entities
+namespace App.Core.Entities;
+
+public class Announcement : BaseEntity
 {
-    public class Announcement : BaseEntity
+    public string TitleImageUrl { get; private set; }
+    public string Title { get; private set; }
+    public string Text { get; private set; }
+
+    public Announcement(string title, string titleImageUrl, string text)
+        : base(Guid.NewGuid())
     {
-        public string TitleImageUrl { get; set; }
-        public string Title { get; set; }
-        public string Text { get; set; }
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(title));
 
-        public Announcement(string title, string titleImageUrl, string text) : base(Guid.NewGuid())
-        {
-            TitleImageUrl = titleImageUrl;
-            Title = title;
-            Text = text;
-        }
+        if (string.IsNullOrWhiteSpace(titleImageUrl))
+            throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(titleImageUrl));
 
-        private Announcement() : base(Guid.Empty)
-        {
-        }
+        if (string.IsNullOrWhiteSpace(text))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(text));
 
-        public void Update(string title, string? titleImageUrl, string text)
-        {
-            if (string.IsNullOrWhiteSpace(title))
-                throw new ArgumentException("Tam ad boş ola bilməz.", nameof(title));
+        Title = title;
+        TitleImageUrl = titleImageUrl;
+        Text = text;
+    }
 
-            if (string.IsNullOrWhiteSpace(text))
-                throw new ArgumentException("Vəzifə boş ola bilməz.", nameof(text));
+    // EF Core materialization
+    private Announcement() : base(Guid.Empty)
+    {
+        TitleImageUrl = string.Empty;
+        Title = string.Empty;
+        Text = string.Empty;
+    }
 
-            if (titleImageUrl is not null)
-                TitleImageUrl = titleImageUrl;
+    /// <param name="titleImageUrl">Null ötürülərsə mövcud dəyər saxlanılır.</param>
+    public void Update(string title, string text)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(title));
 
-            Title = title;
-            Text = text;
-        }
+        if (string.IsNullOrWhiteSpace(text))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(text));
 
+        Title = title;
+        Text = text;
+    }
+
+    public void UpdateImage(string titleImageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(titleImageUrl))
+            throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(titleImageUrl));
+
+        TitleImageUrl = titleImageUrl;
     }
 }

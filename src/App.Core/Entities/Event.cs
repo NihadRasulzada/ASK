@@ -2,9 +2,55 @@
 
 namespace App.Core.Entities;
 
-public class Event() : SoftDeletableEntity(Guid.NewGuid(), false)
+// FIX: abstract olmalıdır — heç vaxt birbaşa "Event" yaradılmır,
+//      yalnız Exhibition / Training yaradılır.
+// FIX: setter-lər private olmalıdır.
+// FIX: EF Core üçün parameterless constructor əlavə edildi.
+public abstract class Event : SoftDeletableEntity
 {
-    public string Title { get; set; }
-    public string TitleImageUrl { get; set; }
-    public string Text { get; set; }
+    public string Title { get; private set; }
+    public string TitleImageUrl { get; private set; }
+    public string Text { get; private set; }
+
+    // EF Core materialization
+    protected Event() : base(Guid.Empty, false)
+    {
+        Title = string.Empty;
+        TitleImageUrl = string.Empty;
+        Text = string.Empty;
+    }
+
+    protected Event(string title, string titleImageUrl, string text)
+        : base(Guid.NewGuid(), false)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(title));
+        if (string.IsNullOrWhiteSpace(titleImageUrl))
+            throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(titleImageUrl));
+        if (string.IsNullOrWhiteSpace(text))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(text));
+
+        Title = title;
+        TitleImageUrl = titleImageUrl;
+        Text = text;
+    }
+
+    public void Update(string title, string text)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(title));
+        if (string.IsNullOrWhiteSpace(text))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(text));
+
+        Title = title;
+        Text = text;
+    }
+    public void UpdateImageUrl(string imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
+
+        TitleImageUrl = imageUrl;
+    }
+
 }

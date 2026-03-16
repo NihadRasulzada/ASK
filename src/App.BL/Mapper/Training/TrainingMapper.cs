@@ -6,12 +6,7 @@ public class TrainingMapper : ITrainingMapper
 {
     public Core.Entities.Training CreateDtoToDomain(CreateTrainingDto dto, string imageUrl)
     {
-        return new Core.Entities.Training
-        {
-            Title = dto.Title,
-            Text = dto.Text,
-            TitleImageUrl = imageUrl
-        };
+        return new Core.Entities.Training(dto.Title, imageUrl, dto.Text);
     }
 
     public TrainingResponseDto DomainToResponseDto(Core.Entities.Training entity)
@@ -21,11 +16,10 @@ public class TrainingMapper : ITrainingMapper
 
     public Core.Entities.Training UpdateDtoToDomain(Core.Entities.Training entity, UpdateTrainingDto dto, string? imageUrl = null)
     {
-        entity.Title = dto.Title;
-        entity.Text = dto.Text;
+        entity.Update(dto.Title, dto.Text);
         if (imageUrl != null)
         {
-            entity.TitleImageUrl = imageUrl;
+            entity.UpdateImageUrl(imageUrl);
         }
         return entity;
     }

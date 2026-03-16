@@ -41,11 +41,14 @@ public class ServiceMapper : IServiceMapper
     public Core.Entities.Service UpdateDtoToDamain(Core.Entities.Service service, UpdateServiceDto dto, string imageUrl)
     {
         service.Update(
-            imageUrl: imageUrl,
             nameAz: dto.NameAz,
             nameEn: dto.NameEn,
             nameRu: dto.NameRu
         );
+        if(imageUrl is not null)
+        {
+            service.UpdateImageUrl(imageUrl);
+        }
         return service;
     }
 }

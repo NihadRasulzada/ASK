@@ -13,7 +13,7 @@ public class NewsMapper : INewsMapper
         this.languageService = languageService;
     }
 
-    public Core.Entities.News CreateDtoToDomain(CreateNewsDto dto, string titleImageUrl, IList<string> imageUrls)
+    public Core.Entities.News CreateDtoToDomain(CreateNewsDto dto, string titleImageUrl)
     {
         var entity = new Core.Entities.News(
             titleImageUrl,
@@ -21,11 +21,6 @@ public class NewsMapper : INewsMapper
             dto.NewsTextEn,
             dto.NewsTextRu
         );
-
-        if (imageUrls != null && imageUrls.Any())
-        {
-            entity.ImageUrls = imageUrls;
-        }
 
         return entity;
     }
@@ -45,23 +40,17 @@ public class NewsMapper : INewsMapper
                 "ru" => entity.NewsTextRu,
                 _ => entity.NewsTextAz
             },
-            entity.ImageUrls?.ToList(),
+            entity.Images?.Select(x => x.ImageUrl).ToList() ?? new List<string>(),
             entity.IsDeactive
         );
     }
 
-    public void UpdateDtoToDomain(Core.Entities.News entity, UpdateNewsDto dto, string titleImageUrl, IList<string> imageUrls)
+    public void UpdateDtoToDomain(Core.Entities.News entity, UpdateNewsDto dto, string titleImageUrl)
     {
         entity.Update(
-            titleImageUrl,
             dto.NewsTextAz,
             dto.NewsTextEn,
             dto.NewsTextRu
         );
-
-        if (imageUrls != null)
-        {
-            entity.ImageUrls = imageUrls;
-        }
     }
 }

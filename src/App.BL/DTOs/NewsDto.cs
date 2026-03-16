@@ -13,8 +13,6 @@ public class CreateNewsDto
     public string NewsTextAz { get; set; } = string.Empty;
     public string NewsTextEn { get; set; } = string.Empty;
     public string NewsTextRu { get; set; } = string.Empty;
-
-    public List<IFormFile>? AdditionalImages { get; set; }
 }
 
 /// <summary>
@@ -27,8 +25,6 @@ public class UpdateNewsDto
     public string NewsTextAz { get; set; } = string.Empty;
     public string NewsTextEn { get; set; } = string.Empty;
     public string NewsTextRu { get; set; } = string.Empty;
-
-    public List<IFormFile>? AdditionalImages { get; set; }
 }
 
 /// <summary>

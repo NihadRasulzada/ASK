@@ -48,10 +48,9 @@ public class DirectorMapper : IDirectorMapper
         );
     }
 
-    public Core.Entities.Director UpdateDtoToDamain(Core.Entities.Director Director, UpdateDirectorDto dto, string imageUrl)
+    public Core.Entities.Director UpdateDtoToDamain(Core.Entities.Director Director, UpdateDirectorDto dto, string? imageUrl = null)
     {
         Director.Update(
-            imageUrl,
             dto.FullNameAz,
             dto.FullNameEn,
             dto.FullNameRu,
@@ -59,6 +58,9 @@ public class DirectorMapper : IDirectorMapper
             dto.DutyEn,
             dto.DutyRu
         );
+        if (imageUrl is not null)
+            Director.UpdateImageUrl(imageUrl);
+
         return Director;
     }
 }

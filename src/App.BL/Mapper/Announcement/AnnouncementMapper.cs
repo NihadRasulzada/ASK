@@ -16,7 +16,9 @@ public class AnnouncementMapper : IAnnouncementMapper
 
     public Core.Entities.Announcement UpdateDtoToDomain(Core.Entities.Announcement entity, UpdateAnnouncementDto dto, string? titleImageUrl = null)
     {
-        entity.Update(dto.Title, titleImageUrl, dto.Text);
+        entity.Update(dto.Title, dto.Text);
+        if (titleImageUrl is not null) 
+            entity.UpdateImage(titleImageUrl);
         return entity;
     }
 }

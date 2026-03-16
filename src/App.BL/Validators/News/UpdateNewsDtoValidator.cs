@@ -3,7 +3,7 @@ using App.BL.Resources;
 using App.Core.Interfaces;
 using FluentValidation;
 
-namespace App.BL.Validators;
+namespace App.BL.Validators.News;
 
 public class UpdateNewsDtoValidator : AbstractValidator<UpdateNewsDto>
 {
@@ -26,14 +26,5 @@ public class UpdateNewsDtoValidator : AbstractValidator<UpdateNewsDto>
         RuleFor(x => x.NewsTextAz)
             .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
             .MaximumLength(10000).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));
-
-        When(x => x.AdditionalImages is not null && x.AdditionalImages.Count > 0, () =>
-        {
-            RuleForEach(x => x.AdditionalImages)
-                .Must(f => f.Length <= MaxFileSizeBytes)
-                    .WithMessage(ValidationMessages.AdditionalImageTooLarge(languageService.Lang))
-                .Must(f => AllowedContentTypes.Contains(f.ContentType.ToLower()))
-                    .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
-        });
     }
 }

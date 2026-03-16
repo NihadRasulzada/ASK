@@ -3,7 +3,7 @@ using App.BL.Resources;
 using App.Core.Interfaces;
 using FluentValidation;
 
-namespace App.BL.Validators;
+namespace App.BL.Validators.Video;
 
 public class CreateVideoDtoValidator : AbstractValidator<CreateVideoDto>
 {

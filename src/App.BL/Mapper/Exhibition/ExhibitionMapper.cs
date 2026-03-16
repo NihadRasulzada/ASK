@@ -6,12 +6,7 @@ public class ExhibitionMapper : IExhibitionMapper
 {
     public Core.Entities.Exhibition CreateDtoToDomain(CreateExhibitionDto dto, string imageUrl)
     {
-        return new Core.Entities.Exhibition
-        {
-            Title = dto.Title,
-            Text = dto.Text,
-            TitleImageUrl = imageUrl
-        };
+        return new Core.Entities.Exhibition(dto.Title, imageUrl, dto.Text);
     }
 
     public ExhibitionResponseDto DomainToResponseDto(Core.Entities.Exhibition entity)
@@ -21,11 +16,10 @@ public class ExhibitionMapper : IExhibitionMapper
 
     public Core.Entities.Exhibition UpdateDtoToDomain(Core.Entities.Exhibition entity, UpdateExhibitionDto dto, string? imageUrl = null)
     {
-        entity.Title = dto.Title;
-        entity.Text = dto.Text;
+        entity.Update(dto.Title, dto.Text);
         if (imageUrl != null)
         {
-            entity.TitleImageUrl = imageUrl;
+            entity.UpdateImageUrl(imageUrl);
         }
         return entity;
     }

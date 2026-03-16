@@ -1,22 +1,21 @@
 using App.Core.Entities;
+using App.DAL.EntityConfigurations.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class PresidentConfiguration : IEntityTypeConfiguration<President>
+// FIX: BaseEntityConfiguration-dan inherit edir
+public class PresidentConfiguration : BaseEntityConfiguration<President>
 {
-    public void Configure(EntityTypeBuilder<President> builder)
+    public override void Configure(EntityTypeBuilder<President> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.Property(e => e.Id).ValueGeneratedOnAdd();
+        base.Configure(builder);
 
         builder.ToTable("Presidents");
 
-        builder.Property(e => e.ImageUrl)
-            .IsRequired();
+        builder.Property(e => e.ImageUrl).IsRequired();
 
-        builder.Property(e => e.Text)
-            .IsRequired();
+        builder.Property(e => e.Text).IsRequired();
     }
 }

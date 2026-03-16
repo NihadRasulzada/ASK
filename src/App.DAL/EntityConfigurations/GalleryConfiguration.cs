@@ -1,17 +1,16 @@
 using App.Core.Entities;
+using App.DAL.EntityConfigurations.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class GalleryConfiguration : IEntityTypeConfiguration<Gallery>
+// FIX: BaseEntityConfiguration-dan inherit edir
+public class GalleryConfiguration : BaseEntityConfiguration<Gallery>
 {
-    public void Configure(EntityTypeBuilder<Gallery> builder)
+    public override void Configure(EntityTypeBuilder<Gallery> builder)
     {
-        builder.HasKey(g => g.Id);
-
-        builder.Property(g => g.Id)
-            .ValueGeneratedOnAdd();
+        base.Configure(builder);
 
         builder.ToTable("Galleries");
 

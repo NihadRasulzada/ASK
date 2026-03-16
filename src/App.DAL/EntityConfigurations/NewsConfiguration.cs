@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
+// FIX: BaseEntityConfiguration-dan inherit edir
+// FIX: PrimitiveCollection silindi — NewsImage entity-si istifadə olunur
 public class NewsConfiguration : SoftDeletableEntityConfiguration<News>
 {
     public override void Configure(EntityTypeBuilder<News> builder)
@@ -13,15 +15,14 @@ public class NewsConfiguration : SoftDeletableEntityConfiguration<News>
 
         builder.ToTable("News");
 
-        builder.Property(n => n.TitleImageUrl)
-            .IsRequired();
+        builder.Property(n => n.TitleImageUrl).IsRequired();
+        builder.Property(n => n.NewsTextAz).IsRequired();
+        builder.Property(n => n.NewsTextEn).IsRequired();
+        builder.Property(n => n.NewsTextRu).IsRequired();
 
-        builder.Property(n => n.NewsTextAz)
-            .IsRequired();
-
-        // IEnumerable<string> — EF Core 8+ PrimitiveCollection API ilə
-        // nvarchar(max) kolonunda JSON array kimi saxlanılır.
-        builder.PrimitiveCollection(n => n.ImageUrls)
-            .IsRequired();
+        builder.HasMany(n => n.Images)
+            .WithOne(i => i.News)
+            .HasForeignKey(i => i.NewsId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

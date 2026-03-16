@@ -1,24 +1,21 @@
 using App.Core.Entities;
+using App.DAL.EntityConfigurations.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class PartnerConfiguration : IEntityTypeConfiguration<Partner>
+// FIX: BaseEntityConfiguration-dan inherit edir
+public class PartnerConfiguration : BaseEntityConfiguration<Partner>
 {
-    public void Configure(EntityTypeBuilder<Partner> builder)
+    public override void Configure(EntityTypeBuilder<Partner> builder)
     {
-        builder.HasKey(p => p.Id);
-
-        builder.Property(p => p.Id)
-            .ValueGeneratedOnAdd();
+        base.Configure(builder);
 
         builder.ToTable("Partners");
 
-        builder.Property(p => p.ImageUrl)
-            .IsRequired();
+        builder.Property(p => p.ImageUrl).IsRequired();
 
-        builder.Property(p => p.Site)
-            .IsRequired();
+        builder.Property(p => p.Site).IsRequired();
     }
 }

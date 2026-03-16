@@ -16,7 +16,9 @@ public class PresidentMapper : IPresidentMapper
 
     public Core.Entities.President UpdateDtoToDomain(Core.Entities.President entity, UpdatePresidentDto dto, string? imageUrl = null)
     {
-        entity.Update(imageUrl, dto.Text);
+        entity.Update(dto.Text);
+        if(imageUrl is not null) 
+            entity.UpdateImageUrl(imageUrl);
         return entity;
     }
 }

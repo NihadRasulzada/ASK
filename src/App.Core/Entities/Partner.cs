@@ -17,7 +17,6 @@ public class Partner : BaseEntity
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
-
         if (string.IsNullOrWhiteSpace(site))
             throw new ArgumentException("Sayt URL-i boş ola bilməz.", nameof(site));
 
@@ -25,14 +24,20 @@ public class Partner : BaseEntity
         Site = site;
     }
 
-    public void Update(string? imageUrl, string site)
+    /// <param name="imageUrl">Null ötürülərsə mövcud dəyər saxlanılır.</param>
+    public void Update(string site)
     {
         if (string.IsNullOrWhiteSpace(site))
             throw new ArgumentException("Sayt URL-i boş ola bilməz.", nameof(site));
 
-        if (imageUrl is not null)
-            ImageUrl = imageUrl;
-
         Site = site;
+    }
+
+    public void UpdateImageUrl(string imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+            throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
+
+        ImageUrl = imageUrl;
     }
 }

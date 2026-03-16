@@ -35,18 +35,7 @@ public class NewsService(
     {
         string titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
 
-        List<string> imageUrls = new();
-
-        if (dto.AdditionalImages != null && dto.AdditionalImages.Any())
-        {
-            foreach (var image in dto.AdditionalImages)
-            {
-                string url = await cloudinaryService.UploadImageAsync(image);
-                imageUrls.Add(url);
-            }
-        }
-
-        Core.Entities.News entity = newsMapper.CreateDtoToDomain(dto, titleImageUrl, imageUrls);
+        Core.Entities.News entity = newsMapper.CreateDtoToDomain(dto, titleImageUrl);
 
         await writeRepository.AddAsync(entity, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -142,20 +131,7 @@ public class NewsService(
             titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
         }
 
-        List<string> imageUrls = entity.ImageUrls?.ToList() ?? new List<string>();
-
-        if (dto.AdditionalImages != null && dto.AdditionalImages.Any())
-        {
-            imageUrls.Clear();
-
-            foreach (var image in dto.AdditionalImages)
-            {
-                string url = await cloudinaryService.UploadImageAsync(image);
-                imageUrls.Add(url);
-            }
-        }
-
-        newsMapper.UpdateDtoToDomain(entity, dto, titleImageUrl, imageUrls);
+        newsMapper.UpdateDtoToDomain(entity, dto, titleImageUrl);
 
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
