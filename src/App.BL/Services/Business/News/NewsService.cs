@@ -4,6 +4,7 @@ using App.BL.Services.External;
 using App.Core.Interfaces.Repository.News;
 using App.Core.ResponseObject.Concreate;
 using App.DAL.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.BL.Services.Business.News;
 //TODO: Full struktur 0 dan yazilacag
@@ -77,7 +78,7 @@ public class NewsService(
 
     public async Task<Response<IEnumerable<NewsResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        IEnumerable<Core.Entities.News> entities = await readRepository.GetAllAsync(false, cancellationToken, false);
+        IEnumerable<Core.Entities.News> entities = await readRepository.GetAllAsync(false, cancellationToken, false, include: x => x.Include(i => i.Images));
 
         if (!entities.Any())
             return Response<IEnumerable<NewsResponseDto>>
