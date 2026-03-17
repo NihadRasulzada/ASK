@@ -15,4 +15,4 @@ public class CreateNewsImageDto
     public Guid NewsId { get; set; }
     public IFormFile Image { get; set; }
 };
-public record NewsImageResponseDto(Guid Id, string ImageUrl);
+public record NewsImageResponseDto(Guid Id, string ImageUrl, Guid NewsId);

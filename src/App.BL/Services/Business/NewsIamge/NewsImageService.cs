@@ -4,6 +4,7 @@ using App.BL.NewsImages.Business.NewsIamge;
 using App.BL.Services.External;
 using App.Core.Interfaces.Repository.NewsImage;
 using App.Core.ResponseObject.Concreate;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.BL.Services.Business.NewsIamge;
 
@@ -50,7 +51,7 @@ public class NewsImageService : INewsImageService
 
     public async Task<Response<IEnumerable<NewsImageResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        IEnumerable<Core.Entities.NewsImage> entities = await readRepository.GetAllAsync(false, cancellationToken, false);
+        IEnumerable<Core.Entities.NewsImage> entities = await readRepository.GetAllAsync(false, cancellationToken, false, include: x => x.Include(i => i.News));
 
         if (!entities.Any())
             return Response<IEnumerable<NewsImageResponseDto>>
