@@ -15,5 +15,6 @@ public class VideoConfiguration : BaseEntityConfiguration<Video>
         builder.ToTable("Videos");
 
         builder.Property(v => v.Link).IsRequired();
+        builder.Property(v => v.Title).IsRequired().HasMaxLength(500);
     }
-}
+}

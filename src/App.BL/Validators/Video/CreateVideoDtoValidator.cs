@@ -10,11 +10,14 @@ public class CreateVideoDtoValidator : AbstractValidator<CreateVideoDto>
 {
     public CreateVideoDtoValidator(ILanguageService languageService)
     {
+        RuleFor(x => x.Title)
+            .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+
         RuleFor(x => x.Link)
             .NotEmpty().WithMessage(ValidationMessages.LinkRequired(languageService.Lang))
             .MaximumLength(2048).WithMessage(ValidationMessages.LinkTooLong(languageService.Lang))
-            // FIX: static helper istifadə olunur — kod təkrarlanmır
             .Must(UrlValidatorHelper.BeAValidUrl)
                 .WithMessage(ValidationMessages.LinkInvalidUrl(languageService.Lang));
     }
-}
+}

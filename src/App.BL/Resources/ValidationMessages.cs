@@ -125,6 +125,34 @@ public static class ValidationMessages
         _ => "Vəzifə 200 simvoldan çox ola bilməz."
     };
 
+    public static string PhoneNumberTooLong(string lang) => lang switch
+    {
+        "en" => "Phone number cannot exceed 50 characters.",
+        "ru" => "Номер телефона не может превышать 50 символов.",
+        _ => "Telefon nömrəsi 50 simvoldan çox ola bilməz."
+    };
+
+    public static string PhoneNumberInvalidFormat(string lang) => lang switch
+    {
+        "en" => "Phone number format is invalid.",
+        "ru" => "Неверный формат номера телефона.",
+        _ => "Telefon nömrəsinin formatı yanlışdır."
+    };
+
+    public static string EmailInvalidFormat(string lang) => lang switch
+    {
+        "en" => "Email address is invalid.",
+        "ru" => "Неверный формат электронной почты.",
+        _ => "E-poçt ünvanı düzgün deyil."
+    };
+
+    public static string EmailTooLong(string lang) => lang switch
+    {
+        "en" => "Email address cannot exceed 256 characters.",
+        "ru" => "Электронная почта не может превышать 256 символов.",
+        _ => "E-poçt ünvanı 256 simvoldan çox ola bilməz."
+    };
+
     // ── News ──────────────────────────────────────────────────────────────────
     public static string TitleImageRequired(string lang) => lang switch
     {

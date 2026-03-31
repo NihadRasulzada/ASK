@@ -1,4 +1,4 @@
-﻿using App.BL.DTOs;
+using App.BL.DTOs;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Director;
@@ -21,7 +21,9 @@ public class DirectorMapper : IDirectorMapper
             dto.FullNameRu,
             dto.DutyAz,
             dto.DutyEn,
-            dto.DutyRu
+            dto.DutyRu,
+            dto.PhoneNumber ?? string.Empty,
+            dto.Email ?? string.Empty
         );
     }
 
@@ -44,6 +46,8 @@ public class DirectorMapper : IDirectorMapper
                 "ru" => Director.DutyRu,
                 _ => Director.DutyAz
             },
+            PhoneNumber: string.IsNullOrWhiteSpace(Director.PhoneNumber) ? null : Director.PhoneNumber,
+            Email: string.IsNullOrWhiteSpace(Director.Email) ? null : Director.Email,
             IsDeactive: Director.IsDeactive
         );
     }
@@ -56,11 +60,13 @@ public class DirectorMapper : IDirectorMapper
             dto.FullNameRu,
             dto.DutyAz,
             dto.DutyEn,
-            dto.DutyRu
+            dto.DutyRu,
+            dto.PhoneNumber ?? string.Empty,
+            dto.Email ?? string.Empty
         );
         if (imageUrl is not null)
             Director.UpdateImageUrl(imageUrl);
 
         return Director;
     }
-}
+}

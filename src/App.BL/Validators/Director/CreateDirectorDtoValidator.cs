@@ -29,7 +29,6 @@ public class CreateDirectorDtoValidator : AbstractValidator<CreateDirectorDto>
                     .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
         });
 
-        // FIX: Yalnız Az deyil, En və Ru sahələri də validasiya edilir
         RuleFor(x => x.FullNameAz)
             .NotEmpty().WithMessage(ValidationMessages.FullNameRequired(languageService.Lang))
             .MaximumLength(200).WithMessage(ValidationMessages.FullNameTooLong(languageService.Lang));
@@ -53,5 +52,19 @@ public class CreateDirectorDtoValidator : AbstractValidator<CreateDirectorDto>
         RuleFor(x => x.DutyRu)
             .NotEmpty().WithMessage(ValidationMessages.DutyRequired(languageService.Lang))
             .MaximumLength(200).WithMessage(ValidationMessages.DutyTooLong(languageService.Lang));
+
+        When(x => x.PhoneNumber is not null, () =>
+        {
+            RuleFor(x => x.PhoneNumber!)
+                .MaximumLength(50).WithMessage(ValidationMessages.PhoneNumberTooLong(languageService.Lang))
+                .Matches(@"^\+?[0-9\s\-\(\)]+$").WithMessage(ValidationMessages.PhoneNumberInvalidFormat(languageService.Lang));
+        });
+
+        When(x => x.Email is not null, () =>
+        {
+            RuleFor(x => x.Email!)
+                .EmailAddress().WithMessage(ValidationMessages.EmailInvalidFormat(languageService.Lang))
+                .MaximumLength(256).WithMessage(ValidationMessages.EmailTooLong(languageService.Lang));
+        });
     }
-}
+}

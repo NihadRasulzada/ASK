@@ -3,18 +3,14 @@ namespace App.BL.DTOs;
 /// <summary>
 /// Video yaratmaq üçün istifadə olunan DTO.
 /// </summary>
-/// <param name="Link">Videonun URL linki.</param>
-public record CreateVideoDto(string Link);
+public record CreateVideoDto(string Link, string Title);
 
 /// <summary>
 /// Video yeniləmək üçün istifadə olunan DTO.
 /// </summary>
-/// <param name="Link">Yeni URL link.</param>
-public record UpdateVideoDto(string Link);
+public record UpdateVideoDto(string Link, string Title);
 
 /// <summary>
 /// Client-ə qaytarılan Video məlumatı.
 /// </summary>
-/// <param name="Id">Videonun unikal identifikatoru.</param>
-/// <param name="Link">Videonun URL linki.</param>
-public record VideoResponseDto(Guid Id, string Link);
+public record VideoResponseDto(Guid Id, string Link, string Title);

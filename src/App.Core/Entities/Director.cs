@@ -11,6 +11,8 @@ public class Director : SoftDeletableEntity
     public string DutyAz { get; private set; }
     public string DutyEn { get; private set; }
     public string DutyRu { get; private set; }
+    public string PhoneNumber { get; set; }
+    public string  Email { get; set; }
 
     // EF Core materialization
     private Director() : base(Guid.Empty, false)
@@ -27,7 +29,7 @@ public class Director : SoftDeletableEntity
     public Director(
         string imageUrl,
         string fullNameAz, string fullNameEn, string fullNameRu,
-        string dutyAz, string dutyEn, string dutyRu)
+        string dutyAz, string dutyEn, string dutyRu, string phoneNumber, string email)
         : base(Guid.NewGuid(), false)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
@@ -52,12 +54,14 @@ public class Director : SoftDeletableEntity
         DutyAz = dutyAz;
         DutyEn = dutyEn;
         DutyRu = dutyRu;
+        PhoneNumber = phoneNumber;
+        Email = email;
     }
 
     /// <param name="imageUrl">Null ötürülərsə mövcud dəyər saxlanılır.</param>
     public void Update(
         string fullNameAz, string fullNameEn, string fullNameRu,
-        string dutyAz, string dutyEn, string dutyRu)
+        string dutyAz, string dutyEn, string dutyRu, string phoneNumber, string email)
     {
 
         if (string.IsNullOrWhiteSpace(fullNameAz))
@@ -79,6 +83,8 @@ public class Director : SoftDeletableEntity
         DutyAz = dutyAz;
         DutyEn = dutyEn;
         DutyRu = dutyRu;
+        PhoneNumber = phoneNumber;
+        Email = email;
     }
 
     public void UpdateImageUrl(string imageUrl)
