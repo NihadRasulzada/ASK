@@ -10,6 +10,7 @@ public class News : SoftDeletableEntity
     public string NewsTextAz { get; private set; }
     public string NewsTextEn { get; private set; }
     public string NewsTextRu { get; private set; }
+    public DateTime CreateDate { get; private set; }
 
     public ICollection<NewsImage> Images { get; private set; } = new List<NewsImage>();
 
@@ -41,6 +42,7 @@ public class News : SoftDeletableEntity
         NewsTextAz = newsTextAz;
         NewsTextEn = newsTextEn;
         NewsTextRu = newsTextRu;
+        CreateDate = DateTime.UtcNow;
     }
 
     public void Update(

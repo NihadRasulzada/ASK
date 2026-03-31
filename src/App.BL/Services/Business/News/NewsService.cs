@@ -93,7 +93,7 @@ public class NewsService(
 
     public async Task<Response<IEnumerable<NewsResponseDto>>> GetAllIncludingDeletedAsync(CancellationToken cancellationToken = default)
     {
-        IEnumerable<Core.Entities.News> entities = await readRepository.GetAllIncludingDeletedAsync(cancellationToken);
+        IEnumerable<Core.Entities.News> entities = await readRepository.GetAllIncludingDeletedAsync(cancellationToken, include: x => x.Include(i => i.Images));
 
         if (!entities.Any())
             return Response<IEnumerable<NewsResponseDto>>
@@ -108,7 +108,7 @@ public class NewsService(
 
     public async Task<Response<NewsResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        Core.Entities.News? entity = await readRepository.GetByIdAsync(id, false, cancellationToken);
+        Core.Entities.News? entity = await readRepository.GetByIdAsync(id, false, cancellationToken, include: x => x.Include(i => i.Images));
 
         if (entity == null)
             return Response<NewsResponseDto?>.NotFound("News not found");
@@ -120,7 +120,7 @@ public class NewsService(
 
     public async Task<Response<NewsResponseDto?>> UpdateAsync(Guid id, UpdateNewsDto dto, CancellationToken cancellationToken = default)
     {
-        Core.Entities.News? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
+        Core.Entities.News? entity = await readRepository.GetByIdAsync(id, true, cancellationToken, include: x => x.Include(i => i.Images));
 
         if (entity == null)
             return Response<NewsResponseDto?>.NotFound("News not found");

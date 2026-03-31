@@ -41,7 +41,8 @@ public class NewsMapper : INewsMapper
                 _ => entity.NewsTextAz
             },
             entity.Images?.Select(x => x.ImageUrl).ToList() ?? new List<string>(),
-            entity.IsDeactive
+            entity.IsDeactive,
+            entity.CreateDate
         );
     }
 
@@ -52,5 +53,9 @@ public class NewsMapper : INewsMapper
             dto.NewsTextEn,
             dto.NewsTextRu
         );
+        if (titleImageUrl != null)
+        {
+            entity.UpdateImageUrl(titleImageUrl);
+        }
     }
 }
