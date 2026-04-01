@@ -262,4 +262,117 @@ public static class ValidationMessages
         "ru" => "Заголовок не может превышать 500 символов.",
         _ => "Başlıq 500 simvoldan çox ola bilməz."
     };
+
+    // ── Company ───────────────────────────────────────────────────────────────
+    public static string CompanyRequired(string lang) => lang switch
+    {
+        "en" => "Company is required.",
+        "ru" => "Компания обязательна.",
+        _ => "Şirkət mütləq daxil edilməlidir."
+    };
+
+    public static string CompanyTooLong(string lang) => lang switch
+    {
+        "en" => "Company cannot exceed 200 characters.",
+        "ru" => "Компания не может превышать 200 символов.",
+        _ => "Şirkət 200 simvoldan çox ola bilməz."
+    };
+
+    // ── District ──────────────────────────────────────────────────────────────
+    public static string DistrictRequired(string lang) => lang switch
+    {
+        "en" => "District is required.",
+        "ru" => "Район обязателен.",
+        _ => "Rayon mütləq daxil edilməlidir."
+    };
+
+    public static string DistrictTooLong(string lang) => lang switch
+    {
+        "en" => "District cannot exceed 200 characters.",
+        "ru" => "Район не может превышать 200 символов.",
+        _ => "Rayon 200 simvoldan çox ola bilməz."
+    };
+
+    // ── Country ───────────────────────────────────────────────────────────────
+    public static string CountryRequired(string lang) => lang switch
+    {
+        "en" => "Country is required.",
+        "ru" => "Страна обязательна.",
+        _ => "Ölkə mütləq daxil edilməlidir."
+    };
+
+    public static string CountryTooLong(string lang) => lang switch
+    {
+        "en" => "Country cannot exceed 200 characters.",
+        "ru" => "Страна не может превышать 200 символов.",
+        _ => "Ölkə 200 simvoldan çox ola bilməz."
+    };
+
+    // ── Position ──────────────────────────────────────────────────────────────
+    public static string PositionRequired(string lang) => lang switch
+    {
+        "en" => "Position is required.",
+        "ru" => "Должность обязательна.",
+        _ => "Vəzifə mütləq daxil edilməlidir."
+    };
+
+    public static string PositionTooLong(string lang) => lang switch
+    {
+        "en" => "Position cannot exceed 200 characters.",
+        "ru" => "Должность не может превышать 200 символов.",
+        _ => "Vəzifə 200 simvoldan çox ola bilməz."
+    };
+
+    // ── Committee Name ────────────────────────────────────────────────────────
+    public static string NameRequired(string lang) => lang switch
+    {
+        "en" => "Name is required.",
+        "ru" => "Название обязательно.",
+        _ => "Ad mütləq daxil edilməlidir."
+    };
+
+    public static string NameTooLong(string lang) => lang switch
+    {
+        "en" => "Name cannot exceed 200 characters.",
+        "ru" => "Название не может превышать 200 символов.",
+        _ => "Ad 200 simvoldan çox ola bilməz."
+    };
+
+    // ── Chairman ──────────────────────────────────────────────────────────────
+    public static string ChairmanRequired(string lang) => lang switch
+    {
+        "en" => "Chairman is required.",
+        "ru" => "Председатель обязателен.",
+        _ => "Sədrin adı mütləq daxil edilməlidir."
+    };
+
+    public static string ChairmanTooLong(string lang) => lang switch
+    {
+        "en" => "Chairman cannot exceed 200 characters.",
+        "ru" => "Председатель не может превышать 200 символов.",
+        _ => "Sədrin adı 200 simvoldan çox ola bilməz."
+    };
+
+    // ── VicePresident ─────────────────────────────────────────────────────────
+    public static string VicePresidentRequired(string lang) => lang switch
+    {
+        "en" => "Vice president is required.",
+        "ru" => "Вице-президент обязателен.",
+        _ => "Vitse-prezidentin adı mütləq daxil edilməlidir."
+    };
+
+    public static string VicePresidentTooLong(string lang) => lang switch
+    {
+        "en" => "Vice president cannot exceed 200 characters.",
+        "ru" => "Вице-президент не может превышать 200 символов.",
+        _ => "Vitse-prezidentin adı 200 simvoldan çox ola bilməz."
+    };
+
+    // ── Icon ──────────────────────────────────────────────────────────────────
+    public static string IconRequired(string lang) => lang switch
+    {
+        "en" => "Icon is required.",
+        "ru" => "Иконка обязательна.",
+        _ => "İkon mütləq daxil edilməlidir."
+    };
 }

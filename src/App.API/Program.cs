@@ -58,6 +58,34 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Net.Http.Headers;
 using App.BL.Validators.Video;
+using App.Core.Interfaces.Repository.Management;
+using App.Core.Interfaces.Repository.InternationalSolidarity;
+using App.Core.Interfaces.Repository.ForeignRepresentatives;
+using App.Core.Interfaces.Repository.DistrictRepresentatives;
+using App.Core.Interfaces.Repository.Committee;
+using App.Core.Interfaces.Repository.Presidium;
+using App.Core.Interfaces.Repository.OurValues;
+using App.DAL.Repositories.Management;
+using App.DAL.Repositories.InternationalSolidarity;
+using App.DAL.Repositories.ForeignRepresentatives;
+using App.DAL.Repositories.DistrictRepresentatives;
+using App.DAL.Repositories.Committee;
+using App.DAL.Repositories.Presidium;
+using App.DAL.Repositories.OurValues;
+using App.BL.Mapper.Management;
+using App.BL.Mapper.InternationalSolidarity;
+using App.BL.Mapper.ForeignRepresentatives;
+using App.BL.Mapper.DistrictRepresentatives;
+using App.BL.Mapper.Committee;
+using App.BL.Mapper.Presidium;
+using App.BL.Mapper.OurValues;
+using App.BL.Services.Business.Management;
+using App.BL.Services.Business.InternationalSolidarity;
+using App.BL.Services.Business.ForeignRepresentatives;
+using App.BL.Services.Business.DistrictRepresentatives;
+using App.BL.Services.Business.Committee;
+using App.BL.Services.Business.Presidium;
+using App.BL.Services.Business.OurValues;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -202,6 +230,27 @@ builder.Services.AddScoped<App.Core.Interfaces.Repository.Announcement.IAnnounce
 
 builder.Services.AddScoped<ICurrencyRateReadRepository, CurrencyRateReadRepository>();
 
+builder.Services.AddScoped<IManagementReadRepository, ManagementReadRepository>();
+builder.Services.AddScoped<IManagementWriteRepository, ManagementWriteRepository>();
+
+builder.Services.AddScoped<IInternationalSolidarityReadRepository, InternationalSolidarityReadRepository>();
+builder.Services.AddScoped<IInternationalSolidarityWriteRepository, InternationalSolidarityWriteRepository>();
+
+builder.Services.AddScoped<IForeignRepresentativesReadRepository, ForeignRepresentativesReadRepository>();
+builder.Services.AddScoped<IForeignRepresentativesWriteRepository, ForeignRepresentativesWriteRepository>();
+
+builder.Services.AddScoped<IDistrictRepresentativesReadRepository, DistrictRepresentativesReadRepository>();
+builder.Services.AddScoped<IDistrictRepresentativesWriteRepository, DistrictRepresentativesWriteRepository>();
+
+builder.Services.AddScoped<ICommitteeReadRepository, CommitteeReadRepository>();
+builder.Services.AddScoped<ICommitteeWriteRepository, CommitteeWriteRepository>();
+
+builder.Services.AddScoped<IPresidiumReadRepository, PresidiumReadRepository>();
+builder.Services.AddScoped<IPresidiumWriteRepository, PresidiumWriteRepository>();
+
+builder.Services.AddScoped<IOurValuesReadRepository, OurValuesReadRepository>();
+builder.Services.AddScoped<IOurValuesWriteRepository, OurValuesWriteRepository>();
+
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -216,6 +265,13 @@ builder.Services.AddScoped<IPartnerMapper, PartnerMapper>();
 builder.Services.AddScoped<IPresidentMapper, PresidentMapper>();
 builder.Services.AddScoped<ITrainingMapper, TrainingMapper>();
 builder.Services.AddScoped<IExhibitionMapper, ExhibitionMapper>();
+builder.Services.AddScoped<IManagementMapper, ManagementMapper>();
+builder.Services.AddScoped<IInternationalSolidarityMapper, InternationalSolidarityMapper>();
+builder.Services.AddScoped<IForeignRepresentativesMapper, ForeignRepresentativesMapper>();
+builder.Services.AddScoped<IDistrictRepresentativesMapper, DistrictRepresentativesMapper>();
+builder.Services.AddScoped<ICommitteeMapper, CommitteeMapper>();
+builder.Services.AddScoped<IPresidiumMapper, PresidiumMapper>();
+builder.Services.AddScoped<IOurValuesMapper, OurValuesMapper>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
@@ -231,6 +287,13 @@ builder.Services.AddScoped<App.BL.NewsImages.Business.NewsIamge.INewsImageServic
 builder.Services.AddSingleton<ICurrencyService, CurrencyService>();
 builder.Services.AddScoped<IDirectorService, DirectorService>();
 builder.Services.AddScoped<IServiceService, ServiceService>();
+builder.Services.AddScoped<IManagementService, ManagementService>();
+builder.Services.AddScoped<IInternationalSolidarityService, InternationalSolidarityService>();
+builder.Services.AddScoped<IForeignRepresentativesService, ForeignRepresentativesService>();
+builder.Services.AddScoped<IDistrictRepresentativesService, DistrictRepresentativesService>();
+builder.Services.AddScoped<ICommitteeService, CommitteeService>();
+builder.Services.AddScoped<IPresidiumService, PresidiumService>();
+builder.Services.AddScoped<IOurValuesService, OurValuesService>();
 
 // ── Background Jobs ───────────────────────────────────────────────────────────
 //builder.Services.AddHostedService<CurrencyBackgroundJob>();

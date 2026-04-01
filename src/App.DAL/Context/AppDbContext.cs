@@ -26,6 +26,13 @@ namespace App.DAL.Context
         public DbSet<Training> Training { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Video> Videos { get; set; }
+        public DbSet<Management> Management { get; set; }
+        public DbSet<InternationalSolidarity> InternationalSolidarity { get; set; }
+        public DbSet<ForeignRepresentatives> ForeignRepresentatives { get; set; }
+        public DbSet<DistrictRepresentatives> DistrictRepresentatives { get; set; }
+        public DbSet<Committee> Committees { get; set; }
+        public DbSet<Presidium> Presidium { get; set; }
+        public DbSet<OurValues> OurValues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
