@@ -20,8 +20,10 @@ public class SettingController(ISettingService settingService) : ControllerBase
     /// <param name="cancellationToken">Ləğvetmə tokeni.</param>
     /// <returns>Parametrlərin siyahısı.</returns>
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
+    /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
     [ProducesResponseType(typeof(SuccessResponse<IEnumerable<SettingResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
         var response = await settingService.GetAllAsync(cancellationToken);
@@ -36,9 +38,11 @@ public class SettingController(ISettingService settingService) : ControllerBase
     /// <returns>Parametr məlumatı.</returns>
     /// <response code="200">Parametr uğurla tapıldı.</response>
     /// <response code="404">Parametr tapılmadı.</response>
+    /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("{key}")]
     [ProducesResponseType(typeof(SuccessResponse<SettingResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetByKey(
         [FromRoute] string key,
         CancellationToken cancellationToken = default)
@@ -58,11 +62,13 @@ public class SettingController(ISettingService settingService) : ControllerBase
     /// <response code="200">Parametr uğurla yeniləndi.</response>
     /// <response code="400">Yanlış dəyər (tip uyğunsuzluğu).</response>
     /// <response code="404">Parametr tapılmadı.</response>
+    /// <response code="500">Server xətası baş verdi.</response>
     [HttpPut("{key}")]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse<SettingResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Update(
         [FromRoute] string key,
         [FromForm] UpdateSettingDto dto,
