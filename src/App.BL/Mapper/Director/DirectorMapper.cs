@@ -1,4 +1,5 @@
 using App.BL.DTOs;
+using App.BL.Services.External;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Director;
@@ -6,10 +7,12 @@ namespace App.BL.Mapper.Director;
 public class DirectorMapper : IDirectorMapper
 {
     private readonly ILanguageService languageService;
+    private readonly IMediaUrlBuilder mediaUrlBuilder;
 
-    public DirectorMapper(ILanguageService languageService)
+    public DirectorMapper(ILanguageService languageService, IMediaUrlBuilder mediaUrlBuilder)
     {
         this.languageService = languageService;
+        this.mediaUrlBuilder = mediaUrlBuilder;
     }
 
     public Core.Entities.Director CreateDtoToDomain(CreateDirectorDto dto, string imageUrl)
@@ -31,7 +34,7 @@ public class DirectorMapper : IDirectorMapper
     {
         return new DirectorResponseDto(
             Id: Director.Id,
-            ImageUrl: Director.ImageUrl,
+            ImageUrl: mediaUrlBuilder.Build(Director.ImageUrl),
             FullName: languageService.Lang switch
             {
                 "az" => Director.FullNameAz,
@@ -69,4 +72,4 @@ public class DirectorMapper : IDirectorMapper
 
         return Director;
     }
-}
+}

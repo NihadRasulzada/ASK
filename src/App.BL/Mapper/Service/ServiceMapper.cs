@@ -1,4 +1,5 @@
-﻿using App.BL.DTOs;
+using App.BL.DTOs;
+using App.BL.Services.External;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Service;
@@ -6,10 +7,12 @@ namespace App.BL.Mapper.Service;
 public class ServiceMapper : IServiceMapper
 {
     private readonly ILanguageService _languageService;
+    private readonly IMediaUrlBuilder _mediaUrlBuilder;
 
-    public ServiceMapper(ILanguageService languageService)
+    public ServiceMapper(ILanguageService languageService, IMediaUrlBuilder mediaUrlBuilder)
     {
         _languageService = languageService;
+        _mediaUrlBuilder = mediaUrlBuilder;
     }
 
     public Core.Entities.Service CreateDtoToDomain(CreateServiceDto dto, string imageUrl)
@@ -26,7 +29,7 @@ public class ServiceMapper : IServiceMapper
     {
         return new ServiceResponseDto(
             Id: service.Id,
-            ImageUrl: service.ImageUrl,
+            ImageUrl: _mediaUrlBuilder.Build(service.ImageUrl),
             Name: _languageService.Lang switch
             {
                 "az" => service.NameAz,
@@ -45,7 +48,7 @@ public class ServiceMapper : IServiceMapper
             nameEn: dto.NameEn,
             nameRu: dto.NameRu
         );
-        if(imageUrl is not null)
+        if (imageUrl is not null)
         {
             service.UpdateImageUrl(imageUrl);
         }

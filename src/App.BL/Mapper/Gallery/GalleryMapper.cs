@@ -1,8 +1,9 @@
 using App.BL.DTOs;
+using App.BL.Services.External;
 
 namespace App.BL.Mapper.Gallery;
 
-public class GalleryMapper : IGalleryMapper
+public class GalleryMapper(IMediaUrlBuilder mediaUrlBuilder) : IGalleryMapper
 {
     public Core.Entities.Gallery CreateDtoToDomain(CreateGalleryDto dto, string imageUrl)
     {
@@ -11,13 +12,12 @@ public class GalleryMapper : IGalleryMapper
 
     public GalleryResponseDto DomainToResponseDto(Core.Entities.Gallery entity)
     {
-        return new GalleryResponseDto(entity.Id, entity.ImageUrl);
+        return new GalleryResponseDto(entity.Id, mediaUrlBuilder.Build(entity.ImageUrl));
     }
 
     public Core.Entities.Gallery UpdateDtoToDomain(Core.Entities.Gallery entity, UpdateGalleryDto dto, string imageUrl)
     {
         entity.Update(imageUrl);
-
         return entity;
     }
 }

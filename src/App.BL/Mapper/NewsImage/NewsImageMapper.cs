@@ -1,11 +1,9 @@
-﻿using App.BL.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using App.BL.DTOs;
+using App.BL.Services.External;
 
 namespace App.BL.Mapper.NewsImage;
 
-public class NewsImageMapper : INewsImageMapper
+public class NewsImageMapper(IMediaUrlBuilder mediaUrlBuilder) : INewsImageMapper
 {
     public Core.Entities.NewsImage CreateDtoToDomain(CreateNewsImageDto dto, string imageUrl)
     {
@@ -17,7 +15,7 @@ public class NewsImageMapper : INewsImageMapper
 
     public NewsImageResponseDto DomainToResponseDto(Core.Entities.NewsImage entity)
     {
-        return new NewsImageResponseDto(entity.Id, entity.ImageUrl, entity.NewsId);
+        return new NewsImageResponseDto(entity.Id, mediaUrlBuilder.Build(entity.ImageUrl), entity.NewsId);
     }
 
     public Core.Entities.NewsImage UpdateDtoToDomain(Core.Entities.NewsImage entity, UpdateNewsImageDto dto, string imageUrl)

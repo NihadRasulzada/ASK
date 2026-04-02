@@ -1,9 +1,10 @@
 using App.BL.DTOs;
+using App.BL.Services.External;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Presidium;
 
-public class PresidiumMapper(ILanguageService languageService) : IPresidiumMapper
+public class PresidiumMapper(ILanguageService languageService, IMediaUrlBuilder mediaUrlBuilder) : IPresidiumMapper
 {
     public Core.Entities.Presidium CreateDtoToDomain(CreatePresidiumDto dto, string imageUrl)
     {
@@ -31,7 +32,7 @@ public class PresidiumMapper(ILanguageService languageService) : IPresidiumMappe
                 "ru" => entity.PositionRu,
                 _ => entity.PositionAz
             },
-            ImageUrl: entity.ImageUrl);
+            ImageUrl: mediaUrlBuilder.Build(entity.ImageUrl));
     }
 
     public Core.Entities.Presidium UpdateDtoToDomain(Core.Entities.Presidium entity, UpdatePresidiumDto dto, string imageUrl)

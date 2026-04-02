@@ -1,8 +1,9 @@
 using App.BL.DTOs;
+using App.BL.Services.External;
 
 namespace App.BL.Mapper.President;
 
-public class PresidentMapper : IPresidentMapper
+public class PresidentMapper(IMediaUrlBuilder mediaUrlBuilder) : IPresidentMapper
 {
     public Core.Entities.President CreateDtoToDomain(CreatePresidentDto dto, string imageUrl)
     {
@@ -11,13 +12,13 @@ public class PresidentMapper : IPresidentMapper
 
     public PresidentResponseDto DomainToResponseDto(Core.Entities.President entity)
     {
-        return new PresidentResponseDto(entity.Id, entity.ImageUrl, entity.Text);
+        return new PresidentResponseDto(entity.Id, mediaUrlBuilder.Build(entity.ImageUrl), entity.Text);
     }
 
     public Core.Entities.President UpdateDtoToDomain(Core.Entities.President entity, UpdatePresidentDto dto, string? imageUrl = null)
     {
         entity.Update(dto.Text);
-        if(imageUrl is not null) 
+        if (imageUrl is not null)
             entity.UpdateImageUrl(imageUrl);
         return entity;
     }

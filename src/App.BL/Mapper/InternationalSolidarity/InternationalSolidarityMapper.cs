@@ -1,8 +1,9 @@
 using App.BL.DTOs;
+using App.BL.Services.External;
 
 namespace App.BL.Mapper.InternationalSolidarity;
 
-public class InternationalSolidarityMapper : IInternationalSolidarityMapper
+public class InternationalSolidarityMapper(IMediaUrlBuilder mediaUrlBuilder) : IInternationalSolidarityMapper
 {
     public Core.Entities.InternationalSolidarity CreateDtoToDomain(CreateInternationalSolidarityDto dto, string iconUrl)
     {
@@ -14,7 +15,7 @@ public class InternationalSolidarityMapper : IInternationalSolidarityMapper
         return new InternationalSolidarityResponseDto(
             Id: entity.Id,
             Link: entity.Link,
-            IconUrl: entity.IconUrl);
+            IconUrl: mediaUrlBuilder.Build(entity.IconUrl));
     }
 
     public Core.Entities.InternationalSolidarity UpdateDtoToDomain(Core.Entities.InternationalSolidarity entity, UpdateInternationalSolidarityDto dto, string iconUrl)

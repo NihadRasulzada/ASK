@@ -1,9 +1,10 @@
 using App.BL.DTOs;
+using App.BL.Services.External;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.OurValues;
 
-public class OurValuesMapper(ILanguageService languageService) : IOurValuesMapper
+public class OurValuesMapper(ILanguageService languageService, IMediaUrlBuilder mediaUrlBuilder) : IOurValuesMapper
 {
     public Core.Entities.OurValues CreateDtoToDomain(CreateOurValuesDto dto, string imageUrl)
     {
@@ -23,7 +24,7 @@ public class OurValuesMapper(ILanguageService languageService) : IOurValuesMappe
                 "ru" => entity.TitleRu,
                 _ => entity.TitleAz
             },
-            ImageUrl: entity.ImageUrl);
+            ImageUrl: mediaUrlBuilder.Build(entity.ImageUrl));
     }
 
     public Core.Entities.OurValues UpdateDtoToDomain(Core.Entities.OurValues entity, UpdateOurValuesDto dto, string imageUrl)

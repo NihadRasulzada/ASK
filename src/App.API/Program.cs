@@ -296,6 +296,7 @@ builder.Services.AddScoped<IPresidentService, PresidentService>();
 builder.Services.AddScoped<ITrainingService, TrainingService>();
 builder.Services.AddScoped<IExhibitionService, ExhibitionService>();
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IMediaUrlBuilder, MediaUrlBuilder>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddScoped<App.BL.NewsImages.Business.NewsIamge.INewsImageService, App.BL.Services.Business.NewsIamge.NewsImageService>();
 builder.Services.AddSingleton<ICurrencyService, CurrencyService>();

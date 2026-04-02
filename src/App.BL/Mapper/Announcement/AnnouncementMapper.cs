@@ -1,8 +1,9 @@
 using App.BL.DTOs;
+using App.BL.Services.External;
 
 namespace App.BL.Mapper.Announcement;
 
-public class AnnouncementMapper : IAnnouncementMapper
+public class AnnouncementMapper(IMediaUrlBuilder mediaUrlBuilder) : IAnnouncementMapper
 {
     public Core.Entities.Announcement CreateDtoToDomain(CreateAnnouncementDto dto, string titleImageUrl)
     {
@@ -11,13 +12,13 @@ public class AnnouncementMapper : IAnnouncementMapper
 
     public AnnouncementResponseDto DomainToResponseDto(Core.Entities.Announcement entity)
     {
-        return new AnnouncementResponseDto(entity.Id, entity.Title, entity.TitleImageUrl, entity.Text);
+        return new AnnouncementResponseDto(entity.Id, entity.Title, mediaUrlBuilder.Build(entity.TitleImageUrl), entity.Text);
     }
 
     public Core.Entities.Announcement UpdateDtoToDomain(Core.Entities.Announcement entity, UpdateAnnouncementDto dto, string? titleImageUrl = null)
     {
         entity.Update(dto.Title, dto.Text);
-        if (titleImageUrl is not null) 
+        if (titleImageUrl is not null)
             entity.UpdateImage(titleImageUrl);
         return entity;
     }

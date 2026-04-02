@@ -1,8 +1,9 @@
 using App.BL.DTOs;
+using App.BL.Services.External;
 
 namespace App.BL.Mapper.Exhibition;
 
-public class ExhibitionMapper : IExhibitionMapper
+public class ExhibitionMapper(IMediaUrlBuilder mediaUrlBuilder) : IExhibitionMapper
 {
     public Core.Entities.Exhibition CreateDtoToDomain(CreateExhibitionDto dto, string imageUrl)
     {
@@ -11,7 +12,7 @@ public class ExhibitionMapper : IExhibitionMapper
 
     public ExhibitionResponseDto DomainToResponseDto(Core.Entities.Exhibition entity)
     {
-        return new ExhibitionResponseDto(entity.Id, entity.Title, entity.Text, entity.TitleImageUrl, entity.IsDeactive);
+        return new ExhibitionResponseDto(entity.Id, entity.Title, entity.Text, mediaUrlBuilder.Build(entity.TitleImageUrl), entity.IsDeactive);
     }
 
     public Core.Entities.Exhibition UpdateDtoToDomain(Core.Entities.Exhibition entity, UpdateExhibitionDto dto, string? imageUrl = null)
