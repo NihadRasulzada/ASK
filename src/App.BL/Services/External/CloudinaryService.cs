@@ -9,12 +9,24 @@ namespace App.BL.Services.External;
 public class CloudinaryService : ICloudinaryService
 {
     private readonly Cloudinary _cloudinary;
+    private readonly string _cloudName;
 
     public CloudinaryService(IOptions<CloudinarySettings> settings)
     {
         var s = settings.Value;
+        _cloudName = s.CloudName;
         var account = new Account(s.CloudName, s.ApiKey, s.ApiSecret);
         _cloudinary = new Cloudinary(account) { Api = { Secure = true } };
+    }
+
+    // Returns the path portion after the cloud name, e.g. "image/upload/v123/file.jpg"
+    private string ToRelativePath(Uri secureUrl)
+    {
+        var path = secureUrl.AbsolutePath.TrimStart('/');
+        var prefix = _cloudName + "/";
+        return path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+            ? path[prefix.Length..]
+            : path;
     }
 
     /// <inheritdoc/>
@@ -36,7 +48,7 @@ public class CloudinaryService : ICloudinaryService
         if (result.Error is not null)
             throw new InvalidOperationException($"Cloudinary yükləmə xətası: {result.Error.Message}");
 
-        return result.SecureUrl.ToString();
+        return ToRelativePath(result.SecureUrl);
     }
 
     /// <inheritdoc/>
@@ -80,6 +92,6 @@ public class CloudinaryService : ICloudinaryService
         if (result.Error is not null)
             throw new InvalidOperationException($"Cloudinary yükləmə xətası: {result.Error.Message}");
 
-        return result.SecureUrl.ToString();
+        return ToRelativePath(result.SecureUrl);
     }
 }

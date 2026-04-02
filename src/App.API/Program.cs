@@ -194,6 +194,12 @@ builder.Services.AddHttpClient("ExchangeRate", (sp, client) =>
         new MediaTypeWithQualityHeaderValue("application/json"));
 });
 
+builder.Services.AddHttpClient("CloudinaryProxy", client =>
+{
+    client.BaseAddress = new Uri("https://res.cloudinary.com/");
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
 // ── HttpContextAccessor / CurrentUser ─────────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
 //builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
