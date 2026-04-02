@@ -52,4 +52,34 @@ public class CloudinaryService : ICloudinaryService
 
         return urls;
     }
+
+    /// <inheritdoc/>
+    public async Task<string> UploadPdfAsync(IFormFile file)
+    {
+        const string pdfContentType = "application/pdf";
+        const long maxSizeBytes = 10L * 1024 * 1024; // 10 MB
+
+        if (!string.Equals(file.ContentType, pdfContentType, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Yalnız PDF fayl qəbul edilir (application/pdf).");
+
+        if (file.Length > maxSizeBytes)
+            throw new InvalidOperationException("PDF faylının ölçüsü 10 MB-dan çox ola bilməz.");
+
+        await using var stream = file.OpenReadStream();
+
+        var uploadParams = new RawUploadParams
+        {
+            File = new FileDescription(file.FileName, stream),
+            UseFilename = true,
+            UniqueFilename = true,
+            Overwrite = false
+        };
+
+        var result = await _cloudinary.UploadAsync(uploadParams);
+
+        if (result.Error is not null)
+            throw new InvalidOperationException($"Cloudinary yükləmə xətası: {result.Error.Message}");
+
+        return result.SecureUrl.ToString();
+    }
 }

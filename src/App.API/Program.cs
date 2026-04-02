@@ -65,6 +65,10 @@ using App.Core.Interfaces.Repository.DistrictRepresentatives;
 using App.Core.Interfaces.Repository.Committee;
 using App.Core.Interfaces.Repository.Presidium;
 using App.Core.Interfaces.Repository.OurValues;
+using App.Core.Interfaces.Repository.Settings;
+using App.DAL.Repositories.Settings;
+using App.BL.Mapper.Setting;
+using App.BL.Services.Business.Setting;
 using App.DAL.Repositories.Management;
 using App.DAL.Repositories.InternationalSolidarity;
 using App.DAL.Repositories.ForeignRepresentatives;
@@ -251,6 +255,9 @@ builder.Services.AddScoped<IPresidiumWriteRepository, PresidiumWriteRepository>(
 builder.Services.AddScoped<IOurValuesReadRepository, OurValuesReadRepository>();
 builder.Services.AddScoped<IOurValuesWriteRepository, OurValuesWriteRepository>();
 
+builder.Services.AddScoped<ISettingReadRepository, SettingReadRepository>();
+builder.Services.AddScoped<ISettingWriteRepository, SettingWriteRepository>();
+
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -272,6 +279,7 @@ builder.Services.AddScoped<IDistrictRepresentativesMapper, DistrictRepresentativ
 builder.Services.AddScoped<ICommitteeMapper, CommitteeMapper>();
 builder.Services.AddScoped<IPresidiumMapper, PresidiumMapper>();
 builder.Services.AddScoped<IOurValuesMapper, OurValuesMapper>();
+builder.Services.AddScoped<ISettingMapper, SettingMapper>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
@@ -294,6 +302,7 @@ builder.Services.AddScoped<IDistrictRepresentativesService, DistrictRepresentati
 builder.Services.AddScoped<ICommitteeService, CommitteeService>();
 builder.Services.AddScoped<IPresidiumService, PresidiumService>();
 builder.Services.AddScoped<IOurValuesService, OurValuesService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
 
 // ── Background Jobs ───────────────────────────────────────────────────────────
 //builder.Services.AddHostedService<CurrencyBackgroundJob>();

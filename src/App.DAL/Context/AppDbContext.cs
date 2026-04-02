@@ -26,6 +26,7 @@ namespace App.DAL.Context
         public DbSet<Training> Training { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Video> Videos { get; set; }
+        public DbSet<Setting> Settings { get; set; }
         public DbSet<Management> Management { get; set; }
         public DbSet<InternationalSolidarity> InternationalSolidarity { get; set; }
         public DbSet<ForeignRepresentatives> ForeignRepresentatives { get; set; }
