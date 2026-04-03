@@ -15,7 +15,6 @@ public class SettingMapper(IMediaUrlBuilder mediaUrlBuilder) : ISettingMapper
         return new SettingResponseDto(
             Id: entity.Id,
             Key: entity.Key,
-            DisplayName: entity.DisplayName,
             Value: value,
             ValueType: entity.ValueType);
     }

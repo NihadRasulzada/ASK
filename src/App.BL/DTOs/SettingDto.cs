@@ -22,6 +22,5 @@ public class UpdateSettingDto
 public record SettingResponseDto(
     Guid Id,
     string Key,
-    string DisplayName,
     string? Value,
     SettingValueType ValueType);
