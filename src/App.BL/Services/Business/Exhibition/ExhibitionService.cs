@@ -56,22 +56,18 @@ public class ExhibitionService(
         return Response.Success("Exhibition deleted successfully");
     }
 
-    public async Task<Response<IEnumerable<ExhibitionResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResponse<IEnumerable<ExhibitionResponseDto>>> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Core.Entities.Exhibition> entities = await readRepository.GetAllAsync(false, cancellationToken);
-        if (!entities.Any()) return Response<IEnumerable<ExhibitionResponseDto>>.Success(Enumerable.Empty<ExhibitionResponseDto>(), "No exhibitions found");
-
-        IEnumerable<ExhibitionResponseDto> result = entities.Select(x => mapper.DomainToResponseDto(x));
-        return Response<IEnumerable<ExhibitionResponseDto>>.Success(result, "Exhibitions retrieved successfully");
+        var (items, totalCount) = await readRepository.GetPagedAsync(false, false, pageIndex, pageSize, cancellationToken);
+        var result = items.Select(mapper.DomainToResponseDto);
+        return PagedResponse<IEnumerable<ExhibitionResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "Exhibitions retrieved successfully");
     }
 
-    public async Task<Response<IEnumerable<ExhibitionResponseDto>>> GetAllIncludingDeletedAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResponse<IEnumerable<ExhibitionResponseDto>>> GetAllIncludingDeletedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Core.Entities.Exhibition> entities = await readRepository.GetAllIncludingDeletedAsync(cancellationToken);
-        if (!entities.Any()) return Response<IEnumerable<ExhibitionResponseDto>>.Success(Enumerable.Empty<ExhibitionResponseDto>(), "No exhibitions found");
-
-        IEnumerable<ExhibitionResponseDto> result = entities.Select(x => mapper.DomainToResponseDto(x));
-        return Response<IEnumerable<ExhibitionResponseDto>>.Success(result, "All exhibitions retrieved successfully");
+        var (items, totalCount) = await readRepository.GetPagedAsync(false, true, pageIndex, pageSize, cancellationToken);
+        var result = items.Select(mapper.DomainToResponseDto);
+        return PagedResponse<IEnumerable<ExhibitionResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "All exhibitions retrieved successfully");
     }
 
     public async Task<Response<ExhibitionResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

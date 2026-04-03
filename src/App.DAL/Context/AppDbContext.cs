@@ -34,6 +34,10 @@ namespace App.DAL.Context
         public DbSet<Committee> Committees { get; set; }
         public DbSet<Presidium> Presidium { get; set; }
         public DbSet<OurValues> OurValues { get; set; }
+        public DbSet<Publication> Publications { get; set; }
+        public DbSet<FAQ> FAQs { get; set; }
+        public DbSet<FAQInquiry> FAQInquiries { get; set; }
+        public DbSet<BusinessForum> BusinessForums { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

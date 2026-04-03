@@ -22,28 +22,30 @@ public class TrainingController(ITrainingService trainingService) : ControllerBa
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<TrainingResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<TrainingResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
-        var response = await trainingService.GetAllAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        var response = await trainingService.GetAllAsync(pageIndex, pageSize, cancellationToken);
+        return this.HandlePagedServiceResponse(response);
     }
 
     /// <summary>
-    /// Bütün təlimlərin (silinmişlər daxil olmaqla) siyahısını qaytarır.
+    /// Bütün təlimlərin (silinmişlər daxil olmaqla) səhifələnmiş siyahısını qaytarır.
     /// </summary>
+    /// <param name="pageIndex">Səhifə nömrəsi (1-dən başlayır).</param>
+    /// <param name="pageSize">Hər səhifədəki element sayı.</param>
     /// <param name="cancellationToken">Ləğvetmə tokeni.</param>
     /// <returns>Təlim DTO-larının tam siyahısı.</returns>
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("all")]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<TrainingResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<TrainingResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllIncludingDeleted(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllIncludingDeleted([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
-        var response = await trainingService.GetAllIncludingDeletedAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        var response = await trainingService.GetAllIncludingDeletedAsync(pageIndex, pageSize, cancellationToken);
+        return this.HandlePagedServiceResponse(response);
     }
 
     /// <summary>

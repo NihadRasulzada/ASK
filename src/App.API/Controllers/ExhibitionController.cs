@@ -22,28 +22,30 @@ public class ExhibitionController(IExhibitionService exhibitionService) : Contro
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<ExhibitionResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<ExhibitionResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
-        var response = await exhibitionService.GetAllAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        var response = await exhibitionService.GetAllAsync(pageIndex, pageSize, cancellationToken);
+        return this.HandlePagedServiceResponse(response);
     }
 
     /// <summary>
-    /// Bütün sərgilərin (silinmişlər daxil olmaqla) siyahısını qaytarır.
+    /// Bütün sərgilərin (silinmişlər daxil olmaqla) səhifələnmiş siyahısını qaytarır.
     /// </summary>
+    /// <param name="pageIndex">Səhifə nömrəsi (1-dən başlayır).</param>
+    /// <param name="pageSize">Hər səhifədəki element sayı.</param>
     /// <param name="cancellationToken">Ləğvetmə tokeni.</param>
     /// <returns>Sərgi DTO-larının tam siyahısı.</returns>
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("all")]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<ExhibitionResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<ExhibitionResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllIncludingDeleted(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllIncludingDeleted([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
-        var response = await exhibitionService.GetAllIncludingDeletedAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        var response = await exhibitionService.GetAllIncludingDeletedAsync(pageIndex, pageSize, cancellationToken);
+        return this.HandlePagedServiceResponse(response);
     }
 
     /// <summary>

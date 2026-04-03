@@ -56,22 +56,18 @@ public class TrainingService(
         return Response.Success("Training deleted successfully");
     }
 
-    public async Task<Response<IEnumerable<TrainingResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResponse<IEnumerable<TrainingResponseDto>>> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Core.Entities.Training> entities = await readRepository.GetAllAsync(false, cancellationToken);
-        if (!entities.Any()) return Response<IEnumerable<TrainingResponseDto>>.Success(Enumerable.Empty<TrainingResponseDto>(), "No trainings found");
-
-        IEnumerable<TrainingResponseDto> result = entities.Select(x => mapper.DomainToResponseDto(x));
-        return Response<IEnumerable<TrainingResponseDto>>.Success(result, "Trainings retrieved successfully");
+        var (items, totalCount) = await readRepository.GetPagedAsync(false, false, pageIndex, pageSize, cancellationToken);
+        var result = items.Select(mapper.DomainToResponseDto);
+        return PagedResponse<IEnumerable<TrainingResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "Trainings retrieved successfully");
     }
 
-    public async Task<Response<IEnumerable<TrainingResponseDto>>> GetAllIncludingDeletedAsync(CancellationToken cancellationToken = default)
+    public async Task<PagedResponse<IEnumerable<TrainingResponseDto>>> GetAllIncludingDeletedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
-        IEnumerable<Core.Entities.Training> entities = await readRepository.GetAllIncludingDeletedAsync(cancellationToken);
-        if (!entities.Any()) return Response<IEnumerable<TrainingResponseDto>>.Success(Enumerable.Empty<TrainingResponseDto>(), "No trainings found");
-
-        IEnumerable<TrainingResponseDto> result = entities.Select(x => mapper.DomainToResponseDto(x));
-        return Response<IEnumerable<TrainingResponseDto>>.Success(result, "All trainings retrieved successfully");
+        var (items, totalCount) = await readRepository.GetPagedAsync(false, true, pageIndex, pageSize, cancellationToken);
+        var result = items.Select(mapper.DomainToResponseDto);
+        return PagedResponse<IEnumerable<TrainingResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "All trainings retrieved successfully");
     }
 
     public async Task<Response<TrainingResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

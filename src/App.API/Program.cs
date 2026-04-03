@@ -90,6 +90,20 @@ using App.BL.Services.Business.DistrictRepresentatives;
 using App.BL.Services.Business.Committee;
 using App.BL.Services.Business.Presidium;
 using App.BL.Services.Business.OurValues;
+using App.Core.Interfaces.Repository.Publication;
+using App.Core.Interfaces.Repository.FAQ;
+using App.Core.Interfaces.Repository.FAQInquiry;
+using App.Core.Interfaces.Repository.BusinessForum;
+using App.DAL.Repositories.Publication;
+using App.DAL.Repositories.FAQ;
+using App.DAL.Repositories.FAQInquiry;
+using App.DAL.Repositories.BusinessForum;
+using App.BL.Mapper.Publication;
+using App.BL.Mapper.FAQ;
+using App.BL.Mapper.BusinessForum;
+using App.BL.Services.Business.Publication;
+using App.BL.Services.Business.FAQ;
+using App.BL.Services.Business.BusinessForum;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -264,6 +278,17 @@ builder.Services.AddScoped<IOurValuesWriteRepository, OurValuesWriteRepository>(
 builder.Services.AddScoped<ISettingReadRepository, SettingReadRepository>();
 builder.Services.AddScoped<ISettingWriteRepository, SettingWriteRepository>();
 
+builder.Services.AddScoped<IPublicationReadRepository, PublicationReadRepository>();
+builder.Services.AddScoped<IPublicationWriteRepository, PublicationWriteRepository>();
+
+builder.Services.AddScoped<IFAQReadRepository, FAQReadRepository>();
+builder.Services.AddScoped<IFAQWriteRepository, FAQWriteRepository>();
+builder.Services.AddScoped<IFAQInquiryReadRepository, FAQInquiryReadRepository>();
+builder.Services.AddScoped<IFAQInquiryWriteRepository, FAQInquiryWriteRepository>();
+
+builder.Services.AddScoped<IBusinessForumReadRepository, BusinessForumReadRepository>();
+builder.Services.AddScoped<IBusinessForumWriteRepository, BusinessForumWriteRepository>();
+
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -286,6 +311,9 @@ builder.Services.AddScoped<ICommitteeMapper, CommitteeMapper>();
 builder.Services.AddScoped<IPresidiumMapper, PresidiumMapper>();
 builder.Services.AddScoped<IOurValuesMapper, OurValuesMapper>();
 builder.Services.AddScoped<ISettingMapper, SettingMapper>();
+builder.Services.AddScoped<IPublicationMapper, PublicationMapper>();
+builder.Services.AddScoped<IFAQMapper, FAQMapper>();
+builder.Services.AddScoped<IBusinessForumMapper, BusinessForumMapper>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
@@ -310,6 +338,9 @@ builder.Services.AddScoped<ICommitteeService, CommitteeService>();
 builder.Services.AddScoped<IPresidiumService, PresidiumService>();
 builder.Services.AddScoped<IOurValuesService, OurValuesService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
+builder.Services.AddScoped<IPublicationService, PublicationService>();
+builder.Services.AddScoped<IFAQService, FAQService>();
+builder.Services.AddScoped<IBusinessForumService, BusinessForumService>();
 
 // ── Background Jobs ───────────────────────────────────────────────────────────
 //builder.Services.AddHostedService<CurrencyBackgroundJob>();

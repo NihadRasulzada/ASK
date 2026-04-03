@@ -5,8 +5,8 @@ namespace App.BL.Services.Business.Exhibition;
 
 public interface IExhibitionService
 {
-    Task<Response<IEnumerable<ExhibitionResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default);
-    Task<Response<IEnumerable<ExhibitionResponseDto>>> GetAllIncludingDeletedAsync(CancellationToken cancellationToken = default);
+    Task<PagedResponse<IEnumerable<ExhibitionResponseDto>>> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default);
+    Task<PagedResponse<IEnumerable<ExhibitionResponseDto>>> GetAllIncludingDeletedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default);
     Task<Response<ExhibitionResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Response<ExhibitionResponseDto>> CreateAsync(CreateExhibitionDto dto, CancellationToken cancellationToken = default);
     Task<Response<ExhibitionResponseDto?>> UpdateAsync(Guid id, UpdateExhibitionDto dto, CancellationToken cancellationToken = default);
