@@ -94,16 +94,20 @@ using App.Core.Interfaces.Repository.Publication;
 using App.Core.Interfaces.Repository.FAQ;
 using App.Core.Interfaces.Repository.FAQInquiry;
 using App.Core.Interfaces.Repository.BusinessForum;
+using App.Core.Interfaces.Repository.UsefulLink;
 using App.DAL.Repositories.Publication;
 using App.DAL.Repositories.FAQ;
 using App.DAL.Repositories.FAQInquiry;
 using App.DAL.Repositories.BusinessForum;
+using App.DAL.Repositories.UsefulLink;
 using App.BL.Mapper.Publication;
 using App.BL.Mapper.FAQ;
 using App.BL.Mapper.BusinessForum;
+using App.BL.Mapper.UsefulLink;
 using App.BL.Services.Business.Publication;
 using App.BL.Services.Business.FAQ;
 using App.BL.Services.Business.BusinessForum;
+using App.BL.Services.Business.UsefulLink;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -253,6 +257,7 @@ builder.Services.AddScoped<App.Core.Interfaces.Repository.Announcement.IAnnounce
 builder.Services.AddScoped<App.Core.Interfaces.Repository.Announcement.IAnnouncementWriteRepository, App.DAL.Repositories.Announcement.AnnouncementWriteRepository>();
 
 builder.Services.AddScoped<ICurrencyRateReadRepository, CurrencyRateReadRepository>();
+builder.Services.AddScoped<ICurrencyRateWriteRepository, CurrencyRateWriteRepository>();
 
 builder.Services.AddScoped<IManagementReadRepository, ManagementReadRepository>();
 builder.Services.AddScoped<IManagementWriteRepository, ManagementWriteRepository>();
@@ -289,6 +294,9 @@ builder.Services.AddScoped<IFAQInquiryWriteRepository, FAQInquiryWriteRepository
 builder.Services.AddScoped<IBusinessForumReadRepository, BusinessForumReadRepository>();
 builder.Services.AddScoped<IBusinessForumWriteRepository, BusinessForumWriteRepository>();
 
+builder.Services.AddScoped<IUsefulLinkReadRepository, UsefulLinkReadRepository>();
+builder.Services.AddScoped<IUsefulLinkWriteRepository, UsefulLinkWriteRepository>();
+
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
@@ -314,6 +322,7 @@ builder.Services.AddScoped<ISettingMapper, SettingMapper>();
 builder.Services.AddScoped<IPublicationMapper, PublicationMapper>();
 builder.Services.AddScoped<IFAQMapper, FAQMapper>();
 builder.Services.AddScoped<IBusinessForumMapper, BusinessForumMapper>();
+builder.Services.AddScoped<IUsefulLinkMapper, UsefulLinkMapper>();
 
 // ── Services ──────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<IVideoService, VideoService>();
@@ -341,9 +350,10 @@ builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IPublicationService, PublicationService>();
 builder.Services.AddScoped<IFAQService, FAQService>();
 builder.Services.AddScoped<IBusinessForumService, BusinessForumService>();
+builder.Services.AddScoped<IUsefulLinkService, UsefulLinkService>();
 
 // ── Background Jobs ───────────────────────────────────────────────────────────
-//builder.Services.AddHostedService<CurrencyBackgroundJob>();
+builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
 // ─────────────────────────────────────────────────────────────────────────────
 

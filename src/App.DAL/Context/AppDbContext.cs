@@ -38,6 +38,7 @@ namespace App.DAL.Context
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<FAQInquiry> FAQInquiries { get; set; }
         public DbSet<BusinessForum> BusinessForums { get; set; }
+        public DbSet<UsefulLink> UsefulLinks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

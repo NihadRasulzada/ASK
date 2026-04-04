@@ -25,6 +25,9 @@ public class DirectorMapper : IDirectorMapper
             dto.DutyAz,
             dto.DutyEn,
             dto.DutyRu,
+            dto.DepartmentAz ?? string.Empty,
+            dto.DepartmentEn ?? string.Empty,
+            dto.DepartmentRu ?? string.Empty,
             dto.PhoneNumber ?? string.Empty,
             dto.Email ?? string.Empty
         );
@@ -49,6 +52,13 @@ public class DirectorMapper : IDirectorMapper
                 "ru" => Director.DutyRu,
                 _ => Director.DutyAz
             },
+            Department: languageService.Lang switch
+            {
+                "az" => string.IsNullOrWhiteSpace(Director.DepartmentAz) ? null : Director.DepartmentAz,
+                "en" => string.IsNullOrWhiteSpace(Director.DepartmentEn) ? null : Director.DepartmentEn,
+                "ru" => string.IsNullOrWhiteSpace(Director.DepartmentRu) ? null : Director.DepartmentRu,
+                _ => string.IsNullOrWhiteSpace(Director.DepartmentAz) ? null : Director.DepartmentAz
+            },
             PhoneNumber: string.IsNullOrWhiteSpace(Director.PhoneNumber) ? null : Director.PhoneNumber,
             Email: string.IsNullOrWhiteSpace(Director.Email) ? null : Director.Email,
             IsDeactive: Director.IsDeactive
@@ -64,6 +74,9 @@ public class DirectorMapper : IDirectorMapper
             dto.DutyAz,
             dto.DutyEn,
             dto.DutyRu,
+            dto.DepartmentAz ?? string.Empty,
+            dto.DepartmentEn ?? string.Empty,
+            dto.DepartmentRu ?? string.Empty,
             dto.PhoneNumber ?? string.Empty,
             dto.Email ?? string.Empty
         );

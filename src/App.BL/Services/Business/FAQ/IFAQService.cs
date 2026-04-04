@@ -5,8 +5,8 @@ namespace App.BL.Services.Business.FAQ;
 
 public interface IFAQService
 {
-    Task<PagedResponse<IEnumerable<FAQResponseDto>>> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default);
-    Task<PagedResponse<IEnumerable<FAQResponseDto>>> GetAllIncludingDeletedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default);
+    Task<Response<IEnumerable<FAQResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default);
+    Task<Response<IEnumerable<FAQResponseDto>>> GetAllIncludingDeletedAsync(CancellationToken cancellationToken = default);
     Task<Response<FAQResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
     Task<Response<FAQResponseDto>> CreateAsync(CreateFAQDto dto, CancellationToken cancellationToken = default);
     Task<Response<FAQResponseDto?>> UpdateAsync(Guid id, UpdateFAQDto dto, CancellationToken cancellationToken = default);

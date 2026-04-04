@@ -25,6 +25,10 @@ public class DirectorConfiguration : SoftDeletableEntityConfiguration<Director>
         builder.Property(e => e.DutyEn).IsRequired().HasMaxLength(200);
         builder.Property(e => e.DutyRu).IsRequired().HasMaxLength(200);
 
+        builder.Property(e => e.DepartmentAz).HasMaxLength(200);
+        builder.Property(e => e.DepartmentEn).HasMaxLength(200);
+        builder.Property(e => e.DepartmentRu).HasMaxLength(200);
+
         builder.Property(e => e.PhoneNumber).HasMaxLength(50);
         builder.Property(e => e.Email).HasMaxLength(256);
     }

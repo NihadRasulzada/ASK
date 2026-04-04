@@ -29,67 +29,67 @@ public class CurrencyService : ICurrencyService
         _logger = logger;
     }
 
-    //public async Task<IEnumerable<CurrencyRateDto>> GetRatesAsync(CancellationToken cancellationToken = default)
-    //{
-    //    using var scope = _scopeFactory.CreateScope();
-    //    var repo = scope.ServiceProvider.GetRequiredService<ICurrencyRateReadRepository>();
+    public async Task<IEnumerable<CurrencyRateDto>> GetRatesAsync(CancellationToken cancellationToken = default)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var repo = scope.ServiceProvider.GetRequiredService<ICurrencyRateReadRepository>();
 
-    //    var today = DateOnly.FromDateTime(DateTime.UtcNow);
-    //    var rates = await repo.GetAllAsync(false, cancellationToken, predicate: r => r.RateDate == today);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var rates = await repo.GetAllAsync(false, cancellationToken, predicate: r => r.RateDate == today);
 
-    //    return rates.Select(r => new CurrencyRateDto(r.CurrencyCode, r.Rate, 0));
-    //}
+        return rates.Select(r => new CurrencyRateDto(r.CurrencyCode, r.Rate, 0));
+    }
 
-    //public async Task FetchAndSaveRatesAsync(CancellationToken cancellationToken = default)
-    //{
-    //    try
-    //    {
-    //        using var scope = _scopeFactory.CreateScope();
-    //        var repo = scope.ServiceProvider.GetRequiredService<ICurrencyRateReadRepository>();
-    //        var dbContext = scope.ServiceProvider.GetRequiredService<DAL.Context.AppDbContext>();
+    public async Task FetchAndSaveRatesAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var readRepo = scope.ServiceProvider.GetRequiredService<ICurrencyRateReadRepository>();
+            var writeRepo = scope.ServiceProvider.GetRequiredService<ICurrencyRateWriteRepository>();
 
-    //        var client = _httpClientFactory.CreateClient("ExchangeRate");
-    //        var response = await client.GetAsync($"latest?access_key={_settings.ApiKey}&symbols={string.Join(",", TargetCurrencies)}&base=AZN", cancellationToken);
+            var client = _httpClientFactory.CreateClient("ExchangeRate");
+            var response = await client.GetAsync($"latest?access_key={_settings.ApiKey}&symbols={string.Join(",", TargetCurrencies)}&base=AZN", cancellationToken);
 
-    //        if (!response.IsSuccessStatusCode)
-    //        {
-    //            _logger.LogWarning("Exchange rate API returned {StatusCode}", response.StatusCode);
-    //            return;
-    //        }
+            if (!response.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("Exchange rate API returned {StatusCode}", response.StatusCode);
+                return;
+            }
 
-    //        var json = await response.Content.ReadAsStringAsync(cancellationToken);
-    //        using var doc = JsonDocument.Parse(json);
+            var json = await response.Content.ReadAsStringAsync(cancellationToken);
+            using var doc = JsonDocument.Parse(json);
 
-    //        if (!doc.RootElement.TryGetProperty("rates", out var ratesElement))
-    //            return;
+            if (!doc.RootElement.TryGetProperty("rates", out var ratesElement))
+                return;
 
-    //        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-    //        foreach (var currency in TargetCurrencies)
-    //        {
-    //            if (!ratesElement.TryGetProperty(currency, out var rateElement))
-    //                continue;
+            foreach (var currency in TargetCurrencies)
+            {
+                if (!ratesElement.TryGetProperty(currency, out var rateElement))
+                    continue;
 
-    //            var rate = rateElement.GetDecimal();
-    //            var existing = await repo.GetAsync(r => r.CurrencyCode == currency && r.RateDate == today, true, cancellationToken);
+                var rate = rateElement.GetDecimal();
+                var existing = await readRepo.GetAsync(r => r.CurrencyCode == currency && r.RateDate == today, true, cancellationToken);
 
-    //            if (existing is not null)
-    //            {
-    //                existing.UpdateRate(rate);
-    //                repo.Update(existing);
-    //            }
-    //            else
-    //            {
-    //                var newRate = new CurrencyRate(currency, rate, today);
-    //                await repo.AddAsync(newRate, cancellationToken);
-    //            }
-    //        }
+                if (existing is not null)
+                {
+                    existing.UpdateRate(rate);
+                    writeRepo.Update(existing);
+                }
+                else
+                {
+                    var newRate = new Core.Entities.CurrencyRate(currency, rate, today);
+                    await writeRepo.AddAsync(newRate, cancellationToken);
+                }
+            }
 
-    //        await dbContext.SaveChangesAsync(cancellationToken);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        _logger.LogError(ex, "Failed to fetch and save currency rates.");
-    //    }
-    //}
+            await writeRepo.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to fetch and save currency rates.");
+        }
+    }
 }

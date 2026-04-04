@@ -1,4 +1,5 @@
 using App.API.Controllers.Common;
+using System.Collections.Generic;
 using App.API.Extensions;
 using App.BL.DTOs;
 using App.BL.Services.Business.FAQ;
@@ -15,39 +16,35 @@ namespace App.API.Controllers;
 public class FAQController(IFAQService faqService) : ControllerBase
 {
     /// <summary>
-    /// Aktiv FAQ-ların səhifələnmiş siyahısını qaytarır.
+    /// Aktiv FAQ-ların siyahısını qaytarır.
     /// </summary>
-    /// <param name="pageIndex">Səhifə nömrəsi (1-dən başlayır).</param>
-    /// <param name="pageSize">Hər səhifədəki element sayı.</param>
     /// <param name="cancellationToken">Ləğvetmə tokeni.</param>
-    /// <returns>FAQ DTO-larının səhifələnmiş siyahısı.</returns>
+    /// <returns>FAQ DTO-larının siyahısı.</returns>
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(PagedDataResponse<FAQResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<FAQResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
     {
-        var response = await faqService.GetAllAsync(pageIndex, pageSize, cancellationToken);
-        return this.HandlePagedServiceResponse(response);
+        var response = await faqService.GetAllAsync(cancellationToken);
+        return this.HandleServiceResponse(response);
     }
 
     /// <summary>
-    /// Bütün FAQ-ların (silinmişlər daxil olmaqla) səhifələnmiş siyahısını qaytarır.
+    /// Bütün FAQ-ların (silinmişlər daxil olmaqla) siyahısını qaytarır.
     /// </summary>
-    /// <param name="pageIndex">Səhifə nömrəsi (1-dən başlayır).</param>
-    /// <param name="pageSize">Hər səhifədəki element sayı.</param>
     /// <param name="cancellationToken">Ləğvetmə tokeni.</param>
     /// <returns>FAQ DTO-larının tam siyahısı.</returns>
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("all")]
-    [ProducesResponseType(typeof(PagedDataResponse<FAQResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<FAQResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllIncludingDeleted([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllIncludingDeleted(CancellationToken cancellationToken = default)
     {
-        var response = await faqService.GetAllIncludingDeletedAsync(pageIndex, pageSize, cancellationToken);
-        return this.HandlePagedServiceResponse(response);
+        var response = await faqService.GetAllIncludingDeletedAsync(cancellationToken);
+        return this.HandleServiceResponse(response);
     }
 
     /// <summary>

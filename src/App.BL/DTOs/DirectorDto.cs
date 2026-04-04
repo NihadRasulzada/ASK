@@ -14,6 +14,9 @@ public class CreateDirectorDto
     public string DutyAz { get; set; } = string.Empty;
     public string DutyEn { get; set; } = string.Empty;
     public string DutyRu { get; set; } = string.Empty;
+    public string? DepartmentAz { get; set; }
+    public string? DepartmentEn { get; set; }
+    public string? DepartmentRu { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Email { get; set; }
 }
@@ -27,8 +30,11 @@ public class UpdateDirectorDto
     public string DutyAz { get; set; } = string.Empty;
     public string DutyEn { get; set; } = string.Empty;
     public string DutyRu { get; set; } = string.Empty;
+    public string? DepartmentAz { get; set; }
+    public string? DepartmentEn { get; set; }
+    public string? DepartmentRu { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Email { get; set; }
 }
 
-public record DirectorResponseDto(Guid Id, string ImageUrl, string FullName, string Duty, string? PhoneNumber, string? Email, bool IsDeactive);
+public record DirectorResponseDto(Guid Id, string ImageUrl, string FullName, string Duty, string? Department, string? PhoneNumber, string? Email, bool IsDeactive);

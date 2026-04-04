@@ -13,18 +13,18 @@ public class FAQService(
     IFAQInquiryWriteRepository inquiryWriteRepository,
     IFAQMapper mapper) : IFAQService
 {
-    public async Task<PagedResponse<IEnumerable<FAQResponseDto>>> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<Response<IEnumerable<FAQResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        var (items, totalCount) = await readRepository.GetPagedAsync(false, false, pageIndex, pageSize, cancellationToken);
+        var items = await readRepository.GetAllAsync(false, cancellationToken);
         var result = items.Select(mapper.DomainToResponseDto);
-        return PagedResponse<IEnumerable<FAQResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "FAQs retrieved successfully");
+        return Response<IEnumerable<FAQResponseDto>>.Success(result, "FAQs retrieved successfully");
     }
 
-    public async Task<PagedResponse<IEnumerable<FAQResponseDto>>> GetAllIncludingDeletedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<Response<IEnumerable<FAQResponseDto>>> GetAllIncludingDeletedAsync(CancellationToken cancellationToken = default)
     {
-        var (items, totalCount) = await readRepository.GetPagedAsync(false, true, pageIndex, pageSize, cancellationToken);
+        var items = await readRepository.GetAllIncludingDeletedAsync(cancellationToken);
         var result = items.Select(mapper.DomainToResponseDto);
-        return PagedResponse<IEnumerable<FAQResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "All FAQs retrieved successfully");
+        return Response<IEnumerable<FAQResponseDto>>.Success(result, "All FAQs retrieved successfully");
     }
 
     public async Task<Response<FAQResponseDto?>> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)

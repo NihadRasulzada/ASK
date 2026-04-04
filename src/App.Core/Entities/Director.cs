@@ -11,6 +11,9 @@ public class Director : SoftDeletableEntity
     public string DutyAz { get; private set; }
     public string DutyEn { get; private set; }
     public string DutyRu { get; private set; }
+    public string DepartmentAz { get; private set; }
+    public string DepartmentEn { get; private set; }
+    public string DepartmentRu { get; private set; }
     public string PhoneNumber { get; set; }
     public string  Email { get; set; }
 
@@ -24,12 +27,17 @@ public class Director : SoftDeletableEntity
         DutyAz = string.Empty;
         DutyEn = string.Empty;
         DutyRu = string.Empty;
+        DepartmentAz = string.Empty;
+        DepartmentEn = string.Empty;
+        DepartmentRu = string.Empty;
     }
 
     public Director(
         string imageUrl,
         string fullNameAz, string fullNameEn, string fullNameRu,
-        string dutyAz, string dutyEn, string dutyRu, string phoneNumber, string email)
+        string dutyAz, string dutyEn, string dutyRu,
+        string departmentAz, string departmentEn, string departmentRu,
+        string phoneNumber, string email)
         : base(Guid.NewGuid(), false)
     {
         if (string.IsNullOrWhiteSpace(imageUrl))
@@ -54,6 +62,9 @@ public class Director : SoftDeletableEntity
         DutyAz = dutyAz;
         DutyEn = dutyEn;
         DutyRu = dutyRu;
+        DepartmentAz = departmentAz;
+        DepartmentEn = departmentEn;
+        DepartmentRu = departmentRu;
         PhoneNumber = phoneNumber;
         Email = email;
     }
@@ -61,9 +72,10 @@ public class Director : SoftDeletableEntity
     /// <param name="imageUrl">Null ötürülərsə mövcud dəyər saxlanılır.</param>
     public void Update(
         string fullNameAz, string fullNameEn, string fullNameRu,
-        string dutyAz, string dutyEn, string dutyRu, string phoneNumber, string email)
+        string dutyAz, string dutyEn, string dutyRu,
+        string departmentAz, string departmentEn, string departmentRu,
+        string phoneNumber, string email)
     {
-
         if (string.IsNullOrWhiteSpace(fullNameAz))
             throw new ArgumentException("Tam ad (AZ) boş ola bilməz.", nameof(fullNameAz));
         if (string.IsNullOrWhiteSpace(fullNameEn))
@@ -83,6 +95,9 @@ public class Director : SoftDeletableEntity
         DutyAz = dutyAz;
         DutyEn = dutyEn;
         DutyRu = dutyRu;
+        DepartmentAz = departmentAz;
+        DepartmentEn = departmentEn;
+        DepartmentRu = departmentRu;
         PhoneNumber = phoneNumber;
         Email = email;
     }
