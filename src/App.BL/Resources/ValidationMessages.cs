@@ -375,4 +375,63 @@ public static class ValidationMessages
         "ru" => "Иконка обязательна.",
         _ => "İkon mütləq daxil edilməlidir."
     };
+
+    // ── PDF ───────────────────────────────────────────────────────────────────
+    public static string PdfFileRequired(string lang) => lang switch
+    {
+        "en" => "PDF file is required.",
+        "ru" => "PDF-файл обязателен.",
+        _ => "PDF fayl mütləq daxil edilməlidir."
+    };
+
+    public static string PdfFileTooLarge(string lang) => lang switch
+    {
+        "en" => "PDF file size cannot exceed 10 MB.",
+        "ru" => "Размер PDF-файла не может превышать 10 МБ.",
+        _ => "PDF faylının ölçüsü 10 MB-dan çox ola bilməz."
+    };
+
+    public static string PdfFileInvalidFormat(string lang) => lang switch
+    {
+        "en" => "Only PDF files are accepted.",
+        "ru" => "Принимаются только PDF-файлы.",
+        _ => "Yalnız PDF formatında fayl qəbul edilir."
+    };
+
+    // ── Detail Image ──────────────────────────────────────────────────────────
+    public static string DetailImageRequired(string lang) => lang switch
+    {
+        "en" => "Detail image is required.",
+        "ru" => "Изображение детали обязательно.",
+        _ => "Ətraflı şəkil mütləq daxil edilməlidir."
+    };
+
+    // ── FAQ ───────────────────────────────────────────────────────────────────
+    public static string QuestionRequired(string lang) => lang switch
+    {
+        "en" => "Question is required.",
+        "ru" => "Вопрос обязателен.",
+        _ => "Sual mütləq daxil edilməlidir."
+    };
+
+    public static string QuestionTooLong(string lang) => lang switch
+    {
+        "en" => "Question cannot exceed 1000 characters.",
+        "ru" => "Вопрос не может превышать 1000 символов.",
+        _ => "Sual 1000 simvoldan çox ola bilməz."
+    };
+
+    public static string AnswerRequired(string lang) => lang switch
+    {
+        "en" => "Answer is required.",
+        "ru" => "Ответ обязателен.",
+        _ => "Cavab mütləq daxil edilməlidir."
+    };
+
+    public static string AnswerTooLong(string lang) => lang switch
+    {
+        "en" => "Answer cannot exceed 5000 characters.",
+        "ru" => "Ответ не может превышать 5000 символов.",
+        _ => "Cavab 5000 simvoldan çox ola bilməz."
+    };
 }

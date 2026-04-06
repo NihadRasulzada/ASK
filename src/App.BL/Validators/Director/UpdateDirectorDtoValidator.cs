@@ -47,6 +47,24 @@ public class UpdateDirectorDtoValidator : AbstractValidator<UpdateDirectorDto>
             .NotEmpty().WithMessage(ValidationMessages.DutyRequired(languageService.Lang))
             .MaximumLength(200).WithMessage(ValidationMessages.DutyTooLong(languageService.Lang));
 
+        When(x => x.DepartmentAz is not null, () =>
+        {
+            RuleFor(x => x.DepartmentAz!)
+                .MaximumLength(200).WithMessage(ValidationMessages.NameTooLong(languageService.Lang));
+        });
+
+        When(x => x.DepartmentEn is not null, () =>
+        {
+            RuleFor(x => x.DepartmentEn!)
+                .MaximumLength(200).WithMessage(ValidationMessages.NameTooLong(languageService.Lang));
+        });
+
+        When(x => x.DepartmentRu is not null, () =>
+        {
+            RuleFor(x => x.DepartmentRu!)
+                .MaximumLength(200).WithMessage(ValidationMessages.NameTooLong(languageService.Lang));
+        });
+
         When(x => x.PhoneNumber is not null, () =>
         {
             RuleFor(x => x.PhoneNumber!)
