@@ -83,6 +83,36 @@ public class SettingConfiguration : BaseEntityConfiguration<Setting>
             new Setting(
                 new Guid("11111111-0011-0000-0000-000000000000"),
                 "Missiyamiz",
+                SettingValueType.Text),
+
+            new Setting(
+                new Guid("11111111-0012-0000-0000-000000000000"),
+                "Membership",
+                SettingValueType.Text),
+
+            new Setting(
+                new Guid("11111111-0013-0000-0000-000000000000"),
+                "HeroTitle",
+                SettingValueType.Text),
+
+            new Setting(
+                new Guid("11111111-0014-0000-0000-000000000000"),
+                "HeroDescription",
+                SettingValueType.Text),
+
+            new Setting(
+                new Guid("11111111-0015-0000-0000-000000000000"),
+                "HeroStatMemberCount",
+                SettingValueType.Text),
+
+            new Setting(
+                new Guid("11111111-0016-0000-0000-000000000000"),
+                "HeroStatPartnerCount",
+                SettingValueType.Text),
+
+            new Setting(
+                new Guid("11111111-0017-0000-0000-000000000000"),
+                "HeroStatEventCount",
                 SettingValueType.Text)
         );
     }
