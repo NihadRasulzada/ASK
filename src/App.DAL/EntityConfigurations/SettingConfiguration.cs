@@ -84,6 +84,8 @@ public class SettingConfiguration : BaseEntityConfiguration<Setting>
                 new Guid("11111111-0011-0000-0000-000000000000"),
                 "Missiyamiz",
                 SettingValueType.Text)
+
+
         );
     }
 }
