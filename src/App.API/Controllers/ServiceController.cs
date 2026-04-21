@@ -2,6 +2,7 @@ using App.API.Controllers.Common;
 using App.API.Extensions;
 using App.BL.DTOs;
 using App.BL.Services.Business.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.API.Controllers;
@@ -86,6 +87,7 @@ public class ServiceController : ControllerBase
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPost]
+    [Authorize]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
@@ -107,6 +109,7 @@ public class ServiceController : ControllerBase
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPut]
+    [Authorize]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse<ServiceResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -129,6 +132,7 @@ public class ServiceController : ControllerBase
     /// <response code="404">Xidmət tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPatch("{id:guid}/activate")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -150,6 +154,7 @@ public class ServiceController : ControllerBase
     /// <response code="404">Xidmət tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPatch("{id:guid}/deactivate")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -170,6 +175,7 @@ public class ServiceController : ControllerBase
     /// <response code="404">Xidmət tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpDelete("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]

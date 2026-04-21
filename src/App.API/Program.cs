@@ -1,113 +1,120 @@
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 using App.API.BackgroundJobs;
 using App.API.Filters;
 using App.API.Middleware;
 using App.API.Services;
+using App.BL.Mapper.Announcement;
+using App.BL.Mapper.BusinessForum;
+using App.BL.Mapper.Committee;
+using App.BL.Mapper.Director;
+using App.BL.Mapper.DistrictRepresentatives;
+using App.BL.Mapper.Exhibition;
+using App.BL.Mapper.FAQ;
+using App.BL.Mapper.ForeignRepresentatives;
+using App.BL.Mapper.Gallery;
+using App.BL.Mapper.InternationalSolidarity;
+using App.BL.Mapper.Management;
+using App.BL.Mapper.OurValues;
+using App.BL.Mapper.Partner;
+using App.BL.Mapper.President;
+using App.BL.Mapper.Presidium;
+using App.BL.Mapper.Publication;
+using App.BL.Mapper.Service;
+using App.BL.Mapper.Setting;
+using App.BL.Mapper.Training;
+using App.BL.Mapper.UsefulLink;
+using App.BL.Mapper.Video;
+using App.BL.Services.Business.Announcement;
+using App.BL.Services.Business.BusinessForum;
+using App.BL.Services.Business.Committee;
 using App.BL.Services.Business.CurrencyRate;
 using App.BL.Services.Business.Director;
+using App.BL.Services.Business.DistrictRepresentatives;
+using App.BL.Services.Business.Exhibition;
+using App.BL.Services.Business.FAQ;
+using App.BL.Services.Business.ForeignRepresentatives;
+using App.BL.Services.Business.Gallery;
+using App.BL.Services.Business.InternationalSolidarity;
+using App.BL.Services.Business.Management;
 using App.BL.Services.Business.News;
+using App.BL.Services.Business.OurValues;
+using App.BL.Services.Business.Partner;
+using App.BL.Services.Business.President;
+using App.BL.Services.Business.Presidium;
+using App.BL.Services.Business.Publication;
 using App.BL.Services.Business.Service;
+using App.BL.Services.Business.Setting;
+using App.BL.Services.Business.Training;
+using App.BL.Services.Business.UsefulLink;
+using App.BL.Services.Business.User;
+using App.BL.Services.Business.Video;
 using App.BL.Services.External;
 using App.BL.Settings;
+using App.BL.Validators.Video;
 using App.Core.Entities;
 using App.Core.Interfaces;
+using App.Core.Interfaces.Repository.BusinessForum;
+using App.Core.Interfaces.Repository.Committee;
 using App.Core.Interfaces.Repository.Common;
 using App.Core.Interfaces.Repository.CurrencyRate;
 using App.Core.Interfaces.Repository.Director;
+using App.Core.Interfaces.Repository.DistrictRepresentatives;
+using App.Core.Interfaces.Repository.Exhibition;
+using App.Core.Interfaces.Repository.FAQ;
+using App.Core.Interfaces.Repository.FAQInquiry;
+using App.Core.Interfaces.Repository.ForeignRepresentatives;
 using App.Core.Interfaces.Repository.Gallery;
+using App.Core.Interfaces.Repository.InternationalSolidarity;
+using App.Core.Interfaces.Repository.Management;
 using App.Core.Interfaces.Repository.News;
 using App.Core.Interfaces.Repository.NewsImage;
+using App.Core.Interfaces.Repository.OurValues;
 using App.Core.Interfaces.Repository.Partner;
 using App.Core.Interfaces.Repository.President;
+using App.Core.Interfaces.Repository.Presidium;
+using App.Core.Interfaces.Repository.Publication;
 using App.Core.Interfaces.Repository.Service;
-using App.Core.Interfaces.Repository.Video;
+using App.Core.Interfaces.Repository.Settings;
 using App.Core.Interfaces.Repository.Training;
-using App.Core.Interfaces.Repository.Exhibition;
+using App.Core.Interfaces.Repository.UsefulLink;
+using App.Core.Interfaces.Repository.Video;
 using App.DAL.Context;
+using App.DAL.Repositories.BusinessForum;
+using App.DAL.Repositories.Committee;
 using App.DAL.Repositories.Common;
 using App.DAL.Repositories.CurrencyRate;
 using App.DAL.Repositories.Director;
-using App.DAL.Repositories.Gallery;
-using App.DAL.Repositories.News;
-using App.DAL.Repositories.NewsImage;
-using App.DAL.Repositories.Partner;
-using App.DAL.Repositories.President;
-using App.DAL.Repositories.Service;
-using App.DAL.Repositories.Video;
-using App.DAL.Repositories.Training;
-using App.DAL.Repositories.Exhibition;
-using App.BL.Services.Business.Video;
-using App.BL.Services.Business.Gallery;
-using App.BL.Services.Business.Announcement;
-using App.BL.Services.Business.Partner;
-using App.BL.Services.Business.President;
-using App.BL.Services.Business.Training;
-using App.BL.Services.Business.Exhibition;
-using App.BL.Mapper.Video;
-using App.BL.Mapper.Gallery;
-using App.BL.Mapper.Announcement;
-using App.BL.Mapper.Partner;
-using App.BL.Mapper.President;
-using App.BL.Mapper.Training;
-using App.BL.Mapper.Exhibition;
-using App.BL.Mapper.Director;
-using App.BL.Mapper.Service;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
-using System.Net.Http.Headers;
-using App.BL.Validators.Video;
-using App.Core.Interfaces.Repository.Management;
-using App.Core.Interfaces.Repository.InternationalSolidarity;
-using App.Core.Interfaces.Repository.ForeignRepresentatives;
-using App.Core.Interfaces.Repository.DistrictRepresentatives;
-using App.Core.Interfaces.Repository.Committee;
-using App.Core.Interfaces.Repository.Presidium;
-using App.Core.Interfaces.Repository.OurValues;
-using App.Core.Interfaces.Repository.Settings;
-using App.DAL.Repositories.Settings;
-using App.BL.Mapper.Setting;
-using App.BL.Services.Business.Setting;
-using App.DAL.Repositories.Management;
-using App.DAL.Repositories.InternationalSolidarity;
-using App.DAL.Repositories.ForeignRepresentatives;
 using App.DAL.Repositories.DistrictRepresentatives;
-using App.DAL.Repositories.Committee;
-using App.DAL.Repositories.Presidium;
-using App.DAL.Repositories.OurValues;
-using App.BL.Mapper.Management;
-using App.BL.Mapper.InternationalSolidarity;
-using App.BL.Mapper.ForeignRepresentatives;
-using App.BL.Mapper.DistrictRepresentatives;
-using App.BL.Mapper.Committee;
-using App.BL.Mapper.Presidium;
-using App.BL.Mapper.OurValues;
-using App.BL.Services.Business.Management;
-using App.BL.Services.Business.InternationalSolidarity;
-using App.BL.Services.Business.ForeignRepresentatives;
-using App.BL.Services.Business.DistrictRepresentatives;
-using App.BL.Services.Business.Committee;
-using App.BL.Services.Business.Presidium;
-using App.BL.Services.Business.OurValues;
-using App.Core.Interfaces.Repository.Publication;
-using App.Core.Interfaces.Repository.FAQ;
-using App.Core.Interfaces.Repository.FAQInquiry;
-using App.Core.Interfaces.Repository.BusinessForum;
-using App.Core.Interfaces.Repository.UsefulLink;
-using App.DAL.Repositories.Publication;
+using App.DAL.Repositories.Exhibition;
 using App.DAL.Repositories.FAQ;
 using App.DAL.Repositories.FAQInquiry;
-using App.DAL.Repositories.BusinessForum;
+using App.DAL.Repositories.ForeignRepresentatives;
+using App.DAL.Repositories.Gallery;
+using App.DAL.Repositories.InternationalSolidarity;
+using App.DAL.Repositories.Management;
+using App.DAL.Repositories.News;
+using App.DAL.Repositories.NewsImage;
+using App.DAL.Repositories.OurValues;
+using App.DAL.Repositories.Partner;
+using App.DAL.Repositories.President;
+using App.DAL.Repositories.Presidium;
+using App.DAL.Repositories.Publication;
+using App.DAL.Repositories.Service;
+using App.DAL.Repositories.Settings;
+using App.DAL.Repositories.Training;
 using App.DAL.Repositories.UsefulLink;
-using App.BL.Mapper.Publication;
-using App.BL.Mapper.FAQ;
-using App.BL.Mapper.BusinessForum;
-using App.BL.Mapper.UsefulLink;
-using App.BL.Services.Business.Publication;
-using App.BL.Services.Business.FAQ;
-using App.BL.Services.Business.BusinessForum;
-using App.BL.Services.Business.UsefulLink;
+using App.DAL.Repositories.Video;
+using App.DAL.Seeder;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -175,11 +182,47 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+
+// ── JWT Authentication ───────────────────────────────────────────────────────
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var jwtSettings = builder.Configuration.GetSection("Jwt");
+    var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+
+        ValidIssuer = jwtSettings["Issuer"],
+        ValidAudience = jwtSettings["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+
 // ── Database ──────────────────────────────────────────────────────────────────
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+// ── Identity ─────────────────────────────────────────────────────────────────
+
+builder.Services.AddIdentityCore<AppUser>()
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddSignInManager();
 
 // ── FluentValidation ──────────────────────────────────────────────────────────
 builder.Services.AddFluentValidationAutoValidation();
@@ -352,12 +395,24 @@ builder.Services.AddScoped<IFAQService, FAQService>();
 builder.Services.AddScoped<IBusinessForumService, BusinessForumService>();
 builder.Services.AddScoped<IUsefulLinkService, UsefulLinkService>();
 
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 // ── Background Jobs ───────────────────────────────────────────────────────────
 builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
 // ─────────────────────────────────────────────────────────────────────────────
 
 var app = builder.Build();
+
+// -- Seed admin user-----------------------------------------------------
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+    await UserSeeder.SeedAdminAsync(userManager, configuration);
+}
 
 using (var scope = app.Services.CreateScope())
 {
@@ -371,11 +426,15 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAll");
+
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.UseMiddleware<LanguageMiddleware>();
 
-app.UseCors("AllowAll");
+
 
 app.MapControllers();
 

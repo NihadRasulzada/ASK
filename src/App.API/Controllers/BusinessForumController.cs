@@ -2,6 +2,7 @@ using App.API.Controllers.Common;
 using App.API.Extensions;
 using App.BL.DTOs;
 using App.BL.Services.Business.BusinessForum;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.API.Controllers;
@@ -61,6 +62,7 @@ public class BusinessForumController(IBusinessForumService businessForumService)
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPost]
+    [Authorize]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse<BusinessForumResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
@@ -83,6 +85,7 @@ public class BusinessForumController(IBusinessForumService businessForumService)
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPut("{id:guid}")]
+    [Authorize]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse<BusinessForumResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -104,6 +107,7 @@ public class BusinessForumController(IBusinessForumService businessForumService)
     /// <response code="404">Biznes forum tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpDelete("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
