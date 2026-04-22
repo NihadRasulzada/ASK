@@ -32,5 +32,5 @@ RUN dotnet publish "App.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:U
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --chown=$APP_UID:$APP_UID --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "App.API.dll"]
