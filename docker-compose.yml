@@ -15,7 +15,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: App.API/Dockerfile   # <-- project-root içində Dockerfile yeri
+      dockerfile:  src/App.API/Dockerfile   # <-- project-root içində Dockerfile yeri
     container_name: api.ask.org.az
     depends_on:
       - db
