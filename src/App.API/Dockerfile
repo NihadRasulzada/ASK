@@ -12,14 +12,14 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/App.API/App.API.csproj", "App.API/"]
-COPY ["src/App.BL/App.BL.csproj", "App.BL/"]
-COPY ["src/App.DAL/App.DAL.csproj", "App.DAL/"]
-COPY ["src/App.Core/App.Core.csproj", "App.Core/"]
-RUN dotnet restore "./App.API/App.API.csproj"
+COPY ["App.API/App.API.csproj", "App.API/"]
+COPY ["App.BL/App.BL.csproj", "App.BL/"]
+COPY ["App.DAL/App.DAL.csproj", "App.DAL/"]
+COPY ["App.Core/App.Core.csproj", "App.Core/"]
+RUN dotnet restore "App.API/App.API.csproj"
 COPY . .
 WORKDIR "/src/App.API"
-RUN dotnet build "./App.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "App.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
