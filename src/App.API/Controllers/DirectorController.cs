@@ -2,6 +2,7 @@ using App.API.Controllers.Common;
 using App.API.Extensions;
 using App.BL.DTOs;
 using App.BL.Services.Business.Director;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.API.Controllers;
@@ -75,6 +76,7 @@ public class DirectorController(IDirectorService directorService) : ControllerBa
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPost]
+    [Authorize]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse<DirectorResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
@@ -97,6 +99,7 @@ public class DirectorController(IDirectorService directorService) : ControllerBa
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPut("{id:guid}")]
+    [Authorize]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse<DirectorResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -119,6 +122,7 @@ public class DirectorController(IDirectorService directorService) : ControllerBa
     /// <response code="404">Rəhbər tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPatch("activate/{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -140,6 +144,7 @@ public class DirectorController(IDirectorService directorService) : ControllerBa
     /// <response code="404">Rəhbər tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPatch("deactivate/{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -160,6 +165,7 @@ public class DirectorController(IDirectorService directorService) : ControllerBa
     /// <response code="404">Rəhbər tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpDelete("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]

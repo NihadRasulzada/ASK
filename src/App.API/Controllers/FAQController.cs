@@ -1,8 +1,9 @@
-using App.API.Controllers.Common;
 using System.Collections.Generic;
+using App.API.Controllers.Common;
 using App.API.Extensions;
 using App.BL.DTOs;
 using App.BL.Services.Business.FAQ;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.API.Controllers;
@@ -76,6 +77,7 @@ public class FAQController(IFAQService faqService) : ControllerBase
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<FAQResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
@@ -97,6 +99,7 @@ public class FAQController(IFAQService faqService) : ControllerBase
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPut("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<FAQResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
@@ -118,6 +121,7 @@ public class FAQController(IFAQService faqService) : ControllerBase
     /// <response code="404">FAQ tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPatch("activate/{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -139,6 +143,7 @@ public class FAQController(IFAQService faqService) : ControllerBase
     /// <response code="404">FAQ tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPatch("deactivate/{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -159,6 +164,7 @@ public class FAQController(IFAQService faqService) : ControllerBase
     /// <response code="404">FAQ tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpDelete("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
@@ -178,6 +184,7 @@ public class FAQController(IFAQService faqService) : ControllerBase
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPost("inquiry")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<FAQInquiryResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
@@ -197,6 +204,7 @@ public class FAQController(IFAQService faqService) : ControllerBase
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("inquiry")]
+    [Authorize]
     [ProducesResponseType(typeof(PagedDataResponse<FAQInquiryResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetInquiries([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)

@@ -2,6 +2,7 @@ using App.API.Controllers.Common;
 using App.API.Extensions;
 using App.BL.DTOs;
 using App.BL.Services.Business.Committee;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.API.Controllers;
@@ -59,6 +60,7 @@ public class CommitteeController(ICommitteeService committeeService) : Controlle
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<CommitteeResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
@@ -80,6 +82,7 @@ public class CommitteeController(ICommitteeService committeeService) : Controlle
     /// <response code="422">Validasiya xətası.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPut("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<CommitteeResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
@@ -100,6 +103,7 @@ public class CommitteeController(ICommitteeService committeeService) : Controlle
     /// <response code="404">Komitə tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpDelete("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<bool>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]

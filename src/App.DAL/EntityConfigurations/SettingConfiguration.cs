@@ -114,6 +114,8 @@ public class SettingConfiguration : BaseEntityConfiguration<Setting>
                 new Guid("11111111-0017-0000-0000-000000000000"),
                 "HeroStatEventCount",
                 SettingValueType.Text)
+
+
         );
     }
 }

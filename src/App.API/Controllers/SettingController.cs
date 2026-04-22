@@ -2,6 +2,7 @@ using App.API.Controllers.Common;
 using App.API.Extensions;
 using App.BL.DTOs;
 using App.BL.Services.Business.Setting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.API.Controllers;
@@ -64,6 +65,7 @@ public class SettingController(ISettingService settingService) : ControllerBase
     /// <response code="404">Parametr tapılmadı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpPut("{key}")]
+    [Authorize]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(typeof(SuccessResponse<SettingResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]

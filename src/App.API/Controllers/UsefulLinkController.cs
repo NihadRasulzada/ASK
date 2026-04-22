@@ -2,6 +2,7 @@ using App.API.Controllers.Common;
 using App.API.Extensions;
 using App.BL.DTOs;
 using App.BL.Services.Business.UsefulLink;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.API.Controllers;
@@ -55,6 +56,7 @@ public class UsefulLinkController(IUsefulLinkService usefulLinkService) : Contro
     /// Yeni faydalı link yaradır.
     /// </summary>
     [HttpPost]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<UsefulLinkResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
@@ -68,6 +70,7 @@ public class UsefulLinkController(IUsefulLinkService usefulLinkService) : Contro
     /// Mövcud faydalı linki yeniləyir.
     /// </summary>
     [HttpPut("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<UsefulLinkResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
@@ -82,6 +85,7 @@ public class UsefulLinkController(IUsefulLinkService usefulLinkService) : Contro
     /// Faydalı linki aktivləşdirir.
     /// </summary>
     [HttpPatch("activate/{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -96,6 +100,7 @@ public class UsefulLinkController(IUsefulLinkService usefulLinkService) : Contro
     /// Faydalı linki deaktivləşdirir.
     /// </summary>
     [HttpPatch("deactivate/{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(BadRequestResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
@@ -110,6 +115,7 @@ public class UsefulLinkController(IUsefulLinkService usefulLinkService) : Contro
     /// Faydalı linki həmişəlik silir.
     /// </summary>
     [HttpDelete("{id:guid}")]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(NotFoundResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
