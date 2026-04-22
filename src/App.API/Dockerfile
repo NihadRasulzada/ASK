@@ -18,7 +18,7 @@ COPY ["./src/App.DAL/App.DAL.csproj", "App.DAL/"]
 COPY ["./src/App.Core/App.Core.csproj", "App.Core/"]
 RUN dotnet restore "App.API/App.API.csproj"
 COPY . .
-RUN dotnet build "App.API/App.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./src/App.API/App.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
