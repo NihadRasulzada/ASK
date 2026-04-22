@@ -80,3 +80,4 @@ $RECYCLE.BIN/
 /src/Presentation/Project.API/proj_ref.txt
 
 appsettings.Development.json
+appsettings.json
