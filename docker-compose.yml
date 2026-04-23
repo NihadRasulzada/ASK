@@ -2,7 +2,7 @@ services:
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: ask-sqlserver
+    container_name: ask.org.az-sqlserver
     environment:
       ACCEPT_EULA: Y
       MSSQL_SA_PASSWORD: ${DB_PASSWORD}
@@ -15,18 +15,12 @@ services:
   api:
     build:
       context: .
-      dockerfile: App.API/Dockerfile   # <-- project-root içində Dockerfile yeri
-    image: ghcr.io/nihadrasulzada/ask-api:latest
-    container_name: ask-api
+      dockerfile:  src/App.API/Dockerfile   # <-- project-root içində Dockerfile yeri
+    container_name: api.ask.org.az
     depends_on:
       - db
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__DefaultConnection: ${DB_CONNECTION}
-      CloudinarySettings__CloudName: ${CLOUDINARY_NAME}
-      CloudinarySettings__ApiKey: ${CLOUDINARY_KEY}
-      CloudinarySettings__ApiSecret: ${CLOUDINARY_SECRET}
-      ExchangeRateSettings__ApiKey: ${EXCHANGE_API_KEY}
     ports:
       - "8080:8080"
     networks:
