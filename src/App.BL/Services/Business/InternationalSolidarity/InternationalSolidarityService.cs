@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.InternationalSolidarity;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.InternationalSolidarity;
 using App.Core.ResponseObject.Concreate;
 
@@ -34,7 +35,7 @@ public class InternationalSolidarityService(
 
     public async Task<Response<InternationalSolidarityResponseDto>> CreateAsync(CreateInternationalSolidarityDto dto, CancellationToken cancellationToken = default)
     {
-        string iconUrl = await cloudinaryService.UploadImageAsync(dto.Icon);
+        CloudinaryURL iconUrl = await cloudinaryService.UploadImageAsync(dto.Icon);
 
         Core.Entities.InternationalSolidarity entity = mapper.CreateDtoToDomain(dto, iconUrl);
 
@@ -51,7 +52,7 @@ public class InternationalSolidarityService(
         if (entity == null)
             return Response<InternationalSolidarityResponseDto?>.NotFound("International solidarity not found");
 
-        string iconUrl = entity.IconUrl;
+        CloudinaryURL iconUrl = entity.IconUrl;
         if (dto.Icon != null)
             iconUrl = await cloudinaryService.UploadImageAsync(dto.Icon);
 

@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.BusinessForum;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.BusinessForum;
 using App.Core.ResponseObject.Concreate;
 
@@ -29,8 +30,8 @@ public class BusinessForumService(
 
     public async Task<Response<BusinessForumResponseDto>> CreateAsync(CreateBusinessForumDto dto, CancellationToken cancellationToken = default)
     {
-        string titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
-        string detailImageUrl = await cloudinaryService.UploadImageAsync(dto.DetailImage);
+        CloudinaryURL titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
+        CloudinaryURL detailImageUrl = await cloudinaryService.UploadImageAsync(dto.DetailImage);
 
         var entity = mapper.CreateDtoToDomain(dto, titleImageUrl, detailImageUrl);
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -44,11 +45,11 @@ public class BusinessForumService(
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response<BusinessForumResponseDto?>.NotFound("Business forum not found");
 
-        string? newTitleImageUrl = null;
+        CloudinaryURL? newTitleImageUrl = null;
         if (dto.TitleImage is not null)
             newTitleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
 
-        string? newDetailImageUrl = null;
+        CloudinaryURL? newDetailImageUrl = null;
         if (dto.DetailImage is not null)
             newDetailImageUrl = await cloudinaryService.UploadImageAsync(dto.DetailImage);
 

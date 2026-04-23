@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Presidium;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Presidium;
 using App.Core.ResponseObject.Concreate;
 
@@ -34,7 +35,7 @@ public class PresidiumService(
 
     public async Task<Response<PresidiumResponseDto>> CreateAsync(CreatePresidiumDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
 
         Core.Entities.Presidium entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -51,7 +52,7 @@ public class PresidiumService(
         if (entity == null)
             return Response<PresidiumResponseDto?>.NotFound("Presidium member not found");
 
-        string imageUrl = entity.ImageUrl;
+        CloudinaryURL imageUrl = entity.ImageUrl;
         if (dto.Image != null)
             imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
 

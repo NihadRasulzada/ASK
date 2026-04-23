@@ -1,4 +1,5 @@
 ﻿using App.Core.Entities.Common;
+using App.Core.Entities.Common.Cloudinary;
 
 namespace App.Core.Entities;
 
@@ -9,23 +10,22 @@ namespace App.Core.Entities;
 public abstract class Event : SoftDeletableEntity
 {
     public string Title { get; private set; }
-    public string TitleImageUrl { get; private set; }
+    public CloudinaryURL TitleImageUrl { get; private set; }
     public string Text { get; private set; }
+
+    public Guid CloudinaryURLId { get; private set; }
 
     // EF Core materialization
     protected Event() : base(Guid.Empty, false)
     {
-        Title = string.Empty;
-        TitleImageUrl = string.Empty;
-        Text = string.Empty;
     }
 
-    protected Event(string title, string titleImageUrl, string text)
+    protected Event(string title, CloudinaryURL titleImageUrl, string text)
         : base(Guid.NewGuid(), false)
     {
         if (string.IsNullOrWhiteSpace(title))
             throw new ArgumentException("Başlıq boş ola bilməz.", nameof(title));
-        if (string.IsNullOrWhiteSpace(titleImageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(titleImageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(titleImageUrl));
         if (string.IsNullOrWhiteSpace(text))
             throw new ArgumentException("Mətn boş ola bilməz.", nameof(text));
@@ -45,12 +45,12 @@ public abstract class Event : SoftDeletableEntity
         Title = title;
         Text = text;
     }
-    public void UpdateImageUrl(string imageUrl)
+    public void UpdateImageUrl(CloudinaryURL titleImageUrl)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
-            throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
+        if (CloudinaryURL.IsNullOrEmpty(titleImageUrl))
+            throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(titleImageUrl));
 
-        TitleImageUrl = imageUrl;
+        TitleImageUrl = titleImageUrl;
     }
 
 }

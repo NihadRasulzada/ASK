@@ -1,4 +1,5 @@
 using App.BL.Settings;
+using App.Core.Entities.Common.Cloudinary;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
@@ -30,7 +31,7 @@ public class CloudinaryService : ICloudinaryService
     }
 
     /// <inheritdoc/>
-    public async Task<string> UploadImageAsync(IFormFile file)
+    public async Task<CloudinaryURL> UploadImageAsync(IFormFile file)
     {
         await using var stream = file.OpenReadStream();
 
@@ -48,13 +49,13 @@ public class CloudinaryService : ICloudinaryService
         if (result.Error is not null)
             throw new InvalidOperationException($"Cloudinary yükləmə xətası: {result.Error.Message}");
 
-        return ToRelativePath(result.SecureUrl);
+        return new CloudinaryURL(ToRelativePath(result.SecureUrl), result.PublicId);
     }
 
     /// <inheritdoc/>
-    public async Task<IList<string>> UploadImagesAsync(IEnumerable<IFormFile> files)
+    public async Task<IList<CloudinaryURL>> UploadImagesAsync(IEnumerable<IFormFile> files)
     {
-        var urls = new List<string>();
+        var urls = new List<CloudinaryURL>();
 
         foreach (var file in files)
         {
@@ -66,7 +67,7 @@ public class CloudinaryService : ICloudinaryService
     }
 
     /// <inheritdoc/>
-    public async Task<string> UploadPdfAsync(IFormFile file)
+    public async Task<CloudinaryURL> UploadPdfAsync(IFormFile file)
     {
         const string pdfContentType = "application/pdf";
         const long maxSizeBytes = 10L * 1024 * 1024; // 10 MB
@@ -92,6 +93,6 @@ public class CloudinaryService : ICloudinaryService
         if (result.Error is not null)
             throw new InvalidOperationException($"Cloudinary yükləmə xətası: {result.Error.Message}");
 
-        return ToRelativePath(result.SecureUrl);
+        return new CloudinaryURL(ToRelativePath(result.SecureUrl), result.PublicId);
     }
 }

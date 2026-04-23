@@ -28,10 +28,13 @@ public class EventConfiguration : SoftDeletableEntityConfiguration<Event>
         builder.Property(e => e.Title)
             .IsRequired();
 
-        builder.Property(e => e.TitleImageUrl)
-            .IsRequired();
 
         builder.Property(e => e.Text)
             .IsRequired();
+
+        builder.OwnsOne(a => a.TitleImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
     }
 }

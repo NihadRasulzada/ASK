@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Director;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Director;
 using App.Core.ResponseObject.Concreate;
 using App.DAL.Context;
@@ -34,7 +35,7 @@ public class DirectorService(
 
     public async Task<Response<DirectorResponseDto>> CreateAsync(CreateDirectorDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
 
         Core.Entities.Director entity = directorMapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -123,7 +124,7 @@ public class DirectorService(
         if (entity == null)
             return Response<DirectorResponseDto?>.NotFound("Director not found");
 
-        string imageUrl = entity.ImageUrl;
+        CloudinaryURL imageUrl = entity.ImageUrl;
 
         if (dto.Image != null)
         {

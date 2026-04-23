@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Publication;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Publication;
 using App.Core.ResponseObject.Concreate;
 
@@ -29,8 +30,8 @@ public class PublicationService(
 
     public async Task<Response<PublicationResponseDto>> CreateAsync(CreatePublicationDto dto, CancellationToken cancellationToken = default)
     {
-        string titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
-        string pdfUrl = await cloudinaryService.UploadPdfAsync(dto.PdfFile);
+        CloudinaryURL titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
+        CloudinaryURL pdfUrl = await cloudinaryService.UploadPdfAsync(dto.PdfFile);
 
         var entity = mapper.CreateDtoToDomain(dto, titleImageUrl, pdfUrl);
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -44,11 +45,11 @@ public class PublicationService(
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response<PublicationResponseDto?>.NotFound("Publication not found");
 
-        string? newTitleImageUrl = null;
+        CloudinaryURL? newTitleImageUrl = null;
         if (dto.TitleImage is not null)
             newTitleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
 
-        string? newPdfUrl = null;
+        CloudinaryURL? newPdfUrl = null;
         if (dto.PdfFile is not null)
             newPdfUrl = await cloudinaryService.UploadPdfAsync(dto.PdfFile);
 

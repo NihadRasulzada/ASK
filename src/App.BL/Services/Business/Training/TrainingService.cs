@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Training;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Training;
 using App.Core.ResponseObject.Concreate;
 
@@ -25,7 +26,7 @@ public class TrainingService(
 
     public async Task<Response<TrainingResponseDto>> CreateAsync(CreateTrainingDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
         Core.Entities.Training entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -84,7 +85,7 @@ public class TrainingService(
         Core.Entities.Training? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity == null) return Response<TrainingResponseDto?>.NotFound("Training not found");
 
-        string? newImageUrl = null;
+        CloudinaryURL? newImageUrl = null;
         if (dto.Image != null)
         {
             newImageUrl = await cloudinaryService.UploadImageAsync(dto.Image);

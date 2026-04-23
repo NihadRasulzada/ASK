@@ -1,28 +1,30 @@
 ﻿using App.Core.Entities.Common;
+using App.Core.Entities.Common.Cloudinary;
 
 namespace App.Core.Entities;
 
 public class Gallery : BaseEntity
 {
-    public string ImageUrl { get; private set; }
+    public CloudinaryURL ImageUrl { get; private set; }
+
+    public Guid CloudinaryURLId { get; private set; }
 
     // FIX: EF Core materialization üçün parameterless constructor əlavə edildi
     private Gallery() : base(Guid.Empty)
     {
-        ImageUrl = string.Empty;
     }
 
-    public Gallery(string imageUrl) : base(Guid.NewGuid())
+    public Gallery(CloudinaryURL imageUrl) : base(Guid.NewGuid())
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         ImageUrl = imageUrl;
     }
 
-    public void Update(string imageUrl)
+    public void UpdateImageUrl(CloudinaryURL imageUrl)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         ImageUrl = imageUrl;

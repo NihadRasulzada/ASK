@@ -1,10 +1,11 @@
 using App.Core.Entities.Common;
+using App.Core.Entities.Common.Cloudinary;
 
 namespace App.Core.Entities;
 
 public class Director : SoftDeletableEntity
 {
-    public string ImageUrl { get; private set; }
+    public CloudinaryURL ImageUrl { get; private set; }
     public string FullNameAz { get; private set; }
     public string FullNameEn { get; private set; }
     public string FullNameRu { get; private set; }
@@ -17,30 +18,23 @@ public class Director : SoftDeletableEntity
     public string PhoneNumber { get; set; }
     public string  Email { get; set; }
 
+    public Guid CloudinaryURLId { get; private set; }
+
+
     // EF Core materialization
     private Director() : base(Guid.Empty, false)
     {
-        ImageUrl = string.Empty;
-        FullNameAz = string.Empty;
-        FullNameEn = string.Empty;
-        FullNameRu = string.Empty;
-        DutyAz = string.Empty;
-        DutyEn = string.Empty;
-        DutyRu = string.Empty;
-        DepartmentAz = string.Empty;
-        DepartmentEn = string.Empty;
-        DepartmentRu = string.Empty;
     }
 
     public Director(
-        string imageUrl,
+        CloudinaryURL imageUrl,
         string fullNameAz, string fullNameEn, string fullNameRu,
         string dutyAz, string dutyEn, string dutyRu,
         string departmentAz, string departmentEn, string departmentRu,
         string phoneNumber, string email)
         : base(Guid.NewGuid(), false)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
         if (string.IsNullOrWhiteSpace(fullNameAz))
             throw new ArgumentException("Tam ad (AZ) boş ola bilməz.", nameof(fullNameAz));
@@ -102,9 +96,9 @@ public class Director : SoftDeletableEntity
         Email = email;
     }
 
-    public void UpdateImageUrl(string imageUrl)
+    public void UpdateImageUrl(CloudinaryURL imageUrl)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         ImageUrl = imageUrl;

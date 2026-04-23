@@ -1,3 +1,4 @@
+using App.Core.Entities.Common.Cloudinary;
 using Microsoft.AspNetCore.Http;
 
 namespace App.BL.Services.External;
@@ -9,19 +10,19 @@ public interface ICloudinaryService
     /// </summary>
     /// <param name="file">Yüklənəcək şəkil faylı.</param>
     /// <returns>Cloudinary-dəki şəkilin HTTPS URL-i.</returns>
-    Task<string> UploadImageAsync(IFormFile file);
+    Task<CloudinaryURL> UploadImageAsync(IFormFile file);
 
     /// <summary>
     /// Bir neçə şəkili Cloudinary-yə yükləyir və URL siyahısı qaytarır.
     /// </summary>
     /// <param name="files">Yüklənəcək şəkil faylları.</param>
     /// <returns>Cloudinary-dəki şəkillərin HTTPS URL siyahısı.</returns>
-    Task<IList<string>> UploadImagesAsync(IEnumerable<IFormFile> files);
+    Task<IList<CloudinaryURL>> UploadImagesAsync(IEnumerable<IFormFile> files);
 
     /// <summary>
     /// PDF faylı Cloudinary-yə raw resurs kimi yükləyir və HTTPS URL qaytarır.
     /// </summary>
     /// <param name="file">Yüklənəcək PDF fayl (application/pdf, max 10 MB).</param>
     /// <returns>Cloudinary-dəki faylın HTTPS URL-i.</returns>
-    Task<string> UploadPdfAsync(IFormFile file);
+    Task<CloudinaryURL> UploadPdfAsync(IFormFile file);
 }

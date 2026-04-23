@@ -18,10 +18,14 @@ public class AnnouncementConfiguration : BaseEntityConfiguration<Announcement>
             .IsRequired()
             .HasMaxLength(500);
 
-        builder.Property(a => a.TitleImageUrl)
-            .IsRequired();
 
         builder.Property(a => a.Text)
             .IsRequired();
+
+        builder.OwnsOne(a => a.TitleImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
+
     }
 }

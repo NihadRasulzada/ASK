@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Gallery;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Gallery;
 using App.Core.ResponseObject.Concreate;
 
@@ -14,7 +15,7 @@ public class GalleryService(
 {
     public async Task<Response> CreateAsync(CreateGalleryDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
 
         Core.Entities.Gallery entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -70,7 +71,7 @@ public class GalleryService(
         if (entity == null)
             return Response<GalleryResponseDto?>.NotFound("Gallery image not found");
 
-        string? newImageUrl = null;
+        CloudinaryURL? newImageUrl = null;
         if (dto.Image != null)
         {
             newImageUrl = await cloudinaryService.UploadImageAsync(dto.Image);

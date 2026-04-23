@@ -10,8 +10,6 @@ public class Video : BaseEntity
     // EF Core materialization üçün private parameterless constructor
     private Video() : base(Guid.Empty)
     {
-        Link = string.Empty;
-        Title = string.Empty;
     }
 
     /// <summary>

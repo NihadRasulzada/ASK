@@ -1,5 +1,6 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.News;
@@ -15,7 +16,7 @@ public class NewsMapper : INewsMapper
         this.mediaUrlBuilder = mediaUrlBuilder;
     }
 
-    public Core.Entities.News CreateDtoToDomain(CreateNewsDto dto, string titleImageUrl)
+    public Core.Entities.News CreateDtoToDomain(CreateNewsDto dto, CloudinaryURL titleImageUrl)
     {
         var entity = new Core.Entities.News(
             titleImageUrl,
@@ -31,7 +32,7 @@ public class NewsMapper : INewsMapper
     {
         return new NewsResponseDto(
             entity.Id,
-            mediaUrlBuilder.Build(entity.TitleImageUrl),
+            mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl),
             languageService.Lang switch
             {
                 "az" => entity.NewsTextAz,
@@ -39,13 +40,13 @@ public class NewsMapper : INewsMapper
                 "ru" => entity.NewsTextRu,
                 _ => entity.NewsTextAz
             },
-            entity.Images?.Select(x => mediaUrlBuilder.Build(x.ImageUrl)!).ToList() ?? new List<string>(),
+            entity.Images?.Select(x => mediaUrlBuilder.Build(x.ImageUrl.ImageURl)!).ToList() ?? new List<string>(),
             entity.IsDeactive,
             entity.CreateDate
         );
     }
 
-    public void UpdateDtoToDomain(Core.Entities.News entity, UpdateNewsDto dto, string titleImageUrl)
+    public void UpdateDtoToDomain(Core.Entities.News entity, UpdateNewsDto dto, CloudinaryURL titleImageUrl)
     {
         entity.Update(
             dto.NewsTextAz,

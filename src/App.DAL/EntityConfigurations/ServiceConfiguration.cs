@@ -14,12 +14,16 @@ public class ServiceConfiguration : SoftDeletableEntityConfiguration<Service>
 
         builder.ToTable("Services");
 
-        builder.Property(e => e.ImageUrl).IsRequired();
 
         builder.Property(e => e.NameAz).IsRequired().HasMaxLength(200);
         builder.Property(e => e.NameEn).IsRequired().HasMaxLength(200);
         builder.Property(e => e.NameRu).IsRequired().HasMaxLength(200);
 
         builder.Property(e => e.ActivateAt).IsRequired();
+
+        builder.OwnsOne(a => a.ImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
     }
 }

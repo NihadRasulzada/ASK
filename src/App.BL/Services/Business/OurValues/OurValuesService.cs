@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.OurValues;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.OurValues;
 using App.Core.ResponseObject.Concreate;
 
@@ -34,7 +35,7 @@ public class OurValuesService(
 
     public async Task<Response<OurValuesResponseDto>> CreateAsync(CreateOurValuesDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
 
         Core.Entities.OurValues entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -51,7 +52,7 @@ public class OurValuesService(
         if (entity == null)
             return Response<OurValuesResponseDto?>.NotFound("Value not found");
 
-        string imageUrl = entity.ImageUrl;
+        CloudinaryURL imageUrl = entity.ImageUrl;
         if (dto.Image != null)
             imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
 

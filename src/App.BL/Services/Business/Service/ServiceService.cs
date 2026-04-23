@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Service;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 using App.Core.Interfaces.Repository.Service;
 using App.Core.ResponseObject.Concreate;
@@ -44,7 +45,7 @@ public class ServiceService(
 
     public async Task<Response> CreateAsync(CreateServiceDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
         Core.Entities.Service newService = serviceMapper.CreateDtoToDomain(dto, imageUrl);
 
         IEnumerable<Core.Entities.Service> services = await readRepository.GetAllIncludingDeletedAsync(cancellationToken, predicate: x => !x.IsDeactive, orderBy: q => q.OrderBy(x => x.ActivateAt));
@@ -151,7 +152,7 @@ public class ServiceService(
 
         if (dto.Image != null)
         {
-            string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+            CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
             newEntity = serviceMapper.UpdateDtoToDamain(entity, dto, imageUrl);
         }
         else

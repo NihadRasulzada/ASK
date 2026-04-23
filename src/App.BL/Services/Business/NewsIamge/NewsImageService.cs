@@ -2,6 +2,7 @@ using App.BL.DTOs;
 using App.BL.Mapper.NewsImage;
 using App.BL.NewsImages.Business.NewsIamge;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.NewsImage;
 using App.Core.ResponseObject.Concreate;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,7 @@ public class NewsImageService : INewsImageService
 
     public async Task<Response> CreateAsync(CreateNewsImageDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
 
         Core.Entities.NewsImage entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -82,7 +83,7 @@ public class NewsImageService : INewsImageService
         if (entity == null)
             return Response<NewsImageResponseDto?>.NotFound("News image not found");
 
-        string imageUrl = entity.ImageUrl;
+        CloudinaryURL imageUrl = entity.ImageUrl;
 
         if (dto.Image != null)
         {

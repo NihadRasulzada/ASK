@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Setting;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Enums;
 using App.Core.Interfaces.Repository.Settings;
 using App.Core.ResponseObject.Concreate;
@@ -50,7 +51,7 @@ public class SettingService(
             return Response<SettingResponseDto?>.NotFound($"Setting '{key}' tapılmadı");
 
         // 2. ValueType-a görə dəyəri müəyyənləşdir
-        string? resolvedValue;
+        (string?, CloudinaryURL?) resultValue = (null, null);
 
         if (entity.ValueType == SettingValueType.Link)
         {
@@ -59,7 +60,7 @@ public class SettingService(
                     "PDF fayl mütləq yüklənməlidir (link tipli setting).");
 
             // Content-type + size yoxlaması UploadPdfAsync içindədir
-            resolvedValue = await cloudinaryService.UploadPdfAsync(dto.PdfFile);
+            resultValue.Item2 = await cloudinaryService.UploadPdfAsync(dto.PdfFile);
         }
         else // SettingValueType.Text
         {
@@ -67,11 +68,11 @@ public class SettingService(
                 return Response<SettingResponseDto?>.BadRequest(
                     "Dəyər boş ola bilməz (text tipli setting).");
 
-            resolvedValue = dto.Value.Trim();
+            resultValue.Item1 = dto.Value.Trim();
         }
 
         // 3. Entity-ni yenilə və saxla
-        entity.UpdateValue(resolvedValue);
+        entity.UpdateValue(resultValue);
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
 

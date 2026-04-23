@@ -14,8 +14,6 @@ public class DirectorConfiguration : SoftDeletableEntityConfiguration<Director>
 
         builder.ToTable("Directors");
 
-        builder.Property(e => e.ImageUrl)
-            .IsRequired();
 
         builder.Property(e => e.FullNameAz).IsRequired().HasMaxLength(200);
         builder.Property(e => e.FullNameEn).IsRequired().HasMaxLength(200);
@@ -31,5 +29,10 @@ public class DirectorConfiguration : SoftDeletableEntityConfiguration<Director>
 
         builder.Property(e => e.PhoneNumber).HasMaxLength(50);
         builder.Property(e => e.Email).HasMaxLength(256);
+
+        builder.OwnsOne(a => a.ImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
     }
 }

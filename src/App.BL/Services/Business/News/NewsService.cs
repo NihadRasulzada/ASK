@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.News;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.News;
 using App.Core.ResponseObject.Concreate;
 using App.DAL.Context;
@@ -34,7 +35,7 @@ public class NewsService(
 
     public async Task<Response<NewsResponseDto>> CreateAsync(CreateNewsDto dto, CancellationToken cancellationToken = default)
     {
-        string titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
+        CloudinaryURL titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
 
         Core.Entities.News entity = newsMapper.CreateDtoToDomain(dto, titleImageUrl);
 
@@ -125,7 +126,7 @@ public class NewsService(
         if (entity == null)
             return Response<NewsResponseDto?>.NotFound("News not found");
 
-        string titleImageUrl = entity.TitleImageUrl;
+        CloudinaryURL titleImageUrl = entity.TitleImageUrl;
 
         if (dto.TitleImage != null)
         {

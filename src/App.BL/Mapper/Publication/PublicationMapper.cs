@@ -1,12 +1,13 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Publication;
 
 public class PublicationMapper(ILanguageService languageService, IMediaUrlBuilder mediaUrlBuilder) : IPublicationMapper
 {
-    public Core.Entities.Publication CreateDtoToDomain(CreatePublicationDto dto, string titleImageUrl, string pdfUrl)
+    public Core.Entities.Publication CreateDtoToDomain(CreatePublicationDto dto, CloudinaryURL titleImageUrl, CloudinaryURL pdfUrl)
     {
         return new Core.Entities.Publication(
             titleImageUrl,
@@ -29,11 +30,11 @@ public class PublicationMapper(ILanguageService languageService, IMediaUrlBuilde
         return new PublicationResponseDto(
             Id: entity.Id,
             Title: title,
-            TitleImageUrl: mediaUrlBuilder.Build(entity.TitleImageUrl)!,
-            PdfUrl: mediaUrlBuilder.Build(entity.PdfUrl)!);
+            TitleImageUrl: mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl)!,
+            PdfUrl: mediaUrlBuilder.Build(entity.PdfUrl.ImageURl)!);
     }
 
-    public Core.Entities.Publication UpdateDtoToDomain(Core.Entities.Publication entity, UpdatePublicationDto dto, string? titleImageUrl = null, string? pdfUrl = null)
+    public Core.Entities.Publication UpdateDtoToDomain(Core.Entities.Publication entity, UpdatePublicationDto dto, CloudinaryURL? titleImageUrl = null, CloudinaryURL? pdfUrl = null)
     {
         entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu);
         if (titleImageUrl is not null) entity.UpdateTitleImage(titleImageUrl);
