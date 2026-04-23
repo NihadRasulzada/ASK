@@ -405,6 +405,12 @@ builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
+}
+
+
 // -- Seed admin user-----------------------------------------------------
 using (var scope = app.Services.CreateScope())
 {
@@ -414,10 +420,6 @@ using (var scope = app.Services.CreateScope())
     await UserSeeder.SeedAdminAsync(userManager, configuration);
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.Migrate();
-}
 
 app.UseExceptionHandler();
 
