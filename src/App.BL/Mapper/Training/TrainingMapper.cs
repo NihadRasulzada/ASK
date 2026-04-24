@@ -13,7 +13,7 @@ public class TrainingMapper(IMediaUrlBuilder mediaUrlBuilder) : ITrainingMapper
 
     public TrainingResponseDto DomainToResponseDto(Core.Entities.Training entity)
     {
-        return new TrainingResponseDto(entity.Id, entity.Title, entity.Text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive);
+        return new TrainingResponseDto(entity.Id, entity.Title, entity.Text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created);
     }
 
     public Core.Entities.Training UpdateDtoToDomain(Core.Entities.Training entity, UpdateTrainingDto dto, CloudinaryURL? imageUrl = null)

@@ -15,6 +15,8 @@ public abstract class Event : SoftDeletableEntity
 
     public Guid CloudinaryURLId { get; private set; }
 
+    public DateTime Created { get; private set; } = DateTime.UtcNow;
+
     // EF Core materialization
     protected Event() : base(Guid.Empty, false)
     {

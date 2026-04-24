@@ -13,7 +13,7 @@ public class ExhibitionMapper(IMediaUrlBuilder mediaUrlBuilder) : IExhibitionMap
 
     public ExhibitionResponseDto DomainToResponseDto(Core.Entities.Exhibition entity)
     {
-        return new ExhibitionResponseDto(entity.Id, entity.Title, entity.Text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive);
+        return new ExhibitionResponseDto(entity.Id, entity.Title, entity.Text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created);
     }
 
     public Core.Entities.Exhibition UpdateDtoToDomain(Core.Entities.Exhibition entity, UpdateExhibitionDto dto, CloudinaryURL? imageUrl = null)

@@ -17,4 +17,4 @@ public class UpdateExhibitionDto
     public IFormFile? Image { get; set; }
 }
 
-public record ExhibitionResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive);
+public record ExhibitionResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created);
