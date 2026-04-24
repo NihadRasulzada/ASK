@@ -9,8 +9,8 @@ namespace App.BL.DTOs;
 /// </summary>
 public class UpdateSettingDto
 {
-    /// <summary>Link tipli setting üçün PDF fayl (application/pdf, max 10 MB).</summary>
-    public IFormFile? PdfFile { get; set; }
+    /// <summary>Link tipli setting üçün fayl (şəkil və ya PDF).</summary>
+    public IFormFile? File { get; set; }
 
     /// <summary>Text tipli setting üçün dəyər.</summary>
     public string? Value { get; set; }
@@ -22,5 +22,6 @@ public class UpdateSettingDto
 public record SettingResponseDto(
     Guid Id,
     string Key,
-    string? Value,
+    string? StringValue,
+    string? CloudinaryUrl,   
     SettingValueType ValueType);

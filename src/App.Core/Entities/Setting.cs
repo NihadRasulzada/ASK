@@ -5,40 +5,17 @@ using App.Core.Enums;
 
 namespace App.Core.Entities;
 
+
 public class Setting : BaseEntity
 {
-    [NotMapped]
-    private CloudinaryURL cloudinaryURL;
-    [NotMapped]
-    private string? value;
     public string Key { get; private set; }
-    public string? Value
-    {
-        get
-        {
-            return ValueType switch
-            {
-                SettingValueType.Text => value ?? string.Empty,
-                SettingValueType.Link => cloudinaryURL?.ImageURl ?? string.Empty,
-                _ => throw new InvalidOperationException($"Dəyər tipi '{ValueType}' üçün dəstək yoxdur.")
-            };
-        }
-    } 
+    public string? StringValue { get; private set; }
+    public CloudinaryURL? CloudinaryValue { get; private set; }
     public SettingValueType ValueType { get; private set; }
 
-    public Guid? CloudinaryURLId { get; private set; }
+    private Setting() : base(Guid.Empty) { Key = string.Empty; }
 
-
-    // EF Core materialization
-    private Setting() : base(Guid.Empty)
-    {
-    }
-
-    /// <summary>
-    /// Seed üçün istifadə olunan konstruktor — sabit Guid tələb edir.
-    /// </summary>
-    public Setting(Guid id, string key, SettingValueType valueType)
-        : base(id)
+    public Setting(Guid id, string key, SettingValueType valueType) : base(id)
     {
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentException("Açar boş ola bilməz.", nameof(key));
@@ -47,9 +24,19 @@ public class Setting : BaseEntity
         ValueType = valueType;
     }
 
-    public void UpdateValue((string?, CloudinaryURL?) value)
+    public void UpdateStringValue(string? value)
     {
-       this.value = value.Item1;
-       cloudinaryURL = value.Item2;
+        if (ValueType != SettingValueType.Text)
+            throw new InvalidOperationException("Bu setting text tipli deyil.");
+
+        StringValue = value;
+    }
+
+    public void UpdateCloudinaryValue(CloudinaryURL? value)
+    {
+        if (ValueType != SettingValueType.Link)
+            throw new InvalidOperationException("Bu setting link tipli deyil.");
+
+        CloudinaryValue = value;
     }
 }
