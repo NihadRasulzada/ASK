@@ -11,7 +11,7 @@ public class BusinessForumService(
     IBusinessForumReadRepository readRepository,
     IBusinessForumWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    IBusinessForumMapper mapper) : IBusinessForumService
+    IBusinessForumMapper mapper) : CloudinaryEntityService(cloudinaryService), IBusinessForumService
 {
     public async Task<PagedResponse<IEnumerable<BusinessForumResponseDto>>> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -45,15 +45,20 @@ public class BusinessForumService(
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response<BusinessForumResponseDto?>.NotFound("Business forum not found");
 
-        CloudinaryURL? newTitleImageUrl = null;
-        if (dto.TitleImage is not null)
-            newTitleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
+        if (dto.TitleImage != null)
+        {
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  // 👈 base metoddan
+                entity.TitleImageUrl.PublicId,
+                dto.TitleImage);
 
-        CloudinaryURL? newDetailImageUrl = null;
-        if (dto.DetailImage is not null)
-            newDetailImageUrl = await cloudinaryService.UploadImageAsync(dto.DetailImage);
+            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId); // upload uğurlu oldu, indi sil
+        }
+        else
+        {
+            mapper.UpdateDtoToDomain(entity, dto, null);
+        }
 
-        mapper.UpdateDtoToDomain(entity, dto, newTitleImageUrl, newDetailImageUrl);
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
 
@@ -64,6 +69,8 @@ public class BusinessForumService(
     {
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response.NotFound("Business forum not found");
+
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);

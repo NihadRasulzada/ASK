@@ -95,4 +95,20 @@ public class CloudinaryService : ICloudinaryService
 
         return new CloudinaryURL(ToRelativePath(result.SecureUrl), result.PublicId);
     }
+
+    public async Task DeleteAsync(string publicId, ResourceType resourceType = ResourceType.Image)
+    {
+        if (string.IsNullOrWhiteSpace(publicId))
+            throw new ArgumentException("PublicId boş ola bilməz.", nameof(publicId));
+
+        var deleteParams = new DeletionParams(publicId)
+        {
+            ResourceType = resourceType
+        };
+
+        var result = await _cloudinary.DestroyAsync(deleteParams);
+
+        if (result.Error is not null)
+            throw new InvalidOperationException($"Cloudinary silmə xətası: {result.Error.Message}");
+    }
 }

@@ -11,7 +11,7 @@ public class AnnouncementService(
     IAnnouncementReadRepository readRepository,
     IAnnouncementWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    IAnnouncementMapper mapper) : IAnnouncementService
+    IAnnouncementMapper mapper) : CloudinaryEntityService(cloudinaryService), IAnnouncementService
 {
     public async Task<Response> CreateAsync(CreateAnnouncementDto dto, CancellationToken cancellationToken = default)
     {
@@ -31,6 +31,8 @@ public class AnnouncementService(
 
         if (entity == null)
             return Response.NotFound("Announcement not found");
+
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -71,13 +73,20 @@ public class AnnouncementService(
         if (entity == null)
             return Response<AnnouncementResponseDto?>.NotFound("Announcement not found");
 
-        CloudinaryURL? newTitleImageUrl = null;
         if (dto.TitleImage != null)
         {
-            newTitleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  // 👈 base metoddan
+                entity.TitleImageUrl.PublicId,
+                dto.TitleImage);
+
+            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId); // upload uğurlu oldu, indi sil
+        }
+        else
+        {
+            mapper.UpdateDtoToDomain(entity, dto, null);
         }
 
-        mapper.UpdateDtoToDomain(entity, dto, newTitleImageUrl);
 
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);

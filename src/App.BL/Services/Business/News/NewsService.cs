@@ -13,7 +13,7 @@ public class NewsService(
     INewsReadRepository readRepository,
     INewsWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    INewsMapper newsMapper) : INewsService
+    INewsMapper newsMapper) : CloudinaryEntityService(cloudinaryService), INewsService
 {
 
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
@@ -70,6 +70,8 @@ public class NewsService(
 
         if (entity == null)
             return Response<bool>.NotFound("News not found");
+
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -130,10 +132,17 @@ public class NewsService(
 
         if (dto.TitleImage != null)
         {
-            titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
-        }
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
+                entity.TitleImageUrl.PublicId,
+                dto.TitleImage);
 
-        newsMapper.UpdateDtoToDomain(entity, dto, titleImageUrl);
+            newsMapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId); 
+        }
+        else
+        {
+            newsMapper.UpdateDtoToDomain(entity, dto, null);
+        }
 
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);

@@ -11,7 +11,7 @@ public class ExhibitionService(
     IExhibitionReadRepository readRepository,
     IExhibitionWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    IExhibitionMapper mapper) : IExhibitionService
+    IExhibitionMapper mapper) : CloudinaryEntityService(cloudinaryService), IExhibitionService
 {
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -52,6 +52,8 @@ public class ExhibitionService(
         Core.Entities.Exhibition? entity = await readRepository.GetByIdIncludingDeletedAsync(id, true, cancellationToken);
         if (entity == null) return Response.NotFound("Exhibition not found");
 
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
+
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
         return Response.Success("Exhibition deleted successfully");
@@ -88,10 +90,18 @@ public class ExhibitionService(
         CloudinaryURL? newImageUrl = null;
         if (dto.Image != null)
         {
-            newImageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
+                entity.TitleImageUrl.PublicId,
+                dto.Image);
+
+            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId); 
+        }
+        else
+        {
+            mapper.UpdateDtoToDomain(entity, dto, null);
         }
 
-        mapper.UpdateDtoToDomain(entity, dto, newImageUrl);
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
 

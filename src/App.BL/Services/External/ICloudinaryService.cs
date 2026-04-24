@@ -1,4 +1,6 @@
+
 using App.Core.Entities.Common.Cloudinary;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 
 namespace App.BL.Services.External;
@@ -25,4 +27,11 @@ public interface ICloudinaryService
     /// <param name="file">Yüklənəcək PDF fayl (application/pdf, max 10 MB).</param>
     /// <returns>Cloudinary-dəki faylın HTTPS URL-i.</returns>
     Task<CloudinaryURL> UploadPdfAsync(IFormFile file);
+
+    /// <summary>
+    /// Cloudinary-dən resursu publicId ilə silir.
+    /// </summary>
+    /// <param name="publicId">Silinəcək resurun public ID-si.</param>
+    /// <param name="resourceType">Resurs tipi (image, raw, video). Default: image</param>
+    Task DeleteAsync(string publicId, ResourceType resourceType = ResourceType.Image);
 }

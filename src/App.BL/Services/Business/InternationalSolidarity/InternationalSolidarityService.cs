@@ -11,7 +11,7 @@ public class InternationalSolidarityService(
     IInternationalSolidarityReadRepository readRepository,
     IInternationalSolidarityWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    IInternationalSolidarityMapper mapper) : IInternationalSolidarityService
+    IInternationalSolidarityMapper mapper) : CloudinaryEntityService(cloudinaryService), IInternationalSolidarityService
 {
     public async Task<Response<IEnumerable<InternationalSolidarityResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -53,10 +53,23 @@ public class InternationalSolidarityService(
             return Response<InternationalSolidarityResponseDto?>.NotFound("International solidarity not found");
 
         CloudinaryURL iconUrl = entity.IconUrl;
-        if (dto.Icon != null)
-            iconUrl = await cloudinaryService.UploadImageAsync(dto.Icon);
 
-        mapper.UpdateDtoToDomain(entity, dto, iconUrl);
+        if (dto.Icon != null)
+        {
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
+                entity.IconUrl.PublicId,
+                dto.Icon);
+
+            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId); 
+        }
+        else
+        {
+            mapper.UpdateDtoToDomain(entity, dto, null);
+        }
+
+
+       
 
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -70,6 +83,8 @@ public class InternationalSolidarityService(
 
         if (entity == null)
             return Response<bool>.NotFound("International solidarity not found");
+
+        await DeleteImageAsync(entity.IconUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);

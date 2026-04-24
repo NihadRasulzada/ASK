@@ -24,6 +24,7 @@ public class BusinessForum : BaseEntity
                          string textAz, string textEn, string textRu, CloudinaryURL detailImageUrl)
         : base(Guid.NewGuid())
     {
+        TitleImageUrl = titleImageUrl;
         TitleAz = titleAz;
         TitleEn = titleEn;
         TitleRu = titleRu;

@@ -15,7 +15,7 @@ public class ServiceService(
     ICloudinaryService cloudinaryService,
     ILanguageService languageService,
     IServiceMapper serviceMapper,
-    AppDbContext context) : IServiceService
+    AppDbContext context) : CloudinaryEntityService(cloudinaryService), IServiceService
 {
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -89,6 +89,8 @@ public class ServiceService(
             return Response.NotFound($"Service not found");
         }
 
+        await DeleteImageAsync(entity.ImageUrl.PublicId);
+
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
 
@@ -152,18 +154,22 @@ public class ServiceService(
 
         if (dto.Image != null)
         {
-            CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
-            newEntity = serviceMapper.UpdateDtoToDamain(entity, dto, imageUrl);
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
+                entity.ImageUrl.PublicId,
+                dto.Image);
+
+            serviceMapper.UpdateDtoToDamain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId);
         }
         else
         {
-            newEntity = serviceMapper.UpdateDtoToDamain(entity, dto, entity.ImageUrl);
+            serviceMapper.UpdateDtoToDamain(entity, dto, null);
         }
 
 
-        writeRepository.Update(newEntity);
+        writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
 
-        return Response<ServiceResponseDto?>.Success(serviceMapper.DomainToResponseDto(newEntity), $"{nameof(Core.Entities.Service)} updated successfully");
+        return Response<ServiceResponseDto?>.Success(serviceMapper.DomainToResponseDto(entity), $"{nameof(Core.Entities.Service)} updated successfully");
     }
 }

@@ -11,7 +11,7 @@ public class PublicationService(
     IPublicationReadRepository readRepository,
     IPublicationWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    IPublicationMapper mapper) : IPublicationService
+    IPublicationMapper mapper) : CloudinaryEntityService(cloudinaryService), IPublicationService
 {
     public async Task<PagedResponse<IEnumerable<PublicationResponseDto>>> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -46,14 +46,35 @@ public class PublicationService(
         if (entity is null) return Response<PublicationResponseDto?>.NotFound("Publication not found");
 
         CloudinaryURL? newTitleImageUrl = null;
-        if (dto.TitleImage is not null)
-            newTitleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
+        if (dto.TitleImage != null)
+        {
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
+                entity.TitleImageUrl.PublicId,
+                dto.TitleImage);
+
+            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId);
+        }
+        else
+        {
+            mapper.UpdateDtoToDomain(entity, dto, null);
+        }
 
         CloudinaryURL? newPdfUrl = null;
-        if (dto.PdfFile is not null)
-            newPdfUrl = await cloudinaryService.UploadPdfAsync(dto.PdfFile);
+        if (dto.PdfFile != null)
+        {
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
+                entity.PdfUrl.PublicId,
+                dto.PdfFile);
 
-        mapper.UpdateDtoToDomain(entity, dto, newTitleImageUrl, newPdfUrl);
+            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId);
+        }
+        else
+        {
+            mapper.UpdateDtoToDomain(entity, dto, null);
+        }
+
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
 
@@ -64,6 +85,9 @@ public class PublicationService(
     {
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response.NotFound("Publication not found");
+
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);   //imahge silmey ucun 
+        await DeleteImageAsync(entity.PdfUrl.PublicId);          // pdf silmey ucun
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
