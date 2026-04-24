@@ -7,6 +7,6 @@ public class Exhibition : Event
     // EF Core materialization
     private Exhibition() { }
 
-    public Exhibition(string title, CloudinaryURL titleImageUrl, string text)
-        : base(title, titleImageUrl, text) { }
+    public Exhibition(string titleAz,string titleEn,string titleRu, CloudinaryURL titleImageUrl, string textAz,string textEn,string textRu)
+        : base(titleAz, titleEn, titleRu, titleImageUrl, textAz, textEn, textRu) { }
 }

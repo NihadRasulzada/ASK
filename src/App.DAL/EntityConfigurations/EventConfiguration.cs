@@ -25,12 +25,12 @@ public class EventConfiguration : SoftDeletableEntityConfiguration<Event>
             .HasMaxLength(13)
             .IsRequired();
 
-        builder.Property(e => e.Title)
-            .IsRequired();
-
-
-        builder.Property(e => e.Text)
-            .IsRequired();
+        builder.Property(b => b.TitleAz).IsRequired();
+        builder.Property(b => b.TitleEn).IsRequired();
+        builder.Property(b => b.TitleRu).IsRequired();
+        builder.Property(b => b.TextAz).IsRequired();
+        builder.Property(b => b.TextEn).IsRequired();
+        builder.Property(b => b.TextRu).IsRequired();
 
         builder.OwnsOne(a => a.TitleImageUrl, c => {
             c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");

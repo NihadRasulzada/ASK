@@ -14,11 +14,25 @@ public class CreateTrainingDtoValidator : AbstractValidator<CreateTrainingDto>
 
     public CreateTrainingDtoValidator(ILanguageService languageService)
     {
-        RuleFor(x => x.Title)
+        RuleFor(x => x.TitleAz)
             .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
-            .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+            .MaximumLength(300).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
 
-        RuleFor(x => x.Text)
+        RuleFor(x => x.TitleEn)
+            .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
+            .MaximumLength(300).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+
+        RuleFor(x => x.TitleRu)
+            .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
+            .MaximumLength(300).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+
+        RuleFor(x => x.TextAz)
+            .NotEmpty().WithMessage(ValidationMessages.TextRequired(languageService.Lang));
+
+        RuleFor(x => x.TextEn)
+            .NotEmpty().WithMessage(ValidationMessages.TextRequired(languageService.Lang));
+
+        RuleFor(x => x.TextRu)
             .NotEmpty().WithMessage(ValidationMessages.TextRequired(languageService.Lang));
 
         // FIX: NotNull() ayrı; size/type yoxlaması When() bloku içindədir

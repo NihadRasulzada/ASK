@@ -1,24 +1,41 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
 using App.Core.Entities.Common.Cloudinary;
+using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Exhibition;
 
-public class ExhibitionMapper(IMediaUrlBuilder mediaUrlBuilder) : IExhibitionMapper
+public class ExhibitionMapper(ILanguageService languageService,IMediaUrlBuilder mediaUrlBuilder) : IExhibitionMapper
 {
     public Core.Entities.Exhibition CreateDtoToDomain(CreateExhibitionDto dto, CloudinaryURL imageUrl)
     {
-        return new Core.Entities.Exhibition(dto.Title, imageUrl, dto.Text);
+        return new Core.Entities.Exhibition(dto.TitleAz, dto.TitleEn, dto.TitleRu, imageUrl, dto.TextAz, dto.TextEn, dto.TextRu);
     }
 
     public ExhibitionResponseDto DomainToResponseDto(Core.Entities.Exhibition entity)
     {
-        return new ExhibitionResponseDto(entity.Id, entity.Title, entity.Text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created);
+        var title = languageService.Lang switch
+        {
+            "az" => entity.TitleAz,
+            "en" => entity.TitleEn,
+            "ru" => entity.TitleRu,
+            _ => entity.TitleAz
+        };
+
+        var text = languageService.Lang switch
+        {
+            "az" => entity.TextAz,
+            "en" => entity.TextEn,
+            "ru" => entity.TextRu,
+            _ => entity.TextAz
+        };
+
+        return new ExhibitionResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created);
     }
 
     public Core.Entities.Exhibition UpdateDtoToDomain(Core.Entities.Exhibition entity, UpdateExhibitionDto dto, CloudinaryURL? imageUrl = null)
     {
-        entity.Update(dto.Title, dto.Text);
+        entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu, dto.TextAz, dto.TextEn, dto.TextRu);
         if (imageUrl != null)
         {
             entity.UpdateImageUrl(imageUrl);

@@ -1,5 +1,6 @@
 ﻿using App.Core.Entities.Common;
 using App.Core.Entities.Common.Cloudinary;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace App.Core.Entities;
 
@@ -9,9 +10,13 @@ namespace App.Core.Entities;
 // FIX: EF Core üçün parameterless constructor əlavə edildi.
 public abstract class Event : SoftDeletableEntity
 {
-    public string Title { get; private set; }
+    public string TitleAz { get; private set; }
+    public string TitleEn { get; private set; }
+    public string TitleRu { get; private set; }
     public CloudinaryURL TitleImageUrl { get; private set; }
-    public string Text { get; private set; }
+    public string TextAz { get; private set; }
+    public string TextEn { get; private set; }
+    public string TextRu { get; private set; }
 
     public Guid CloudinaryURLId { get; private set; }
 
@@ -22,30 +27,54 @@ public abstract class Event : SoftDeletableEntity
     {
     }
 
-    protected Event(string title, CloudinaryURL titleImageUrl, string text)
+    protected Event(string titleAz, string titleEn, string titleRu, CloudinaryURL titleImageUrl, string textAz, string textEn, string textRu)
         : base(Guid.NewGuid(), false)
     {
-        if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(title));
+        if (string.IsNullOrWhiteSpace(titleAz))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(titleAz)); 
+        if (string.IsNullOrWhiteSpace(titleEn))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(titleEn));
+        if (string.IsNullOrWhiteSpace(titleRu))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(titleRu));
         if (CloudinaryURL.IsNullOrEmpty(titleImageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(titleImageUrl));
-        if (string.IsNullOrWhiteSpace(text))
-            throw new ArgumentException("Mətn boş ola bilməz.", nameof(text));
+        if (string.IsNullOrWhiteSpace(textAz))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(textAz));
+        if (string.IsNullOrWhiteSpace(textEn))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(textEn));
+        if (string.IsNullOrWhiteSpace(textRu))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(textRu));
 
-        Title = title;
+        TitleAz = titleAz;
+        TitleEn = titleEn;
+        TitleRu = titleRu;
         TitleImageUrl = titleImageUrl;
-        Text = text;
+        TextAz = textAz;
+        TextEn = textEn;
+        TextRu = textRu;
     }
 
-    public void Update(string title, string text)
+    public void Update(string titleAz, string titleEn, string titleRu, string textAz, string textEn, string textRu)
     {
-        if (string.IsNullOrWhiteSpace(title))
-            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(title));
-        if (string.IsNullOrWhiteSpace(text))
-            throw new ArgumentException("Mətn boş ola bilməz.", nameof(text));
+        if (string.IsNullOrWhiteSpace(titleAz))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(titleAz));
+        if (string.IsNullOrWhiteSpace(titleEn))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(titleEn));
+        if (string.IsNullOrWhiteSpace(titleRu))
+            throw new ArgumentException("Başlıq boş ola bilməz.", nameof(titleRu));
+        if (string.IsNullOrWhiteSpace(textAz))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(textAz));
+        if (string.IsNullOrWhiteSpace(textEn))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(textEn));
+        if (string.IsNullOrWhiteSpace(textRu))
+            throw new ArgumentException("Mətn boş ola bilməz.", nameof(textRu)); ;
 
-        Title = title;
-        Text = text;
+        TitleAz = titleAz;
+        TitleEn = titleEn;
+        TitleRu = titleRu;
+        TextAz = textAz;
+        TextEn = textEn;
+        TextRu = textRu;
     }
     public void UpdateImageUrl(CloudinaryURL titleImageUrl)
     {
