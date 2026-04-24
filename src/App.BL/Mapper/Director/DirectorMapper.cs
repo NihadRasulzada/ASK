@@ -1,5 +1,6 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Director;
@@ -15,7 +16,7 @@ public class DirectorMapper : IDirectorMapper
         this.mediaUrlBuilder = mediaUrlBuilder;
     }
 
-    public Core.Entities.Director CreateDtoToDomain(CreateDirectorDto dto, string imageUrl)
+    public Core.Entities.Director CreateDtoToDomain(CreateDirectorDto dto, CloudinaryURL imageUrl)
     {
         return new Core.Entities.Director(
             imageUrl,
@@ -37,7 +38,7 @@ public class DirectorMapper : IDirectorMapper
     {
         return new DirectorResponseDto(
             Id: Director.Id,
-            ImageUrl: mediaUrlBuilder.Build(Director.ImageUrl),
+            ImageUrl: mediaUrlBuilder.Build(Director.ImageUrl.ImageURl),
             FullName: languageService.Lang switch
             {
                 "az" => Director.FullNameAz,
@@ -65,7 +66,7 @@ public class DirectorMapper : IDirectorMapper
         );
     }
 
-    public Core.Entities.Director UpdateDtoToDamain(Core.Entities.Director Director, UpdateDirectorDto dto, string? imageUrl = null)
+    public Core.Entities.Director UpdateDtoToDamain(Core.Entities.Director Director, UpdateDirectorDto dto, CloudinaryURL? imageUrl = null)
     {
         Director.Update(
             dto.FullNameAz,

@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Setting;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Enums;
 using App.Core.Interfaces.Repository.Settings;
 using App.Core.ResponseObject.Concreate;
@@ -11,72 +12,85 @@ public class SettingService(
     ISettingReadRepository readRepository,
     ISettingWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    ISettingMapper mapper) : ISettingService
+    ISettingMapper mapper)
+    : CloudinaryEntityService(cloudinaryService), ISettingService  
 {
     public async Task<Response<IEnumerable<SettingResponseDto>>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+        CancellationToken ct = default)
     {
-        IEnumerable<Core.Entities.Setting> entities =
-            await readRepository.GetAllAsync(false, cancellationToken);
-
-        IEnumerable<SettingResponseDto> result = entities.Select(mapper.DomainToResponseDto);
-
+        var entities = await readRepository.GetAllAsync(false, ct);
+        var result = entities.Select(mapper.DomainToResponseDto);
         return Response<IEnumerable<SettingResponseDto>>
             .Success(result, $"{result.Count()} settings retrieved successfully");
     }
 
     public async Task<Response<SettingResponseDto?>> GetByKeyAsync(
-        string key, CancellationToken cancellationToken = default)
+        string key, CancellationToken ct = default)
     {
-        Core.Entities.Setting? entity = await readRepository.GetAsync(
-            s => s.Key == key, false, cancellationToken);
-
+        var entity = await readRepository.GetAsync(s => s.Key == key, false, ct);
         if (entity is null)
             return Response<SettingResponseDto?>.NotFound($"Setting '{key}' tapılmadı");
 
         return Response<SettingResponseDto?>.Success(
-            mapper.DomainToResponseDto(entity),
-            "Setting uğurla əldə edildi");
+            mapper.DomainToResponseDto(entity), "Uğurla əldə edildi");
     }
 
     public async Task<Response<SettingResponseDto?>> UpdateAsync(
-        string key, UpdateSettingDto dto, CancellationToken cancellationToken = default)
+        string key, UpdateSettingDto dto, CancellationToken ct = default)
     {
-        // 1. Tracking ilə yüklə (EF update üçün lazımdır)
-        Core.Entities.Setting? entity = await readRepository.GetAsync(
-            s => s.Key == key, true, cancellationToken);
-
+        var entity = await readRepository.GetAsync(s => s.Key == key, true, ct);
         if (entity is null)
             return Response<SettingResponseDto?>.NotFound($"Setting '{key}' tapılmadı");
 
-        // 2. ValueType-a görə dəyəri müəyyənləşdir
-        string? resolvedValue;
-
-        if (entity.ValueType == SettingValueType.Link)
-        {
-            if (dto.PdfFile is null)
-                return Response<SettingResponseDto?>.BadRequest(
-                    "PDF fayl mütləq yüklənməlidir (link tipli setting).");
-
-            // Content-type + size yoxlaması UploadPdfAsync içindədir
-            resolvedValue = await cloudinaryService.UploadPdfAsync(dto.PdfFile);
-        }
-        else // SettingValueType.Text
+        if (entity.ValueType == SettingValueType.Text)
         {
             if (string.IsNullOrWhiteSpace(dto.Value))
-                return Response<SettingResponseDto?>.BadRequest(
-                    "Dəyər boş ola bilməz (text tipli setting).");
+                return Response<SettingResponseDto?>.BadRequest("Dəyər boş ola bilməz.");
 
-            resolvedValue = dto.Value.Trim();
+            entity.UpdateStringValue(dto.Value.Trim());
+        }
+        else // Link → Cloudinary
+        {
+            if (dto.File is null)
+                return Response<SettingResponseDto?>.BadRequest("Fayl mütləq yüklənməlidir.");
+
+            string? oldPublicId = entity.CloudinaryValue?.PublicId;
+
+            CloudinaryURL newUrl = await cloudinaryService.UploadImageAsync(dto.File);
+            entity.UpdateCloudinaryValue(newUrl);
+
+            await DeleteImageAsync(oldPublicId); 
         }
 
-        // 3. Entity-ni yenilə və saxla
-        entity.UpdateValue(resolvedValue);
         writeRepository.Update(entity);
-        await writeRepository.SaveChangesAsync(cancellationToken);
+        await writeRepository.SaveChangesAsync(ct);
 
         return Response<SettingResponseDto?>.Success(
-            mapper.DomainToResponseDto(entity),
-            "Setting uğurla yeniləndi");
+            mapper.DomainToResponseDto(entity), "Uğurla yeniləndi");
+    }
+
+    public async Task<Response> DeleteAsync(
+        string key, CancellationToken ct = default)
+    {
+        var entity = await readRepository.GetAsync(s => s.Key == key, true, ct);
+        if (entity is null)
+            return Response.NotFound($"Setting '{key}' tapılmadı");
+
+        if (entity.ValueType == SettingValueType.Text)
+        {
+            entity.UpdateStringValue(null);
+        }
+        else // Link → Cloudinary
+        {
+            string? publicId = entity.CloudinaryValue?.PublicId;
+            entity.UpdateCloudinaryValue(null);
+            await DeleteImageAsync(publicId); 
+        }
+
+        writeRepository.Update(entity);
+        await writeRepository.SaveChangesAsync(ct);
+
+        return Response.Success("Setting dəyəri silindi");
     }
 }
+

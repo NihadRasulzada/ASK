@@ -11,10 +11,6 @@ public class UsefulLink : SoftDeletableEntity
 
     private UsefulLink() : base(Guid.Empty, false)
     {
-        TitleAz = string.Empty;
-        TitleEn = string.Empty;
-        TitleRu = string.Empty;
-        Link = string.Empty;
     }
 
     public UsefulLink(string titleAz, string titleEn, string titleRu, string link)

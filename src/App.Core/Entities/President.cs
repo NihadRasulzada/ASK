@@ -1,21 +1,22 @@
 using App.Core.Entities.Common;
+using App.Core.Entities.Common.Cloudinary;
 
 namespace App.Core.Entities;
 
 public class President : BaseEntity
 {
-    public string ImageUrl { get; private set; }
+    public CloudinaryURL ImageUrl { get; private set; }
     public string Text { get; private set; }
+
+    public Guid CloudinaryURLId { get; private set; }
 
     private President() : base(Guid.Empty)
     {
-        ImageUrl = string.Empty;
-        Text = string.Empty;
     }
 
-    public President(string imageUrl, string text) : base(Guid.NewGuid())
+    public President(CloudinaryURL imageUrl, string text) : base(Guid.NewGuid())
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
         if (string.IsNullOrWhiteSpace(text))
             throw new ArgumentException("Mətn boş ola bilməz.", nameof(text));
@@ -33,9 +34,9 @@ public class President : BaseEntity
         Text = text;
     }
 
-    public void UpdateImageUrl(string imageUrl)
+    public void UpdateImageUrl(CloudinaryURL imageUrl)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         ImageUrl = imageUrl;

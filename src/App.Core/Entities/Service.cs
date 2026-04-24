@@ -1,27 +1,27 @@
 using App.Core.Entities.Common;
+using App.Core.Entities.Common.Cloudinary;
 
 namespace App.Core.Entities;
 
 public class Service : SoftDeletableEntity
 {
-    public string ImageUrl { get; private set; }
+    public CloudinaryURL ImageUrl { get; private set; }
     public string NameAz { get; private set; }
     public string NameEn { get; private set; }
     public string NameRu { get; private set; }
     public DateTime ActivateAt { get; private set; }
 
+    public Guid CloudinaryURLId { get; private set; }
+
+
     private Service() : base(Guid.Empty, false)
     {
-        ImageUrl = string.Empty;
-        NameAz = string.Empty;
-        NameEn = string.Empty;
-        NameRu = string.Empty;
     }
 
-    public Service(string imageUrl, string nameAz, string nameEn, string nameRu)
+    public Service(CloudinaryURL imageUrl, string nameAz, string nameEn, string nameRu)
         : base(Guid.NewGuid(), false)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
         if (string.IsNullOrWhiteSpace(nameAz))
             throw new ArgumentException("Az dili adı boş ola bilməz.", nameof(nameAz));
@@ -51,9 +51,9 @@ public class Service : SoftDeletableEntity
         NameEn = nameEn;
         NameRu = nameRu;
     }
-    public void UpdateImageUrl(string imageUrl)
+    public void UpdateImageUrl(CloudinaryURL imageUrl)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl))
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         ImageUrl = imageUrl;

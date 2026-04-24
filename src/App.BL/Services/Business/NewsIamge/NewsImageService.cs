@@ -2,20 +2,21 @@ using App.BL.DTOs;
 using App.BL.Mapper.NewsImage;
 using App.BL.NewsImages.Business.NewsIamge;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.NewsImage;
 using App.Core.ResponseObject.Concreate;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.BL.Services.Business.NewsIamge;
 
-public class NewsImageService : INewsImageService
+public class NewsImageService : CloudinaryEntityService , INewsImageService
 {
     private readonly ICloudinaryService cloudinaryService;
     private readonly INewsImageWriteRepository writeRepository;
     private readonly INewsImageReadRepository readRepository;
     private readonly INewsImageMapper mapper;
 
-    public NewsImageService(ICloudinaryService cloudinaryService, INewsImageWriteRepository writeRepository, INewsImageReadRepository readRepository, INewsImageMapper mapper)
+    public NewsImageService(ICloudinaryService cloudinaryService, INewsImageWriteRepository writeRepository, INewsImageReadRepository readRepository, INewsImageMapper mapper): base(cloudinaryService)
     {
         this.cloudinaryService = cloudinaryService;
         this.writeRepository = writeRepository;
@@ -25,7 +26,7 @@ public class NewsImageService : INewsImageService
 
     public async Task<Response> CreateAsync(CreateNewsImageDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
 
         Core.Entities.NewsImage entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -42,6 +43,8 @@ public class NewsImageService : INewsImageService
 
         if (entity == null)
             return Response.NotFound("News image not found");
+
+        await DeleteImageAsync(entity.ImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -82,14 +85,21 @@ public class NewsImageService : INewsImageService
         if (entity == null)
             return Response<NewsImageResponseDto?>.NotFound("News image not found");
 
-        string imageUrl = entity.ImageUrl;
+        CloudinaryURL imageUrl = entity.ImageUrl;
 
         if (dto.Image != null)
         {
-            imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
-        }
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
+                entity.ImageUrl.PublicId,
+                dto.Image);
 
-        mapper.UpdateDtoToDomain(entity, dto, imageUrl);
+            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId); 
+        }
+        else
+        {
+            mapper.UpdateDtoToDomain(entity, dto, null);
+        }
 
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);

@@ -1,4 +1,5 @@
 using App.Core.Entities.Common;
+using App.Core.Entities.Common.Cloudinary;
 
 namespace App.Core.Entities;
 
@@ -10,23 +11,18 @@ public class Presidium : BaseEntity
     public string PositionAz { get; private set; }
     public string PositionEn { get; private set; }
     public string PositionRu { get; private set; }
-    public string ImageUrl { get; private set; }
+    public CloudinaryURL ImageUrl { get; private set; }
+    public Guid CloudinaryURLId { get; private set; }
+
 
     private Presidium() : base(Guid.Empty)
     {
-        FullNameAz = string.Empty;
-        FullNameEn = string.Empty;
-        FullNameRu = string.Empty;
-        PositionAz = string.Empty;
-        PositionEn = string.Empty;
-        PositionRu = string.Empty;
-        ImageUrl = string.Empty;
     }
 
     public Presidium(
         string fullNameAz, string fullNameEn, string fullNameRu,
         string positionAz, string positionEn, string positionRu,
-        string imageUrl)
+        CloudinaryURL imageUrl)
         : base(Guid.NewGuid())
     {
         if (string.IsNullOrWhiteSpace(fullNameAz)) throw new ArgumentException("Tam ad (AZ) boş ola bilməz.", nameof(fullNameAz));
@@ -35,7 +31,7 @@ public class Presidium : BaseEntity
         if (string.IsNullOrWhiteSpace(positionAz)) throw new ArgumentException("Vəzifə (AZ) boş ola bilməz.", nameof(positionAz));
         if (string.IsNullOrWhiteSpace(positionEn)) throw new ArgumentException("Vəzifə (EN) boş ola bilməz.", nameof(positionEn));
         if (string.IsNullOrWhiteSpace(positionRu)) throw new ArgumentException("Vəzifə (RU) boş ola bilməz.", nameof(positionRu));
-        if (string.IsNullOrWhiteSpace(imageUrl)) throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl)) throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         FullNameAz = fullNameAz;
         FullNameEn = fullNameEn;
@@ -65,9 +61,9 @@ public class Presidium : BaseEntity
         PositionRu = positionRu;
     }
 
-    public void UpdateImageUrl(string imageUrl)
+    public void UpdateImageUrl(CloudinaryURL imageUrl)
     {
-        if (string.IsNullOrWhiteSpace(imageUrl)) throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
+        if (CloudinaryURL.IsNullOrEmpty(imageUrl)) throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
         ImageUrl = imageUrl;
     }
 }

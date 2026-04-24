@@ -1,5 +1,6 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Service;
@@ -15,7 +16,7 @@ public class ServiceMapper : IServiceMapper
         _mediaUrlBuilder = mediaUrlBuilder;
     }
 
-    public Core.Entities.Service CreateDtoToDomain(CreateServiceDto dto, string imageUrl)
+    public Core.Entities.Service CreateDtoToDomain(CreateServiceDto dto, CloudinaryURL imageUrl)
     {
         return new Core.Entities.Service(
             imageUrl: imageUrl,
@@ -29,7 +30,7 @@ public class ServiceMapper : IServiceMapper
     {
         return new ServiceResponseDto(
             Id: service.Id,
-            ImageUrl: _mediaUrlBuilder.Build(service.ImageUrl),
+            ImageUrl: _mediaUrlBuilder.Build(service.ImageUrl.ImageURl),
             Name: _languageService.Lang switch
             {
                 "az" => service.NameAz,
@@ -41,7 +42,7 @@ public class ServiceMapper : IServiceMapper
         );
     }
 
-    public Core.Entities.Service UpdateDtoToDamain(Core.Entities.Service service, UpdateServiceDto dto, string imageUrl)
+    public Core.Entities.Service UpdateDtoToDamain(Core.Entities.Service service, UpdateServiceDto dto, CloudinaryURL imageUrl)
     {
         service.Update(
             nameAz: dto.NameAz,

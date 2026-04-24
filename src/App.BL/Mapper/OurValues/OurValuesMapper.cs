@@ -1,12 +1,13 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.OurValues;
 
 public class OurValuesMapper(ILanguageService languageService, IMediaUrlBuilder mediaUrlBuilder) : IOurValuesMapper
 {
-    public Core.Entities.OurValues CreateDtoToDomain(CreateOurValuesDto dto, string imageUrl)
+    public Core.Entities.OurValues CreateDtoToDomain(CreateOurValuesDto dto, CloudinaryURL imageUrl)
     {
         return new Core.Entities.OurValues(
             dto.TitleAz, dto.TitleEn, dto.TitleRu,
@@ -24,10 +25,10 @@ public class OurValuesMapper(ILanguageService languageService, IMediaUrlBuilder 
                 "ru" => entity.TitleRu,
                 _ => entity.TitleAz
             },
-            ImageUrl: mediaUrlBuilder.Build(entity.ImageUrl));
+            ImageUrl: mediaUrlBuilder.Build(entity.ImageUrl.ImageURl));
     }
 
-    public Core.Entities.OurValues UpdateDtoToDomain(Core.Entities.OurValues entity, UpdateOurValuesDto dto, string imageUrl)
+    public Core.Entities.OurValues UpdateDtoToDomain(Core.Entities.OurValues entity, UpdateOurValuesDto dto, CloudinaryURL imageUrl)
     {
         entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu);
         entity.UpdateImageUrl(imageUrl);

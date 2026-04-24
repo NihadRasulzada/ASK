@@ -16,7 +16,17 @@ public class PublicationConfiguration : BaseEntityConfiguration<Publication>
         builder.Property(p => p.TitleAz).IsRequired().HasMaxLength(500);
         builder.Property(p => p.TitleEn).IsRequired().HasMaxLength(500);
         builder.Property(p => p.TitleRu).IsRequired().HasMaxLength(500);
-        builder.Property(p => p.TitleImageUrl).IsRequired();
-        builder.Property(p => p.PdfUrl).IsRequired();
+
+        builder.OwnsOne(a => a.TitleImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
+
+        builder.OwnsOne(a => a.PdfUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("PdfImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("PdfPublicId");
+        });
+
+
     }
 }

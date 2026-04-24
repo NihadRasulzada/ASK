@@ -1,11 +1,12 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 
 namespace App.BL.Mapper.NewsImage;
 
 public class NewsImageMapper(IMediaUrlBuilder mediaUrlBuilder) : INewsImageMapper
 {
-    public Core.Entities.NewsImage CreateDtoToDomain(CreateNewsImageDto dto, string imageUrl)
+    public Core.Entities.NewsImage CreateDtoToDomain(CreateNewsImageDto dto, CloudinaryURL imageUrl)
     {
         return new Core.Entities.NewsImage(
             imageUrl,
@@ -15,12 +16,12 @@ public class NewsImageMapper(IMediaUrlBuilder mediaUrlBuilder) : INewsImageMappe
 
     public NewsImageResponseDto DomainToResponseDto(Core.Entities.NewsImage entity)
     {
-        return new NewsImageResponseDto(entity.Id, mediaUrlBuilder.Build(entity.ImageUrl), entity.NewsId);
+        return new NewsImageResponseDto(entity.Id, mediaUrlBuilder.Build(entity.ImageUrl.ImageURl), entity.NewsId);
     }
 
-    public Core.Entities.NewsImage UpdateDtoToDomain(Core.Entities.NewsImage entity, UpdateNewsImageDto dto, string imageUrl)
+    public Core.Entities.NewsImage UpdateDtoToDomain(Core.Entities.NewsImage entity, UpdateNewsImageDto dto, CloudinaryURL imageUrl)
     {
-        entity.Update(imageUrl);
+        entity.UpdateImageUrl(imageUrl);
         return entity;
     }
 }

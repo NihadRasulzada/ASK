@@ -1,23 +1,24 @@
 using App.Core.Entities.Common;
+using App.Core.Entities.Common.Cloudinary;
 
 namespace App.Core.Entities;
 
 public class InternationalSolidarity : BaseEntity
 {
     public string Link { get; private set; }
-    public string IconUrl { get; private set; }
+    public CloudinaryURL IconUrl { get; private set; }
+
+    public Guid CloudinaryURLId { get; private set; }
 
     private InternationalSolidarity() : base(Guid.Empty)
     {
-        Link = string.Empty;
-        IconUrl = string.Empty;
     }
 
-    public InternationalSolidarity(string link, string iconUrl) : base(Guid.NewGuid())
+    public InternationalSolidarity(string link, CloudinaryURL iconUrl) : base(Guid.NewGuid())
     {
         if (string.IsNullOrWhiteSpace(link))
             throw new ArgumentException("Link boş ola bilməz.", nameof(link));
-        if (string.IsNullOrWhiteSpace(iconUrl))
+        if (CloudinaryURL.IsNullOrEmpty(iconUrl))
             throw new ArgumentException("İkon URL-i boş ola bilməz.", nameof(iconUrl));
 
         Link = link;
@@ -32,9 +33,9 @@ public class InternationalSolidarity : BaseEntity
         Link = link;
     }
 
-    public void UpdateIconUrl(string iconUrl)
+    public void UpdateIconUrl(CloudinaryURL iconUrl)
     {
-        if (string.IsNullOrWhiteSpace(iconUrl))
+        if (CloudinaryURL.IsNullOrEmpty(iconUrl))
             throw new ArgumentException("İkon URL-i boş ola bilməz.", nameof(iconUrl));
 
         IconUrl = iconUrl;

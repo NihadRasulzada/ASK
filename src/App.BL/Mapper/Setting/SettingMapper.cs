@@ -8,14 +8,15 @@ public class SettingMapper(IMediaUrlBuilder mediaUrlBuilder) : ISettingMapper
 {
     public SettingResponseDto DomainToResponseDto(Core.Entities.Setting entity)
     {
-        var value = entity.ValueType == SettingValueType.Link
-            ? mediaUrlBuilder.Build(entity.Value)
-            : entity.Value;
+        string? cloudinaryUrl = entity.CloudinaryValue is not null
+            ? mediaUrlBuilder.Build(entity.CloudinaryValue.ImageURl)
+            : null;
 
         return new SettingResponseDto(
             Id: entity.Id,
             Key: entity.Key,
-            Value: value,
+            StringValue: entity.StringValue,
+            CloudinaryUrl: cloudinaryUrl,
             ValueType: entity.ValueType);
     }
 }

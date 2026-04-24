@@ -14,8 +14,12 @@ public class PresidentConfiguration : BaseEntityConfiguration<President>
 
         builder.ToTable("Presidents");
 
-        builder.Property(e => e.ImageUrl).IsRequired();
 
         builder.Property(e => e.Text).IsRequired();
+
+        builder.OwnsOne(a => a.ImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
     }
 }

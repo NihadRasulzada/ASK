@@ -15,7 +15,6 @@ public class NewsConfiguration : SoftDeletableEntityConfiguration<News>
 
         builder.ToTable("News");
 
-        builder.Property(n => n.TitleImageUrl).IsRequired();
         builder.Property(n => n.NewsTextAz).IsRequired();
         builder.Property(n => n.NewsTextEn).IsRequired();
         builder.Property(n => n.NewsTextRu).IsRequired();
@@ -24,5 +23,10 @@ public class NewsConfiguration : SoftDeletableEntityConfiguration<News>
             .WithOne(i => i.News)
             .HasForeignKey(i => i.NewsId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.OwnsOne(a => a.TitleImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
     }
 }

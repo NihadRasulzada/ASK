@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Exhibition;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Exhibition;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,7 +11,7 @@ public class ExhibitionService(
     IExhibitionReadRepository readRepository,
     IExhibitionWriteRepository writeRepository,
     ICloudinaryService cloudinaryService,
-    IExhibitionMapper mapper) : IExhibitionService
+    IExhibitionMapper mapper) : CloudinaryEntityService(cloudinaryService), IExhibitionService
 {
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -25,7 +26,7 @@ public class ExhibitionService(
 
     public async Task<Response<ExhibitionResponseDto>> CreateAsync(CreateExhibitionDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
         Core.Entities.Exhibition entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -50,6 +51,8 @@ public class ExhibitionService(
     {
         Core.Entities.Exhibition? entity = await readRepository.GetByIdIncludingDeletedAsync(id, true, cancellationToken);
         if (entity == null) return Response.NotFound("Exhibition not found");
+
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -84,13 +87,21 @@ public class ExhibitionService(
         Core.Entities.Exhibition? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity == null) return Response<ExhibitionResponseDto?>.NotFound("Exhibition not found");
 
-        string? newImageUrl = null;
+        CloudinaryURL? newImageUrl = null;
         if (dto.Image != null)
         {
-            newImageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
+                entity.TitleImageUrl.PublicId,
+                dto.Image);
+
+            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId); 
+        }
+        else
+        {
+            mapper.UpdateDtoToDomain(entity, dto, null);
         }
 
-        mapper.UpdateDtoToDomain(entity, dto, newImageUrl);
         writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
 

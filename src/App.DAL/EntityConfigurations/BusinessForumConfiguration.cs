@@ -19,8 +19,16 @@ public class BusinessForumConfiguration : BaseEntityConfiguration<BusinessForum>
         builder.Property(b => b.TextAz).IsRequired();
         builder.Property(b => b.TextEn).IsRequired();
         builder.Property(b => b.TextRu).IsRequired();
-        builder.Property(b => b.TitleImageUrl).IsRequired();
-        builder.Property(b => b.DetailImageUrl).IsRequired();
         builder.Property(b => b.CreateDate).IsRequired();
+
+        builder.OwnsOne(a => a.TitleImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
+
+        builder.OwnsOne(a => a.DetailImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("DetailImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("DetailPublicId");
+        });
     }
 }

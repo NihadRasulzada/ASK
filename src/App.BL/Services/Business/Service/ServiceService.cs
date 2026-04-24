@@ -1,6 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Service;
 using App.BL.Services.External;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 using App.Core.Interfaces.Repository.Service;
 using App.Core.ResponseObject.Concreate;
@@ -14,7 +15,7 @@ public class ServiceService(
     ICloudinaryService cloudinaryService,
     ILanguageService languageService,
     IServiceMapper serviceMapper,
-    AppDbContext context) : IServiceService
+    AppDbContext context) : CloudinaryEntityService(cloudinaryService), IServiceService
 {
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -44,7 +45,7 @@ public class ServiceService(
 
     public async Task<Response> CreateAsync(CreateServiceDto dto, CancellationToken cancellationToken = default)
     {
-        string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
         Core.Entities.Service newService = serviceMapper.CreateDtoToDomain(dto, imageUrl);
 
         IEnumerable<Core.Entities.Service> services = await readRepository.GetAllIncludingDeletedAsync(cancellationToken, predicate: x => !x.IsDeactive, orderBy: q => q.OrderBy(x => x.ActivateAt));
@@ -87,6 +88,8 @@ public class ServiceService(
         {
             return Response.NotFound($"Service not found");
         }
+
+        await DeleteImageAsync(entity.ImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -151,18 +154,22 @@ public class ServiceService(
 
         if (dto.Image != null)
         {
-            string imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
-            newEntity = serviceMapper.UpdateDtoToDamain(entity, dto, imageUrl);
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
+                entity.ImageUrl.PublicId,
+                dto.Image);
+
+            serviceMapper.UpdateDtoToDamain(entity, dto, newUrl);
+            await DeleteImageAsync(oldPublicId);
         }
         else
         {
-            newEntity = serviceMapper.UpdateDtoToDamain(entity, dto, entity.ImageUrl);
+            serviceMapper.UpdateDtoToDamain(entity, dto, null);
         }
 
 
-        writeRepository.Update(newEntity);
+        writeRepository.Update(entity);
         await writeRepository.SaveChangesAsync(cancellationToken);
 
-        return Response<ServiceResponseDto?>.Success(serviceMapper.DomainToResponseDto(newEntity), $"{nameof(Core.Entities.Service)} updated successfully");
+        return Response<ServiceResponseDto?>.Success(serviceMapper.DomainToResponseDto(entity), $"{nameof(Core.Entities.Service)} updated successfully");
     }
 }

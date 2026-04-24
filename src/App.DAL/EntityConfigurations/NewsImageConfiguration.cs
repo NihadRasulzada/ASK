@@ -14,8 +14,12 @@ public class NewsImageConfiguration : BaseEntityConfiguration<NewsImage>
 
         builder.ToTable("NewsImages");
 
-        builder.Property(i => i.ImageUrl).IsRequired();
 
         builder.Property(i => i.NewsId).IsRequired();
+
+        builder.OwnsOne(a => a.ImageUrl, c => {
+            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
+            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+        });
     }
 }

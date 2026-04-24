@@ -4,6 +4,7 @@ using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260423135203_Init-13")]
+    partial class Init13
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -850,12 +853,15 @@ namespace App.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("CloudinaryURLId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("StringValue")
+                    b.Property<string>("Value")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)");
 
@@ -1638,36 +1644,6 @@ namespace App.DAL.Migrations
 
                     b.Navigation("ImageUrl")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("App.Core.Entities.Setting", b =>
-                {
-                    b.OwnsOne("App.Core.Entities.Common.Cloudinary.CloudinaryURL", "CloudinaryValue", b1 =>
-                        {
-                            b1.Property<Guid>("SettingId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<string>("ImageURl")
-                                .IsRequired()
-                                .HasMaxLength(2000)
-                                .HasColumnType("nvarchar(2000)")
-                                .HasColumnName("CloudinaryImageUrl");
-
-                            b1.Property<string>("PublicId")
-                                .IsRequired()
-                                .HasMaxLength(500)
-                                .HasColumnType("nvarchar(500)")
-                                .HasColumnName("CloudinaryPublicId");
-
-                            b1.HasKey("SettingId");
-
-                            b1.ToTable("Settings");
-
-                            b1.WithOwner()
-                                .HasForeignKey("SettingId");
-                        });
-
-                    b.Navigation("CloudinaryValue");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
