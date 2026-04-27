@@ -28,6 +28,7 @@ using App.BL.Mapper.UsefulLink;
 using App.BL.Mapper.Video;
 using App.BL.Services.Business.Announcement;
 using App.BL.Services.Business.BusinessForum;
+using App.BL.Services.Business.Calendar;
 using App.BL.Services.Business.Committee;
 using App.BL.Services.Business.CurrencyRate;
 using App.BL.Services.Business.Director;
@@ -340,7 +341,6 @@ builder.Services.AddScoped<IBusinessForumWriteRepository, BusinessForumWriteRepo
 builder.Services.AddScoped<IUsefulLinkReadRepository, UsefulLinkReadRepository>();
 builder.Services.AddScoped<IUsefulLinkWriteRepository, UsefulLinkWriteRepository>();
 
-builder.Services.AddScoped<ILanguageService, LanguageService>();
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
 builder.Services.AddScoped<App.BL.Mapper.News.INewsMapper, App.BL.Mapper.News.NewsMapper>();
@@ -395,8 +395,13 @@ builder.Services.AddScoped<IFAQService, FAQService>();
 builder.Services.AddScoped<IBusinessForumService, BusinessForumService>();
 builder.Services.AddScoped<IUsefulLinkService, UsefulLinkService>();
 
+
+builder.Services.AddScoped<ILanguageService, LanguageService>();
+
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<ICalendarService, CalendarService>();
 
 // ── Background Jobs ───────────────────────────────────────────────────────────
 builder.Services.AddHostedService<CurrencyBackgroundJob>();

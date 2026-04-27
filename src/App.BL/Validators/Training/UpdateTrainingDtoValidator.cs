@@ -43,5 +43,13 @@ public class UpdateTrainingDtoValidator : AbstractValidator<UpdateTrainingDto>
                 .Must(f => AllowedContentTypes.Contains(f.ContentType.ToLower()))
                     .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
         });
+
+        RuleFor(x => x.StartDate)
+           .NotEmpty().WithMessage(ValidationMessages.StartDateRequired(languageService.Lang));
+
+        RuleFor(x => x.EndDate)
+            .NotEmpty().WithMessage(ValidationMessages.EndDateRequired(languageService.Lang))
+            .GreaterThanOrEqualTo(x => x.StartDate)
+                .WithMessage(ValidationMessages.EndDateMustBeAfterStartDate(languageService.Lang));
     }
 }

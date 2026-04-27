@@ -36,5 +36,18 @@ public class EventConfiguration : SoftDeletableEntityConfiguration<Event>
             c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
             c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
         });
+
+        // Exhibition üçün StartDate / EndDate — nullable çünki TPH paylaşılan cədvəldir,
+        // Event base tipinin bu field-ləri yoxdur.
+        //builder.Property<DateTime?>("StartDate")
+        //    .HasColumnName("StartDate")
+        //    .IsRequired(false);
+
+        //builder.Property<DateTime?>("EndDate")
+        //    .HasColumnName("EndDate")
+        //    .IsRequired(false);
+
+        builder.Property(x => x.StartDate).IsRequired();
+        builder.Property(x => x.EndDate).IsRequired();
     }
 }

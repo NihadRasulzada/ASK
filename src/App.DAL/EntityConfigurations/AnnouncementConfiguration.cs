@@ -14,12 +14,25 @@ public class AnnouncementConfiguration : BaseEntityConfiguration<Announcement>
 
         builder.ToTable("Announcements");
 
-        builder.Property(a => a.Title)
+        builder.Property(a => a.TitleAz)
             .IsRequired()
             .HasMaxLength(500);
 
+        builder.Property(a => a.TitleEn)
+            .IsRequired()
+            .HasMaxLength(500);
 
-        builder.Property(a => a.Text)
+        builder.Property(a => a.TitleRu)
+            .IsRequired()
+            .HasMaxLength(500);
+
+        builder.Property(a => a.TextAz)
+            .IsRequired();
+
+        builder.Property(a => a.TextEn)
+            .IsRequired();
+
+        builder.Property(a => a.TextRu)
             .IsRequired();
 
         builder.OwnsOne(a => a.TitleImageUrl, c => {

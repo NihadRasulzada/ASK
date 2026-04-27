@@ -2,6 +2,31 @@ namespace App.BL.Resources;
 
 public static class ValidationMessages
 {
+
+    //  Calendar Event gore validation mesajlari
+    public static string StartDateRequired(string lang) => lang switch
+    {
+        "en" => "Start date is required.",
+        "ru" => "Дата начала обязательна.",
+        _ => "Başlanğıc tarixi tələb olunur."
+    };
+
+    public static string EndDateRequired(string lang) => lang switch
+    {
+        "en" => "End date is required.",
+        "ru" => "Дата окончания обязательна.",
+        _ => "Bitmə tarixi tələb olunur."
+    };
+
+    public static string EndDateMustBeAfterStartDate(string lang) => lang switch
+    {
+        "en" => "End date must be greater than or equal to start date.",
+        "ru" => "Дата окончания должна быть больше или равна дате начала.",
+        _ => "Bitmə tarixi başlanğıc tarixindən əvvəl ola bilməz."
+    };
+
+
+
     // ── General ───────────────────────────────────────────────────────────────
     public static string ValidationFailed(string lang) => lang switch
     {

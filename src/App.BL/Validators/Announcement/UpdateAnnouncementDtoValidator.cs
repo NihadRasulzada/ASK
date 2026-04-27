@@ -14,7 +14,15 @@ public class UpdateAnnouncementDtoValidator : AbstractValidator<UpdateAnnounceme
 
     public UpdateAnnouncementDtoValidator(ILanguageService languageService)
     {
-        RuleFor(x => x.Title)
+        RuleFor(x => x.TitleAz)
+            .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+
+        RuleFor(x => x.TitleEn)
+            .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+
+        RuleFor(x => x.TitleRu)
             .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
             .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
 
@@ -28,7 +36,11 @@ public class UpdateAnnouncementDtoValidator : AbstractValidator<UpdateAnnounceme
                     .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
         });
 
-        RuleFor(x => x.Text)
+        RuleFor(x => x.TextAz)
+            .NotEmpty().WithMessage(ValidationMessages.TextRequired(languageService.Lang));
+        RuleFor(x => x.TextEn)
+            .NotEmpty().WithMessage(ValidationMessages.TextRequired(languageService.Lang));
+        RuleFor(x => x.TextRu)
             .NotEmpty().WithMessage(ValidationMessages.TextRequired(languageService.Lang));
     }
 }
