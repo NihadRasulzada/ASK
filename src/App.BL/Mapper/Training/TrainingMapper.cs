@@ -9,7 +9,7 @@ public class TrainingMapper(ILanguageService languageService, IMediaUrlBuilder m
 {
     public Core.Entities.Training CreateDtoToDomain(CreateTrainingDto dto, CloudinaryURL imageUrl)
     {
-        return new Core.Entities.Training(dto.TitleAz, dto.TitleEn, dto.TitleRu, imageUrl, dto.TextAz, dto.TextEn, dto.TextRu);
+        return new Core.Entities.Training(dto.TitleAz, dto.TitleEn, dto.TitleRu, imageUrl, dto.TextAz, dto.TextEn, dto.TextRu, dto.StartDate, dto.EndDate);
     }
 
     public TrainingResponseDto DomainToResponseDto(Core.Entities.Training entity)
@@ -31,12 +31,12 @@ public class TrainingMapper(ILanguageService languageService, IMediaUrlBuilder m
         };
 
 
-        return new TrainingResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created);
+        return new TrainingResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created, entity.StartDate, entity.EndDate);
     }
 
     public Core.Entities.Training UpdateDtoToDomain(Core.Entities.Training entity, UpdateTrainingDto dto, CloudinaryURL? imageUrl = null)
     {
-        entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu, dto.TextAz, dto.TextEn, dto.TextRu);
+        entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu, dto.TextAz, dto.TextEn, dto.TextRu, dto.StartDate, dto.EndDate);
         if (imageUrl != null)
         {
             entity.UpdateImageUrl(imageUrl);

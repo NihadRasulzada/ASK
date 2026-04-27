@@ -12,11 +12,12 @@ public class CreateTrainingDto
     public string TextEn { get; set; } = string.Empty;
     public string TextRu { get; set; } = string.Empty;
     public IFormFile Image { get; set; } = null!;
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 }
 
 public class UpdateTrainingDto
 {
-    public string Title { get; set; } = string.Empty;
     public string Text { get; set; } = string.Empty;
     public string TitleAz { get; set; } = string.Empty;
     public string TitleEn { get; set; } = string.Empty;
@@ -25,6 +26,8 @@ public class UpdateTrainingDto
     public string TextEn { get; set; } = string.Empty;
     public string TextRu { get; set; } = string.Empty;
     public IFormFile? Image { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 }
 
-public record TrainingResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created);
+public record TrainingResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created, DateTime StartDate, DateTime EndDate);

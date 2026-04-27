@@ -6,16 +6,24 @@ namespace App.BL.DTOs;
 // FIX: UpdateAnnouncementDto-dan Guid Id silindi — route-dan gəlməlidir
 public class CreateAnnouncementDto
 {
-    public string Title { get; set; } = string.Empty;
+    public string TitleAz { get; set; } = string.Empty;
+    public string TitleEn { get; set; } = string.Empty;
+    public string TitleRu { get; set; } = string.Empty;
     public IFormFile TitleImage { get; set; } = null!;
-    public string Text { get; set; } = string.Empty;
+    public string TextAz { get; set; } = string.Empty;
+    public string TextEn { get; set; } = string.Empty;
+    public string TextRu { get; set; } = string.Empty;
 }
 
 public class UpdateAnnouncementDto
 {
-    public string Title { get; set; } = string.Empty;
+    public string TitleAz { get; set; } = string.Empty;
+    public string TitleEn { get; set; } = string.Empty;
+    public string TitleRu { get; set; } = string.Empty;
     public IFormFile? TitleImage { get; set; }
-    public string Text { get; set; } = string.Empty;
+    public string TextAz { get; set; } = string.Empty;
+    public string TextEn { get; set; } = string.Empty;
+    public string TextRu { get; set; } = string.Empty;
 }
 
-public record AnnouncementResponseDto(Guid Id, string Title, string TitleImageUrl, string Text);
+public record AnnouncementResponseDto(Guid Id, string Title, string TitleImageUrl, string Text , DateTime Created);

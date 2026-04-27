@@ -9,7 +9,7 @@ public class ExhibitionMapper(ILanguageService languageService,IMediaUrlBuilder 
 {
     public Core.Entities.Exhibition CreateDtoToDomain(CreateExhibitionDto dto, CloudinaryURL imageUrl)
     {
-        return new Core.Entities.Exhibition(dto.TitleAz, dto.TitleEn, dto.TitleRu, imageUrl, dto.TextAz, dto.TextEn, dto.TextRu);
+        return new Core.Entities.Exhibition(dto.TitleAz, dto.TitleEn, dto.TitleRu, imageUrl, dto.TextAz, dto.TextEn, dto.TextRu, dto.StartDate,dto.EndDate);
     }
 
     public ExhibitionResponseDto DomainToResponseDto(Core.Entities.Exhibition entity)
@@ -30,12 +30,13 @@ public class ExhibitionMapper(ILanguageService languageService,IMediaUrlBuilder 
             _ => entity.TextAz
         };
 
-        return new ExhibitionResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created);
+        return new ExhibitionResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created, entity.StartDate,
+            entity.EndDate);
     }
 
     public Core.Entities.Exhibition UpdateDtoToDomain(Core.Entities.Exhibition entity, UpdateExhibitionDto dto, CloudinaryURL? imageUrl = null)
     {
-        entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu, dto.TextAz, dto.TextEn, dto.TextRu);
+        entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu, dto.TextAz, dto.TextEn, dto.TextRu, dto.StartDate, dto.EndDate);
         if (imageUrl != null)
         {
             entity.UpdateImageUrl(imageUrl);
