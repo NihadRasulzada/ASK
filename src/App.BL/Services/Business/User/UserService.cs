@@ -31,7 +31,8 @@ public class UserService : IUserService
         if (!result)
             return Response<AuthResponseDto>.Unauthorized("Username or password is wrong");
 
-        var token = _tokenService.CreateToken(user);
+        //var token = _tokenService.CreateToken(user);
+        var (token, expiresAt) = _tokenService.CreateToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
 
         user.RefreshToken = refreshToken;
@@ -39,10 +40,12 @@ public class UserService : IUserService
 
         await _userManager.UpdateAsync(user);
 
-        return Response<AuthResponseDto>.Success(
-            new AuthResponseDto(token, refreshToken),
-            "Login successful"
-        );
+        //return Response<AuthResponseDto>.Success(
+        //    new AuthResponseDto(token, refreshToken),
+        //    "Login successful"
+        //);
+
+        return Response<AuthResponseDto>.Success(new AuthResponseDto(token, refreshToken, expiresAt), "Login successful");
     }
 
     public async Task<Response<AuthResponseDto>> RefreshTokenAsync(RefreshTokenRequestDto dto)
@@ -56,7 +59,8 @@ public class UserService : IUserService
             return Response<AuthResponseDto>.Unauthorized("Invalid refresh token");
         }
 
-        var newToken = _tokenService.CreateToken(user);
+        //var newToken = _tokenService.CreateToken(user);
+        var (newToken, newExpiresAt) = _tokenService.CreateToken(user);
         var newRefreshToken = _tokenService.CreateRefreshToken();
 
         user.RefreshToken = newRefreshToken;
@@ -64,10 +68,12 @@ public class UserService : IUserService
 
         await _userManager.UpdateAsync(user);
 
-        return Response<AuthResponseDto>.Success(
-            new AuthResponseDto(newToken, newRefreshToken),
-            "Token refreshed"
-        );
+        //return Response<AuthResponseDto>.Success(
+        //    new AuthResponseDto(newToken, newRefreshToken),
+        //    "Token refreshed"
+        //);
+
+        return Response<AuthResponseDto>.Success(new AuthResponseDto(newToken, newRefreshToken, newExpiresAt), "Token refreshed");
     }
 
     public async Task<Response> ChangePasswordAsync(string userId, ChangePasswordRequestDto dto)

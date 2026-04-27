@@ -12,7 +12,8 @@ public record RefreshTokenRequestDto(
 
 public record AuthResponseDto(
     string Token,
-    string RefreshToken
+    string RefreshToken,
+    DateTime TokenExpiresAt
 );
 
 public record ChangePasswordRequestDto(
