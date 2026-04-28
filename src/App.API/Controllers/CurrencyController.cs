@@ -1,5 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Services.Business.CurrencyRate;
+using App.Core.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.API.Controllers;
@@ -13,18 +15,37 @@ namespace App.API.Controllers;
 public class CurrencyController(ICurrencyService currencyService) : ControllerBase
 {
     /// <summary>
-    /// EUR, USD, TRY, RUB valyutalarının AZN-ə nisbətən cari məzənnəsini qaytarır.
-    /// Nəticə hər gün gecə saat 01:00-da yenilənir.
+    /// Seçilmiş müddətə görə valyuta məzənnəsi və dəyişiklik faizini qaytarır.
+    /// DB-də seçimi saxlayır. Sonrakı /api/currency sorğusu bu seçimə görə cavab verəcək.
     /// </summary>
-    /// <returns>Valyuta məzənnələrinin siyahısı.</returns>
+    /// <param name="period">Day = 1 gün, Week = 1 həftə, Month = 1 ay</param>
+    /// <response code="200">Seçim uğurla saxlanıldı.</response>
+    /// <response code="400">Yanlış müddət dəyəri.</response>
+    [HttpGet("change")]
+    [Authorize]
+    [ProducesResponseType(typeof(PeriodSelectionDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SetPeriod([FromQuery] RatePeriod period = RatePeriod.Day)
+    {
+        if (!Enum.IsDefined(typeof(RatePeriod), period))
+            return BadRequest("Yanlış müddət. Day, Week, Month seçin.");
+
+        var result = await currencyService.SetSelectedPeriodAsync(period);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// /change endpointindəki seçimə görə valyuta məzənnələrini qaytarır.
+    /// ChangePercent seçilmiş müddətə görə hesablanır.
+    /// </summary>
     /// <response code="200">Valyuta məzənnələri uğurla qaytarıldı.</response>
     /// <response code="500">Xəta baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(IEnumerable<CurrencyRateDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CurrencyRatesResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetRates(CancellationToken cancellationToken = default)
     {
-        var rates = await currencyService.GetRatesAsync(cancellationToken);
-        return Ok(rates);
+        var result = await currencyService.GetRatesAsync(cancellationToken);
+        return Ok(result);
     }
 }

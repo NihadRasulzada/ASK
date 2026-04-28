@@ -1,10 +1,12 @@
+using System.Text.Json;
 using App.BL.DTOs;
 using App.BL.Settings;
+using App.Core.Enums;
 using App.Core.Interfaces.Repository.CurrencyRate;
+using App.Core.Interfaces.Repository.UserPeriodSetting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 
 namespace App.BL.Services.Business.CurrencyRate;
 
@@ -29,14 +31,80 @@ public class CurrencyService : ICurrencyService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<CurrencyRateDto>> GetRatesAsync(CancellationToken cancellationToken = default)
+    private static string GetPeriodLabel(RatePeriod period) => period switch
+    {
+        RatePeriod.Day => "Son 1 günün hesabatı",
+        RatePeriod.Week => "Son 1 həftənin hesabatı",
+        RatePeriod.Month => "Son 1 ayın hesabatı",
+        _ => "Naməlum müddət"
+    };
+
+    public async Task<PeriodSelectionDto> SetSelectedPeriodAsync(RatePeriod period)
     {
         using var scope = _scopeFactory.CreateScope();
-        var repo = scope.ServiceProvider.GetRequiredService<ICurrencyRateReadRepository>();
+        var readRepo = scope.ServiceProvider.GetRequiredService<IUserPeriodSettingReadRepository>();
+        var writeRepo = scope.ServiceProvider.GetRequiredService<IUserPeriodSettingWriteRepository>();
 
-        var rates = await repo.GetAllAsync(false, cancellationToken);
+        var existing = await readRepo.GetCurrentAsync();
 
-        return rates.Select(r => new CurrencyRateDto(r.CurrencyCode, r.Rate, 0));
+        if (existing is not null)
+        {
+            existing.UpdatePeriod(period);
+            writeRepo.Update(existing);
+        }
+        else
+        {
+            var newSetting = new Core.Entities.UserPeriodSetting(period);
+            await writeRepo.AddAsync(newSetting, CancellationToken.None);
+        }
+
+        await writeRepo.SaveChangesAsync(CancellationToken.None);
+
+        return new PeriodSelectionDto(period, GetPeriodLabel(period));
+    }
+
+    public async Task<CurrencyRatesResponseDto> GetRatesAsync(CancellationToken cancellationToken = default)
+    {
+        using var scope = _scopeFactory.CreateScope();
+        var readRepo = scope.ServiceProvider.GetRequiredService<ICurrencyRateReadRepository>();
+        var settingRepo = scope.ServiceProvider.GetRequiredService<IUserPeriodSettingReadRepository>();
+
+        var setting = await settingRepo.GetCurrentAsync(cancellationToken);
+        var period = setting?.SelectedPeriod ?? RatePeriod.Day;
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var pastDate = today.AddDays(-(int)period);
+
+        var allRates = await readRepo.GetAllAsync(false, cancellationToken);
+        var targetRates = allRates
+            .Where(r => TargetCurrencies.Contains(r.CurrencyCode))
+            .ToList();
+
+        var latestRates = targetRates
+            .GroupBy(r => r.CurrencyCode)
+            .Select(g => g.OrderByDescending(r => r.RateDate).First())
+            .ToList();
+
+        var result = new List<CurrencyRateDto>();
+
+        foreach (var current in latestRates)
+        {
+            var pastRate = targetRates
+                .Where(r => r.CurrencyCode == current.CurrencyCode && r.RateDate <= pastDate)
+                .OrderByDescending(r => r.RateDate)
+                .FirstOrDefault();
+
+            decimal changePercent = 0;
+            if (pastRate is not null && pastRate.Rate != 0)
+                changePercent = Math.Round(
+                    ((current.Rate - pastRate.Rate) / pastRate.Rate) * 100, 2);
+
+            result.Add(new CurrencyRateDto(current.CurrencyCode, current.Rate, changePercent));
+        }
+
+        var ordered = result.OrderBy(r => Array.IndexOf(TargetCurrencies, r.Code));
+
+        return new CurrencyRatesResponseDto(GetPeriodLabel(period), period, ordered);
     }
 
     public async Task FetchAndSaveRatesAsync(CancellationToken cancellationToken = default)
@@ -48,11 +116,8 @@ public class CurrencyService : ICurrencyService
             var writeRepo = scope.ServiceProvider.GetRequiredService<ICurrencyRateWriteRepository>();
 
             var client = _httpClientFactory.CreateClient("ExchangeRate");
-            //var response = await client.GetAsync($"latest?access_key={_settings.ApiKey}&symbols={string.Join(",", TargetCurrencies)}&base=AZN", cancellationToken);
-            //var response = await client.GetAsync($"{_settings.ApiKey}/latest/AZN",cancellationToken);
             var url = $"https://v6.exchangerate-api.com/v6/{_settings.ApiKey}/latest/AZN";
             var response = await client.GetAsync(url, cancellationToken);
-
 
             if (!response.IsSuccessStatusCode)
             {
@@ -60,11 +125,9 @@ public class CurrencyService : ICurrencyService
                 _logger.LogWarning("API FAILED. Status: {StatusCode}, Body: {Body}", response.StatusCode, errorBody);
                 return;
             }
-            
-
 
             var json = await response.Content.ReadAsStringAsync(cancellationToken);
-            _logger.LogInformation("API RESPONSE: {Json}", json); // sonradan men eleve etdim bunu
+            _logger.LogInformation("API RESPONSE: {Json}", json);
             using var doc = JsonDocument.Parse(json);
 
             if (!doc.RootElement.TryGetProperty("conversion_rates", out var ratesElement))
@@ -73,14 +136,7 @@ public class CurrencyService : ICurrencyService
                 return;
             }
 
-
-
-            //if (!doc.RootElement.TryGetProperty("rates", out var ratesElement))
-            //    return;
-            
-
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
-            _logger.LogInformation("ENTERING SAVE LOOP");
 
             foreach (var currency in TargetCurrencies)
             {
@@ -88,7 +144,10 @@ public class CurrencyService : ICurrencyService
                     continue;
 
                 var rate = rateElement.GetDecimal();
-                var existing = await readRepo.GetAsync(r => r.CurrencyCode == currency && r.RateDate == today, true, cancellationToken);
+                var existing = await readRepo.GetAsync(
+                    r => r.CurrencyCode == currency && r.RateDate == today,
+                    true,
+                    cancellationToken);
 
                 if (existing is not null)
                 {
@@ -101,8 +160,6 @@ public class CurrencyService : ICurrencyService
                     await writeRepo.AddAsync(newRate, cancellationToken);
                 }
             }
-
-            //await writeRepo.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("SAVING TO DB...");
             await writeRepo.SaveChangesAsync(cancellationToken);

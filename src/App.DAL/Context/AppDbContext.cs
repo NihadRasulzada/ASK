@@ -42,6 +42,9 @@ namespace App.DAL.Context
         public DbSet<BusinessForum> BusinessForums { get; set; }
         public DbSet<UsefulLink> UsefulLinks { get; set; }
 
+
+        public DbSet<UserPeriodSetting> UserPeriodSettings { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ApplySoftDeleteQueryFilters(modelBuilder);

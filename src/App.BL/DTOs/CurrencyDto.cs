@@ -1,3 +1,5 @@
+using App.Core.Enums;
+
 namespace App.BL.DTOs;
 
 /// <summary>
@@ -10,3 +12,12 @@ public record CurrencyRateDto(
     string Code,
     decimal Rate,
     decimal ChangePercent);
+
+public record CurrencyRatesResponseDto(
+    string PeriodLabel,      // "Son 1 günün hesabatı" və s.
+    RatePeriod SelectedPeriod,
+    IEnumerable<CurrencyRateDto> Rates);
+
+public record PeriodSelectionDto(
+    RatePeriod SelectedPeriod,
+    string PeriodLabel);
