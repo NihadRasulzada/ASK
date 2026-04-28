@@ -6,7 +6,6 @@ namespace App.BL.DTOs;
 // FIX: IFormFile saxladığı üçün class (record deyil)
 public class CreateExhibitionDto
 {
-    public string Text { get; set; } = string.Empty;
     public string TitleAz { get; set; } = string.Empty;
     public string TitleEn { get; set; } = string.Empty;
     public string TitleRu { get; set; } = string.Empty;
@@ -20,7 +19,6 @@ public class CreateExhibitionDto
 
 public class UpdateExhibitionDto
 {
-    public string Text { get; set; } = string.Empty;
     public string TitleAz { get; set; } = string.Empty;
     public string TitleEn { get; set; } = string.Empty;
     public string TitleRu { get; set; } = string.Empty;
