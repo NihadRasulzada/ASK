@@ -32,4 +32,5 @@ public class UpdateExhibitionDto
     public DateTime EndDate { get; set; }
 }
 
-public record ExhibitionResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created, DateTime StartDate, DateTime EndDate);
+public record ExhibitionResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created);
+public record ExhibitionDateResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created, DateTime StartDate, DateTime EndDate);

@@ -66,6 +66,13 @@ public class TrainingService(
         return PagedResponse<IEnumerable<TrainingResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "Trainings retrieved successfully");
     }
 
+    public async Task<PagedResponse<IEnumerable<TrainingDateResponseDto>>> GetAllDateAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var (items, totalCount) = await readRepository.GetPagedAsync(false, false, pageIndex, pageSize, cancellationToken);
+        var result = items.Select(mapper.DomainToResponseDateDto);
+        return PagedResponse<IEnumerable<TrainingDateResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "Trainings retrieved successfully");
+    }
+
     public async Task<PagedResponse<IEnumerable<TrainingResponseDto>>> GetAllIncludingDeletedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
         var (items, totalCount) = await readRepository.GetPagedAsync(false, true, pageIndex, pageSize, cancellationToken);

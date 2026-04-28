@@ -8,4 +8,5 @@ public interface IExhibitionMapper
     Core.Entities.Exhibition CreateDtoToDomain(CreateExhibitionDto dto, CloudinaryURL imageUrl);
     Core.Entities.Exhibition UpdateDtoToDomain(Core.Entities.Exhibition entity, UpdateExhibitionDto dto, CloudinaryURL? imageUrl = null);
     ExhibitionResponseDto DomainToResponseDto(Core.Entities.Exhibition entity);
+    ExhibitionDateResponseDto DomainToResponseDateDto(Core.Entities.Exhibition entity);
 }
