@@ -70,13 +70,10 @@ public class CloudinaryService : ICloudinaryService
     public async Task<CloudinaryURL> UploadPdfAsync(IFormFile file)
     {
         const string pdfContentType = "application/pdf";
-        const long maxSizeBytes = 10L * 1024 * 1024; // 10 MB
 
         if (!string.Equals(file.ContentType, pdfContentType, StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Yalnız PDF fayl qəbul edilir (application/pdf).");
 
-        if (file.Length > maxSizeBytes)
-            throw new InvalidOperationException("PDF faylının ölçüsü 10 MB-dan çox ola bilməz.");
 
         await using var stream = file.OpenReadStream();
 
