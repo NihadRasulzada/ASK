@@ -66,6 +66,13 @@ public class ExhibitionService(
         return PagedResponse<IEnumerable<ExhibitionResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "Exhibitions retrieved successfully");
     }
 
+    public async Task<PagedResponse<IEnumerable<ExhibitionDateResponseDto>>> GetAllDateAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+    {
+        var (items, totalCount) = await readRepository.GetPagedAsync(false, false, pageIndex, pageSize, cancellationToken);
+        var result = items.Select(mapper.DomainToResponseDateDto);
+        return PagedResponse<IEnumerable<ExhibitionDateResponseDto>>.Create(result, pageIndex, pageSize, totalCount, "Exhibitions retrieved successfully");
+    }
+
     public async Task<PagedResponse<IEnumerable<ExhibitionResponseDto>>> GetAllIncludingDeletedAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
         var (items, totalCount) = await readRepository.GetPagedAsync(false, true, pageIndex, pageSize, cancellationToken);

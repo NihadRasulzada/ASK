@@ -16,18 +16,35 @@ namespace App.API.Controllers;
 public class TrainingController(ITrainingService trainingService) : ControllerBase
 {
     /// <summary>
-    /// Aktiv təlimlərin siyahısını qaytarır.
+    /// Aktiv sərgilərin siyahısını qaytarır Date olmadan.
     /// </summary>
     /// <param name="cancellationToken">Ləğvetmə tokeni.</param>
     /// <returns>Təlim DTO-larının siyahısı.</returns>
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
-    [HttpGet]
+    [HttpGet()]
     [ProducesResponseType(typeof(PagedDataResponse<TrainingResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await trainingService.GetAllAsync(pageIndex, pageSize, cancellationToken);
+        return this.HandlePagedServiceResponse(response);
+    }
+
+    /// <summary>
+    /// Aktiv sərgilərin siyahısını qaytarır Start date ve End date ile biryerde.
+    /// </summary>
+    /// <param name="cancellationToken">Ləğvetmə tokeni.</param>
+    /// <returns>Təlim DTO-larının siyahısı.</returns>
+    /// <response code="200">Siyahı uğurla qaytarıldı.</response>
+    /// <response code="500">Server xətası baş verdi.</response>
+    [HttpGet("alldatedata")]
+    [Authorize]
+    [ProducesResponseType(typeof(PagedDataResponse<TrainingDateResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetDateAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
+    {
+        var response = await trainingService.GetAllDateAsync(pageIndex, pageSize, cancellationToken);
         return this.HandlePagedServiceResponse(response);
     }
 

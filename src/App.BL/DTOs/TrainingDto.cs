@@ -30,4 +30,5 @@ public class UpdateTrainingDto
     public DateTime EndDate { get; set; }
 }
 
-public record TrainingResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created, DateTime StartDate, DateTime EndDate);
+public record TrainingResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created);
+public record TrainingDateResponseDto(Guid Id, string Title, string Text, string TitleImageUrl, bool IsDeactive, DateTime Created, DateTime StartDate, DateTime EndDate);

@@ -31,7 +31,28 @@ public class TrainingMapper(ILanguageService languageService, IMediaUrlBuilder m
         };
 
 
-        return new TrainingResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created, entity.StartDate, entity.EndDate);
+        return new TrainingResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created);
+    }
+    public TrainingDateResponseDto DomainToResponseDateDto(Core.Entities.Training entity)
+    {
+        var title = languageService.Lang switch
+        {
+            "az" => entity.TitleAz,
+            "en" => entity.TitleEn,
+            "ru" => entity.TitleRu,
+            _ => entity.TitleAz
+        };
+
+        var text = languageService.Lang switch
+        {
+            "az" => entity.TextAz,
+            "en" => entity.TextEn,
+            "ru" => entity.TextRu,
+            _ => entity.TextAz
+        };
+
+
+        return new TrainingDateResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created, entity.StartDate, entity.EndDate);
     }
 
     public Core.Entities.Training UpdateDtoToDomain(Core.Entities.Training entity, UpdateTrainingDto dto, CloudinaryURL? imageUrl = null)
