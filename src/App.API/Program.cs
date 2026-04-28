@@ -80,6 +80,7 @@ using App.Core.Interfaces.Repository.Service;
 using App.Core.Interfaces.Repository.Settings;
 using App.Core.Interfaces.Repository.Training;
 using App.Core.Interfaces.Repository.UsefulLink;
+using App.Core.Interfaces.Repository.UserPeriodSetting;
 using App.Core.Interfaces.Repository.Video;
 using App.DAL.Context;
 using App.DAL.Repositories.BusinessForum;
@@ -106,6 +107,7 @@ using App.DAL.Repositories.Service;
 using App.DAL.Repositories.Settings;
 using App.DAL.Repositories.Training;
 using App.DAL.Repositories.UsefulLink;
+using App.DAL.Repositories.UserPeriodSetting;
 using App.DAL.Repositories.Video;
 using App.DAL.Seeder;
 using FluentValidation;
@@ -340,6 +342,10 @@ builder.Services.AddScoped<IBusinessForumWriteRepository, BusinessForumWriteRepo
 
 builder.Services.AddScoped<IUsefulLinkReadRepository, UsefulLinkReadRepository>();
 builder.Services.AddScoped<IUsefulLinkWriteRepository, UsefulLinkWriteRepository>();
+
+builder.Services.AddScoped<IUserPeriodSettingReadRepository, UserPeriodSettingReadRepository>();
+builder.Services.AddScoped<IReadRepository<UserPeriodSetting>, UserPeriodSettingReadRepository>();
+builder.Services.AddScoped<IUserPeriodSettingWriteRepository, UserPeriodSettingWriteRepository>();
 
 
 // ── Mappers ───────────────────────────────────────────────────────────────────
