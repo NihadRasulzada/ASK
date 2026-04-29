@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using App.API.BackgroundJobs;
+using App.API.Extensions.FileSize;
 using App.API.Filters;
 using App.API.Middleware;
 using App.API.Services;
@@ -415,14 +416,16 @@ builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
 
 // ── File Upload Limits ───────────────────────────────────────────────────────
-builder.Services.Configure<FormOptions>(options =>
-{
-    options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
-});
+
+
+//builder.Services.Configure<FormOptions>(options =>
+//{
+//    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
+//});
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+    options.Limits.MaxRequestBodySize = null; // 10 MB
 });
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -452,14 +455,15 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+
 app.UseCors("AllowAll");
+app.UseFileSizeLimit(); //File size limit middleware
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.UseMiddleware<LanguageMiddleware>();
-
 
 
 app.MapControllers();
