@@ -113,6 +113,7 @@ using App.DAL.Seeder;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -412,7 +413,19 @@ builder.Services.AddScoped<ICalendarService, CalendarService>();
 // ── Background Jobs ───────────────────────────────────────────────────────────
 builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
-// ─────────────────────────────────────────────────────────────────────────────
+
+// ── File Upload Limits ───────────────────────────────────────────────────────
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100 MB
+});
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100 MB
+});
+
+// ────────────────────────────────────────────────────────────────────────────
 
 var app = builder.Build();
 

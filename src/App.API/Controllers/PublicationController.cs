@@ -64,7 +64,6 @@ public class PublicationController(IPublicationService publicationService) : Con
     [HttpPost]
     [Authorize]
     [Consumes("multipart/form-data")]
-    [RequestSizeLimit(100 * 1024 * 1024)]
     [ProducesResponseType(typeof(SuccessResponse<PublicationResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status422UnprocessableEntity)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
