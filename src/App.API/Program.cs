@@ -417,15 +417,9 @@ builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
 // ── File Upload Limits ───────────────────────────────────────────────────────
 
-
-//builder.Services.Configure<FormOptions>(options =>
-//{
-//    options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
-//});
-
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = null; // 10 MB
+    options.Limits.MaxRequestBodySize = null; // null
 });
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -455,8 +449,8 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-
 app.UseCors("AllowAll");
+
 app.UseFileSizeLimit(); //File size limit middleware
 
 app.UseAuthentication();
@@ -464,7 +458,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<LanguageMiddleware>();
-
 
 app.MapControllers();
 

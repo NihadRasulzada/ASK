@@ -11,7 +11,7 @@ public class CreatePublicationDtoValidator : AbstractValidator<CreatePublication
         ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
     private const long MaxImageSizeBytes = 5 * 1024 * 1024;   // 5 MB
-    private const long MaxPdfSizeBytes = 50 * 1024 * 1024;    // 10 MB
+    private const long MaxPdfSizeBytes = 10 * 1024 * 1024;    // 10 MB
 
     public CreatePublicationDtoValidator(ILanguageService languageService)
     {
