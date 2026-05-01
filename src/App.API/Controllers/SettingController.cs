@@ -23,6 +23,7 @@ public class SettingController(ISettingService settingService) : ControllerBase
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
+    [Authorize]
     [ProducesResponseType(typeof(SuccessResponse<IEnumerable<SettingResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
