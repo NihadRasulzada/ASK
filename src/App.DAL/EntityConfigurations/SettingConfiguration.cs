@@ -57,7 +57,10 @@ public class SettingConfiguration : BaseEntityConfiguration<Setting>
             new Setting(new Guid("11111111-0014-0000-0000-000000000000"), "HeroDescription", SettingValueType.Text),
             new Setting(new Guid("11111111-0015-0000-0000-000000000000"), "HeroStatMemberCount", SettingValueType.Text),
             new Setting(new Guid("11111111-0016-0000-0000-000000000000"), "HeroStatPartnerCount", SettingValueType.Text),
-            new Setting(new Guid("11111111-0017-0000-0000-000000000000"), "HeroStatEventCount", SettingValueType.Text)
+            new Setting(new Guid("11111111-0017-0000-0000-000000000000"), "HeroStatEventCount", SettingValueType.Text),
+            new Setting(new Guid("11111111-0018-0000-0000-000000000000"), "Location", SettingValueType.Text),
+            new Setting(new Guid("11111111-0019-0000-0000-000000000000"), "Number", SettingValueType.Text),
+            new Setting(new Guid("11111111-0020-0000-0000-000000000000"), "Email", SettingValueType.Text)
         );
     }
 }
