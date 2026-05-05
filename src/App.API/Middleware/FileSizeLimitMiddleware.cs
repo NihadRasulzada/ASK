@@ -25,14 +25,29 @@ public class FileSizeLimitMiddleware(RequestDelegate next)
             {
                 if (context.Response.HasStarted) return;
 
-                context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
-                await context.Response.WriteAsJsonAsync(new ValidationErrorResponse(
-                    "Validasiya xətası.",
-                    [
-                        new CustomValidationError("file","Fayl ölçüsü 10 MB-dan böyük ola bilməz.")
-                    ]
-                ));
-                return;
+                var form = await context.Request.ReadFormAsync();
+                var errors = new List<CustomValidationError>();
+
+                foreach (var file in form.Files)
+                {
+                    if (file.Length > MaxFileSize)
+                    {
+                        errors.Add(new CustomValidationError(
+                            file.Name, 
+                            "Fayl ölçüsü 10 MB-dan böyük ola bilməz."
+                        ));
+                    }
+                }
+
+                if (errors.Count > 0)
+                {
+                    context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+                    await context.Response.WriteAsJsonAsync(new ValidationErrorResponse(
+                        "Validasiya xətası.",
+                        errors
+                    ));
+                    return;
+                }
             }
         }
 
