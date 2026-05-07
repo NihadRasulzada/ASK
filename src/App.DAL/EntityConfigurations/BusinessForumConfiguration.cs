@@ -5,26 +5,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.DAL.EntityConfigurations;
 
-public class BusinessForumConfiguration : BaseEntityConfiguration<BusinessForum>
+public class BusinessForumConfiguration : IEntityTypeConfiguration<BusinessForum>
 {
-    public override void Configure(EntityTypeBuilder<BusinessForum> builder)
+    //public override void Configure(EntityTypeBuilder<BusinessForum> builder)
+    //{
+    //    builder.HasBaseType<Event>();
+
+        
+    //}
+    public void Configure(EntityTypeBuilder<BusinessForum> builder)
     {
-        base.Configure(builder);
-
-        builder.ToTable("BusinessForums");
-
-        builder.Property(b => b.TitleAz).IsRequired().HasMaxLength(500);
-        builder.Property(b => b.TitleEn).IsRequired().HasMaxLength(500);
-        builder.Property(b => b.TitleRu).IsRequired().HasMaxLength(500);
-        builder.Property(b => b.TextAz).IsRequired();
-        builder.Property(b => b.TextEn).IsRequired();
-        builder.Property(b => b.TextRu).IsRequired();
-        builder.Property(b => b.CreateDate).IsRequired();
-
-        builder.OwnsOne(a => a.TitleImageUrl, c => {
-            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
-            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
-        });
+        // TPH leaf type — öz cədvəli yoxdur, Events cədvəlini paylaşır.
+        // Discriminator dəyəri "Exhibition" EventConfiguration-da təyin edilib.
+        builder.HasBaseType<Event>();
 
         builder.OwnsOne(a => a.DetailImageUrl, c => {
             c.Property(x => x.ImageURl).HasColumnName("DetailImageUrl");

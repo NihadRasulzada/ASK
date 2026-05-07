@@ -12,6 +12,8 @@ public class CreateBusinessForumDto
     public string TextRu { get; set; }
     public IFormFile TitleImage { get; set; }
     public IFormFile DetailImage { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 }
 
 public class UpdateBusinessForumDto
@@ -24,6 +26,8 @@ public class UpdateBusinessForumDto
     public string TextRu { get; set; }
     public IFormFile? TitleImage { get; set; }
     public IFormFile? DetailImage { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 }
 
 public record BusinessForumResponseDto(
@@ -33,3 +37,16 @@ public record BusinessForumResponseDto(
     string TitleImageUrl,
     string DetailImageUrl,
     DateTime CreateDate);
+
+public record BusinessForumDateResponseDto(
+    Guid Id,
+    string Title,
+    string Text,
+    string TitleImageUrl,
+    string DetailImageUrl,
+    DateTime CreateDate,
+    DateTime StartDate, 
+    DateTime EndDate
+    );
+
+

@@ -19,7 +19,9 @@ public class EventConfiguration : SoftDeletableEntityConfiguration<Event>
         builder.HasDiscriminator<string>("Discriminator")
             .HasValue<Event>("Event")
             .HasValue<Exhibition>("Exhibition")
-            .HasValue<Training>("Training");
+            .HasValue<Training>("Training")
+            .HasValue<BusinessForum>("BusinessForum");
+
 
         builder.Property("Discriminator")
             .HasMaxLength(13)
@@ -36,6 +38,8 @@ public class EventConfiguration : SoftDeletableEntityConfiguration<Event>
             c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
             c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
         });
+        
+        
 
         // Exhibition üçün StartDate / EndDate — nullable çünki TPH paylaşılan cədvəldir,
         // Event base tipinin bu field-ləri yoxdur.

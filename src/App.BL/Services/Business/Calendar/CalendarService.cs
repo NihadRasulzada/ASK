@@ -1,18 +1,21 @@
 ﻿using App.BL.DTOs;
 using App.BL.Services.External;
 using App.Core.Entities;
+using App.Core.Interfaces.Repository.BusinessForum;
 using App.Core.Interfaces.Repository.Common;
 using App.Core.Interfaces.Repository.Exhibition;
 using App.Core.Interfaces.Repository.Training;
 using App.Core.ResponseObject.Concreate;
 using ExhibitionEntity = App.Core.Entities.Exhibition;
 using TrainingEntity = App.Core.Entities.Training;
+using BusinessForumEntity = App.Core.Entities.BusinessForum;
 
 namespace App.BL.Services.Business.Calendar;
 
 public class CalendarService(
     IExhibitionReadRepository exhibitionReadRepository,
     ITrainingReadRepository trainingReadRepository,
+    IBusinessForumReadRepository businessForumReadRepository,
     IMediaUrlBuilder mediaUrlBuilder) : ICalendarService
 {
     public async Task<Response<CalendarResponseDto>> GetByDateAsync(
@@ -36,6 +39,12 @@ public class CalendarService(
             ignoreQueryFilters: false,
             predicate: t => t.StartDate.Date <= lastDay && t.EndDate.Date >= firstDay);
 
+        var biznessform = await businessForumReadRepository.GetAllAsync(
+            enableTracking: false,
+            cancellationToken: cancellationToken,
+            ignoreQueryFilters: false,
+            predicate: b => b.StartDate.Date <= lastDay && b.EndDate.Date >= firstDay);
+
         // Seçilən günün event-ləri
         var dayEvents = exhibitions
             .Where(e => e.StartDate.Date <= targetDate && e.EndDate.Date >= targetDate)
@@ -43,6 +52,9 @@ public class CalendarService(
             .Concat(trainings
                 .Where(t => t.StartDate.Date <= targetDate && t.EndDate.Date >= targetDate)
                 .Select(t => ToDto(t, "Training")))
+            .Concat(biznessform
+                .Where(b => b.StartDate.Date <= targetDate && b.EndDate.Date >= targetDate)
+                .Select(b => ToDto(b, "BusinessForum")))
             .OrderBy(x => x.StartDate)
             .ToList();
 
@@ -53,6 +65,9 @@ public class CalendarService(
             ExpandDatesIntoMonth(e.StartDate, e.EndDate, firstDay, lastDay, eventDates);
 
         foreach (var t in trainings)
+            ExpandDatesIntoMonth(t.StartDate, t.EndDate, firstDay, lastDay, eventDates);
+
+        foreach (var t in biznessform)
             ExpandDatesIntoMonth(t.StartDate, t.EndDate, firstDay, lastDay, eventDates);
 
         var result = new CalendarResponseDto(
@@ -70,6 +85,10 @@ public class CalendarService(
     private CalendarEventDto ToDto(TrainingEntity t, string eventType) =>
         new(t.Id, eventType, t.TitleAz, t.TitleEn, t.TitleRu,
             mediaUrlBuilder.Build(t.TitleImageUrl.ImageURl), t.StartDate, t.EndDate);
+
+    private CalendarEventDto ToDto(BusinessForumEntity b, string eventType) =>
+        new(b.Id, eventType, b.TitleAz, b.TitleEn, b.TitleRu,
+            mediaUrlBuilder.Build(b.TitleImageUrl.ImageURl), b.StartDate, b.EndDate);
 
     private static void ExpandDatesIntoMonth(
         DateTime startDate,
