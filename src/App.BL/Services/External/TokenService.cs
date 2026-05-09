@@ -24,12 +24,7 @@ public class TokenService
             Encoding.UTF8.GetBytes(jwtSettings["Key"]!)
         );
         var durationInMinutes = int.Parse(jwtSettings["DurationInMinutes"]!);
-        //var expiry = DateTime.UtcNow.AddMinutes(durationInMinutes);
-
-        var timeZoneId = jwtSettings["TimeZoneId"] ?? "Azerbaijan Standard Time";
-        var azerbaijanZone = TimeZoneInfo.FindSystemTimeZoneById(timeZoneId);
-        var nowInAzerbaijan = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, azerbaijanZone);
-        var expiry = nowInAzerbaijan.AddMinutes(durationInMinutes);
+        var expiry = DateTime.UtcNow.AddMinutes(durationInMinutes);
 
         var claims = new List<Claim>
     {
@@ -60,6 +55,14 @@ public class TokenService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
         return Convert.ToBase64String(randomBytes);
+    }
+
+    public string HashRefreshToken(string refreshToken)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(refreshToken);
+
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
+        return Convert.ToHexString(hash);
     }
 }
 

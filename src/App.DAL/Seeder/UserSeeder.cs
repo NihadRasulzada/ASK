@@ -1,6 +1,7 @@
 ﻿using App.Core.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace App.DAL.Seeder;
 
@@ -8,7 +9,8 @@ public static class UserSeeder
 {
     public static async Task SeedAdminAsync(
         UserManager<AppUser> userManager,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        ILogger logger)
     {
         var username = configuration["SeedAdmin:UserName"];
         var email = configuration["SeedAdmin:Email"];
@@ -18,7 +20,8 @@ public static class UserSeeder
             string.IsNullOrEmpty(email) ||
             string.IsNullOrEmpty(password))
         {
-            throw new Exception("SeedAdmin configuration is missing");
+            logger.LogWarning("SeedAdmin is enabled but configuration is incomplete. Skipping admin seed.");
+            return;
         }
 
         var user = await userManager.FindByNameAsync(username);
@@ -39,6 +42,8 @@ public static class UserSeeder
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 throw new Exception($"Admin creation failed: {errors}");
             }
+
+            logger.LogInformation("Seed admin user created: {Username}", username);
         }
     }
 }

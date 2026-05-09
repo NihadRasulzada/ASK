@@ -116,21 +116,46 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+const long maxUploadRequestBodySize = 12 * 1024 * 1024; // 12 MB
+
+var allowedOrigins = builder.Configuration["Cors:AllowedOrigins"]
+    ?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+    ?? [];
+
+var jwtSection = builder.Configuration.GetSection("Jwt");
+var jwtKey = jwtSection["Key"];
+
+if (string.IsNullOrWhiteSpace(jwtKey) || jwtKey.Length < 32)
+{
+    throw new InvalidOperationException("Jwt:Key must be set and contain at least 32 characters.");
+}
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("ConfiguredOrigins", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        if (allowedOrigins.Length > 0)
+        {
+            policy.WithOrigins(allowedOrigins)
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            return;
+        }
+
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        }
     });
 });
 
@@ -197,8 +222,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    var jwtSettings = builder.Configuration.GetSection("Jwt");
-    var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+    var key = Encoding.UTF8.GetBytes(jwtKey);
 
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -207,8 +231,8 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
+        ValidIssuer = jwtSection["Issuer"],
+        ValidAudience = jwtSection["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(key),
 
         ClockSkew = TimeSpan.Zero
@@ -224,7 +248,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // ── Identity ─────────────────────────────────────────────────────────────────
 
-builder.Services.AddIdentityCore<AppUser>()
+builder.Services.AddIdentityCore<AppUser>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+    })
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddSignInManager();
@@ -416,10 +446,22 @@ builder.Services.AddHostedService<CurrencyBackgroundJob>();
 
 
 // ── File Upload Limits ───────────────────────────────────────────────────────
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = maxUploadRequestBodySize;
+});
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Limits.MaxRequestBodySize = null; // null
+    options.Limits.MaxRequestBodySize = maxUploadRequestBodySize;
+});
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
 });
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -433,23 +475,30 @@ using (var scope = app.Services.CreateScope())
 
 
 // -- Seed admin user-----------------------------------------------------
-using (var scope = app.Services.CreateScope())
+if (app.Configuration.GetValue<bool>("SeedAdmin:Enabled"))
 {
+    using var scope = app.Services.CreateScope();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("SeedAdmin");
 
-    await UserSeeder.SeedAdminAsync(userManager, configuration);
+    await UserSeeder.SeedAdminAsync(userManager, configuration, logger);
 }
 
 
 app.UseExceptionHandler();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.UseForwardedHeaders();
+
+if (app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enabled"))
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseCors("ConfiguredOrigins");
 
 app.UseFileSizeLimit(); //File size limit middleware
 
@@ -458,6 +507,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<LanguageMiddleware>();
+
+app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 
 app.MapControllers();
 

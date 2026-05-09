@@ -2,16 +2,21 @@ using App.BL.Resources;
 using App.Core.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace App.API.Middleware;
 
 public class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly ILogger<GlobalExceptionHandler> _logger;
+    private readonly IHostEnvironment _environment;
 
-    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+    public GlobalExceptionHandler(
+        ILogger<GlobalExceptionHandler> logger,
+        IHostEnvironment environment)
     {
         _logger = logger;
+        _environment = environment;
     }
 
     public async ValueTask<bool> TryHandleAsync(
@@ -28,7 +33,9 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             Status = StatusCodes.Status500InternalServerError,
             Title = ValidationMessages.UnexpectedError(lang),
-            Detail = exception.Message // TODO: dil mentiqisi yazilacaq
+            Detail = _environment.IsDevelopment()
+                ? exception.Message
+                : "An unexpected server error occurred."
         };
 
         httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;

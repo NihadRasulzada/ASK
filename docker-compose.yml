@@ -1,31 +1,46 @@
 services:
-
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: ask.org.az-sqlserver
+    container_name: ${DB_CONTAINER_NAME}
     environment:
       ACCEPT_EULA: Y
-      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "1433:1433"
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${DB_SA_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -Q \"SELECT 1\" || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 45s
     networks:
       - ask-network
-
 
   api:
     build:
       context: .
-      dockerfile:  src/App.API/Dockerfile   # <-- project-root içində Dockerfile yeri
-    container_name: api.ask.org.az
+      dockerfile: src/App.API/Dockerfile
+    container_name: ${API_CONTAINER_NAME}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
     environment:
-      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Server=db,1433;Database=${MSSQL_DATABASE};User Id=sa;Password=${DB_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True
     ports:
-      - "8080:8080"
+      - "${API_PORT}:8080"
+    restart: unless-stopped
     networks:
       - ask-network
 
 networks:
   ask-network:
     driver: bridge
+
+volumes:
+  mssql-data:
