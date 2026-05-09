@@ -11,16 +11,13 @@ namespace App.BL.Services.Business.User;
 public class UserService : IUserService
 {
     private readonly UserManager<AppUser> _userManager;
-    private readonly SignInManager<AppUser> _signInManager;
     private readonly TokenService _tokenService;
 
     public UserService(
         UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager,
         TokenService tokenService)
     {
         _userManager = userManager;
-        _signInManager = signInManager;
         _tokenService = tokenService;
     }
 
@@ -31,13 +28,22 @@ public class UserService : IUserService
         if (user == null)
             return Response<AuthResponseDto>.Unauthorized("Username or password is wrong");
 
-        var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: true);
-
-        if (result.IsLockedOut)
+        if (await _userManager.IsLockedOutAsync(user))
             return Response<AuthResponseDto>.Unauthorized("Too many failed attempts. Please try again later.");
 
-        if (!result.Succeeded)
+        var result = await _userManager.CheckPasswordAsync(user, dto.Password);
+
+        if (!result)
+        {
+            await _userManager.AccessFailedAsync(user);
+
+            if (await _userManager.IsLockedOutAsync(user))
+                return Response<AuthResponseDto>.Unauthorized("Too many failed attempts. Please try again later.");
+
             return Response<AuthResponseDto>.Unauthorized("Username or password is wrong");
+        }
+
+        await _userManager.ResetAccessFailedCountAsync(user);
 
         var (token, expiresAt) = _tokenService.CreateToken(user);
         var refreshToken = _tokenService.CreateRefreshToken();
