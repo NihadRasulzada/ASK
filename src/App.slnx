@@ -2,8 +2,8 @@
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
   </Folder>
-  <Project Path="App.API/App.API.csproj" Id="4327f963-1298-4443-8009-b65670e8772c" />
-  <Project Path="App.BL/App.BL.csproj" Id="c6518e4f-3ed5-418d-b4c5-670b11335b0f" />
-  <Project Path="App.Core/App.Core.csproj" Id="5c9588c0-0656-41b4-ba52-4a0aa4d5aca4" />
-  <Project Path="App.DAL/App.DAL.csproj" Id="755a1aa5-05e7-4e4f-821e-996f8fdff5c4" />
+  <Project Path="src/App.API/App.API.csproj" Id="4327f963-1298-4443-8009-b65670e8772c" />
+  <Project Path="src/App.BL/App.BL.csproj" Id="c6518e4f-3ed5-418d-b4c5-670b11335b0f" />
+  <Project Path="src/App.Core/App.Core.csproj" Id="5c9588c0-0656-41b4-ba52-4a0aa4d5aca4" />
+  <Project Path="src/App.DAL/App.DAL.csproj" Id="755a1aa5-05e7-4e4f-821e-996f8fdff5c4" />
 </Solution>
