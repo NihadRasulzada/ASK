@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Exhibition;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.Exhibition;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,8 +10,8 @@ namespace App.BL.Services.Business.Exhibition;
 public class ExhibitionService(
     IExhibitionReadRepository readRepository,
     IExhibitionWriteRepository writeRepository,
-    ICloudinaryService cloudinaryService,
-    IExhibitionMapper mapper) : CloudinaryEntityService(cloudinaryService), IExhibitionService
+    IStorageService storageService,
+    IExhibitionMapper mapper) : StorageEntityService(storageService), IExhibitionService
 {
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -26,7 +26,7 @@ public class ExhibitionService(
 
     public async Task<Response<ExhibitionResponseDto>> CreateAsync(CreateExhibitionDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        StoredFile imageUrl = await storageService.UploadAsync(dto.Image);
         Core.Entities.Exhibition entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -52,7 +52,7 @@ public class ExhibitionService(
         Core.Entities.Exhibition? entity = await readRepository.GetByIdIncludingDeletedAsync(id, true, cancellationToken);
         if (entity == null) return Response.NotFound("Exhibition not found");
 
-        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
+        await DeleteFileAsync(entity.TitleImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -94,15 +94,15 @@ public class ExhibitionService(
         Core.Entities.Exhibition? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity == null) return Response<ExhibitionResponseDto?>.NotFound("Exhibition not found");
 
-        CloudinaryURL? newImageUrl = null;
+        StoredFile? newImageUrl = null;
         if (dto.Image != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
-                entity.TitleImageUrl.PublicId,
+            var (newUrl, oldPublicId) = await ReplaceFileAsync(  
+                entity.TitleImageUrl.ObjectKey,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteImageAsync(oldPublicId); 
+            await DeleteFileAsync(oldPublicId); 
         }
         else
         {

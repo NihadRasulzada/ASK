@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.President;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.President;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,12 +10,12 @@ namespace App.BL.Services.Business.President;
 public class PresidentService(
     IPresidentReadRepository readRepository,
     IPresidentWriteRepository writeRepository,
-    ICloudinaryService cloudinaryService,
-    IPresidentMapper mapper) : CloudinaryEntityService(cloudinaryService), IPresidentService
+    IStorageService storageService,
+    IPresidentMapper mapper) : StorageEntityService(storageService), IPresidentService
 {
     public async Task<Response> CreateAsync(CreatePresidentDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        StoredFile imageUrl = await storageService.UploadAsync(dto.Image);
 
         Core.Entities.President entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -32,7 +32,7 @@ public class PresidentService(
         if (entity == null)
             return Response.NotFound("President info not found");
 
-        await DeleteImageAsync(entity.ImageUrl.PublicId);
+        await DeleteFileAsync(entity.ImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -73,15 +73,15 @@ public class PresidentService(
         if (entity == null)
             return Response<PresidentResponseDto?>.NotFound("President info not found");
 
-        CloudinaryURL? newImageUrl = null;
+        StoredFile? newImageUrl = null;
         if (dto.Image != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
-                entity.ImageUrl.PublicId,
+            var (newUrl, oldPublicId) = await ReplaceFileAsync(  
+                entity.ImageUrl.ObjectKey,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteImageAsync(oldPublicId); 
+            await DeleteFileAsync(oldPublicId); 
         }
         else
         {

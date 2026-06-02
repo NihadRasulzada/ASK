@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Setting;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Enums;
 using App.Core.Interfaces.Repository.Settings;
 using App.Core.ResponseObject.Concreate;
@@ -11,9 +11,9 @@ namespace App.BL.Services.Business.Setting;
 public class SettingService(
     ISettingReadRepository readRepository,
     ISettingWriteRepository writeRepository,
-    ICloudinaryService cloudinaryService,
+    IStorageService storageService,
     ISettingMapper mapper)
-    : CloudinaryEntityService(cloudinaryService), ISettingService  
+    : StorageEntityService(storageService), ISettingService  
 {
     public async Task<Response<IEnumerable<SettingResponseDto>>> GetAllAsync(
         CancellationToken ct = default)
@@ -49,17 +49,17 @@ public class SettingService(
 
             entity.UpdateStringValue(dto.Value.Trim());
         }
-        else // Link → Cloudinary
+        else // Link → MinIO
         {
             if (dto.File is null)
                 return Response<SettingResponseDto?>.BadRequest("Fayl mütləq yüklənməlidir.");
 
-            string? oldPublicId = entity.CloudinaryValue?.PublicId;
+            string? oldPublicId = entity.MediaValue?.ObjectKey;
 
-            CloudinaryURL newUrl = await cloudinaryService.UploadImageAsync(dto.File);
-            entity.UpdateCloudinaryValue(newUrl);
+            StoredFile newUrl = await storageService.UploadAsync(dto.File);
+            entity.UpdateMediaValue(newUrl);
 
-            await DeleteImageAsync(oldPublicId); 
+            await DeleteFileAsync(oldPublicId); 
         }
 
         writeRepository.Update(entity);
@@ -80,11 +80,11 @@ public class SettingService(
         {
             entity.UpdateStringValue(null);
         }
-        else // Link → Cloudinary
+        else // Link → MinIO
         {
-            string? publicId = entity.CloudinaryValue?.PublicId;
-            entity.UpdateCloudinaryValue(null);
-            await DeleteImageAsync(publicId); 
+            string? publicId = entity.MediaValue?.ObjectKey;
+            entity.UpdateMediaValue(null);
+            await DeleteFileAsync(publicId); 
         }
 
         writeRepository.Update(entity);

@@ -29,15 +29,11 @@ public class SettingConfiguration : BaseEntityConfiguration<Setting>
             .IsRequired()
             .HasConversion<byte>();
 
-        builder.OwnsOne(s => s.CloudinaryValue, nav =>
+        builder.OwnsOne(s => s.MediaValue, nav =>
         {
-            nav.Property(c => c.ImageURl)
-                .HasColumnName("CloudinaryImageUrl")
+            nav.Property(c => c.ObjectKey)
+                .HasColumnName("MediaObjectKey")
                 .HasMaxLength(2000);
-
-            nav.Property(c => c.PublicId)
-                .HasColumnName("CloudinaryPublicId")
-                .HasMaxLength(500);
         });
 
         builder.HasData(

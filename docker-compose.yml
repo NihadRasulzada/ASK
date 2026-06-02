@@ -1,4 +1,20 @@
 services:
+  minio:
+    image: minio/minio:latest
+    container_name: ${MINIO_CONTAINER_NAME:-ask-minio}
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    restart: unless-stopped
+    networks:
+      - ask-network
+
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: ${DB_CONTAINER_NAME}
@@ -26,12 +42,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      minio:
+        condition: service_started
     env_file:
       - .env
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: Server=db,1433;Database=${MSSQL_DATABASE};User Id=sa;Password=${DB_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True
+      MinioSettings__Endpoint: minio:9000
+      MinioSettings__AccessKey: ${MINIO_ACCESS_KEY}
+      MinioSettings__SecretKey: ${MINIO_SECRET_KEY}
+      MinioSettings__BucketName: ${MINIO_BUCKET_NAME:-ask}
+      MinioSettings__UseSSL: "false"
     expose:
       - "8080"
     restart: unless-stopped
@@ -44,3 +67,4 @@ networks:
 
 volumes:
   mssql-data:
+  minio-data:

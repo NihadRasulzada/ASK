@@ -35,8 +35,7 @@ public class EventConfiguration : SoftDeletableEntityConfiguration<Event>
         builder.Property(b => b.TextRu).IsRequired();
 
         builder.OwnsOne(a => a.TitleImageUrl, c => {
-            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
-            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+            c.Property(x => x.ObjectKey).HasColumnName("TitleImageUrl");
         });
         
         

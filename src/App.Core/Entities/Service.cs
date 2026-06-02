@@ -1,27 +1,24 @@
 using App.Core.Entities.Common;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 
 namespace App.Core.Entities;
 
 public class Service : SoftDeletableEntity
 {
-    public CloudinaryURL ImageUrl { get; private set; }
+    public StoredFile ImageUrl { get; private set; }
     public string NameAz { get; private set; }
     public string NameEn { get; private set; }
     public string NameRu { get; private set; }
     public DateTime ActivateAt { get; private set; }
 
-    public Guid CloudinaryURLId { get; private set; }
-
-
     private Service() : base(Guid.Empty, false)
     {
     }
 
-    public Service(CloudinaryURL imageUrl, string nameAz, string nameEn, string nameRu)
+    public Service(StoredFile imageUrl, string nameAz, string nameEn, string nameRu)
         : base(Guid.NewGuid(), false)
     {
-        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
+        if (StoredFile.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
         if (string.IsNullOrWhiteSpace(nameAz))
             throw new ArgumentException("Az dili adı boş ola bilməz.", nameof(nameAz));
@@ -37,7 +34,6 @@ public class Service : SoftDeletableEntity
         ActivateAt = DateTime.UtcNow;
     }
 
-    /// <param name="imageUrl">Null ötürülərsə mövcud dəyər saxlanılır.</param>
     public void Update(string nameAz, string nameEn, string nameRu)
     {
         if (string.IsNullOrWhiteSpace(nameAz))
@@ -51,9 +47,10 @@ public class Service : SoftDeletableEntity
         NameEn = nameEn;
         NameRu = nameRu;
     }
-    public void UpdateImageUrl(CloudinaryURL imageUrl)
+
+    public void UpdateImageUrl(StoredFile imageUrl)
     {
-        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
+        if (StoredFile.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         ImageUrl = imageUrl;

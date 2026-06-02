@@ -1,19 +1,15 @@
 using App.Core.Entities.Common;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 
 namespace App.Core.Entities;
 
-// FIX: ICollection<string> ImageUrls silindi — NewsImage entity-si ilə
-//      düzgün relational əlaqə istifadə olunur. İkiqat yanaşma ziddiyyət yaradır.
 public class News : SoftDeletableEntity
 {
-    public CloudinaryURL TitleImageUrl { get; private set; }
+    public StoredFile TitleImageUrl { get; private set; }
     public string NewsTextAz { get; private set; }
     public string NewsTextEn { get; private set; }
     public string NewsTextRu { get; private set; }
     public DateTime CreateDate { get; private set; }
-
-    public Guid CloudinaryURLId { get; private set; }
 
     public ICollection<NewsImage> Images { get; private set; } = new List<NewsImage>();
 
@@ -22,13 +18,13 @@ public class News : SoftDeletableEntity
     }
 
     public News(
-        CloudinaryURL titleImageUrl,
+        StoredFile titleImageUrl,
         string newsTextAz,
         string newsTextEn,
         string newsTextRu)
         : base(Guid.NewGuid(), false)
     {
-        if (CloudinaryURL.IsNullOrEmpty(titleImageUrl))
+        if (StoredFile.IsNullOrEmpty(titleImageUrl))
             throw new ArgumentException("Title image url cannot be empty.", nameof(titleImageUrl));
         if (string.IsNullOrWhiteSpace(newsTextAz))
             throw new ArgumentException("AZ news text cannot be empty.", nameof(newsTextAz));
@@ -61,12 +57,11 @@ public class News : SoftDeletableEntity
         NewsTextRu = newsTextRu;
     }
 
-    public void UpdateImageUrl(CloudinaryURL titleImageUrl)
+    public void UpdateImageUrl(StoredFile titleImageUrl)
     {
-        if (CloudinaryURL.IsNullOrEmpty(titleImageUrl))
+        if (StoredFile.IsNullOrEmpty(titleImageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(titleImageUrl));
 
         TitleImageUrl = titleImageUrl;
     }
-
 }

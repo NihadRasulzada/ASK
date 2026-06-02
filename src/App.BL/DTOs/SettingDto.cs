@@ -23,5 +23,5 @@ public record SettingResponseDto(
     Guid Id,
     string Key,
     string? StringValue,
-    string? CloudinaryUrl,   
+    string? MediaUrl,
     SettingValueType ValueType);

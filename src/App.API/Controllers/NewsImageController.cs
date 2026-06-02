@@ -109,7 +109,7 @@ public class NewsImageController : ControllerBase
     /// Xəbər şəkilini həmişəlik silir.
     /// </summary>
     /// <remarks>
-    /// Diqqət: Şəkil həm DB-dən, həm də Cloudinary-dən silinməlidir.
+    /// Diqqət: Şəkil həm DB-dən, həm də MinIO-dan silinməlidir.
     /// </remarks>
     /// <param name="id">Silinəcək xəbər şəkilinin unikal identifikatoru.</param>
     /// <param name="cancellationToken">Ləğvetmə tokeni.</param>

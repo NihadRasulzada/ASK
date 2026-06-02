@@ -31,8 +31,7 @@ public class DirectorConfiguration : SoftDeletableEntityConfiguration<Director>
         builder.Property(e => e.Email).HasMaxLength(256);
 
         builder.OwnsOne(a => a.ImageUrl, c => {
-            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
-            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+            c.Property(x => x.ObjectKey).HasColumnName("TitleImageUrl");
         });
     }
 }

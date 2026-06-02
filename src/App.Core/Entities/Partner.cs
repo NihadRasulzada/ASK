@@ -1,23 +1,20 @@
 using App.Core.Entities.Common;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 
 namespace App.Core.Entities;
 
 public class Partner : BaseEntity
 {
-    public CloudinaryURL ImageUrl { get; private set; }
+    public StoredFile ImageUrl { get; private set; }
     public string Site { get; private set; }
-
-    public Guid CloudinaryURLId { get; private set; }
-
 
     private Partner() : base(Guid.Empty)
     {
     }
 
-    public Partner(CloudinaryURL imageUrl, string site) : base(Guid.NewGuid())
+    public Partner(StoredFile imageUrl, string site) : base(Guid.NewGuid())
     {
-        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
+        if (StoredFile.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
         if (string.IsNullOrWhiteSpace(site))
             throw new ArgumentException("Sayt URL-i boş ola bilməz.", nameof(site));
@@ -26,7 +23,6 @@ public class Partner : BaseEntity
         Site = site;
     }
 
-    /// <param name="imageUrl">Null ötürülərsə mövcud dəyər saxlanılır.</param>
     public void Update(string site)
     {
         if (string.IsNullOrWhiteSpace(site))
@@ -35,9 +31,9 @@ public class Partner : BaseEntity
         Site = site;
     }
 
-    public void UpdateImageUrl(CloudinaryURL imageUrl)
+    public void UpdateImageUrl(StoredFile imageUrl)
     {
-        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
+        if (StoredFile.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         ImageUrl = imageUrl;

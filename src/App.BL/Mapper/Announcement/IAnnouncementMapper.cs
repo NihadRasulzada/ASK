@@ -1,11 +1,11 @@
 using App.BL.DTOs;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 
 namespace App.BL.Mapper.Announcement;
 
 public interface IAnnouncementMapper
 {
-    Core.Entities.Announcement CreateDtoToDomain(CreateAnnouncementDto dto, CloudinaryURL titleImageUrl);
-    Core.Entities.Announcement UpdateDtoToDomain(Core.Entities.Announcement entity, UpdateAnnouncementDto dto, CloudinaryURL? titleImageUrl = null);
+    Core.Entities.Announcement CreateDtoToDomain(CreateAnnouncementDto dto, StoredFile titleImageUrl);
+    Core.Entities.Announcement UpdateDtoToDomain(Core.Entities.Announcement entity, UpdateAnnouncementDto dto, StoredFile? titleImageUrl = null);
     AnnouncementResponseDto DomainToResponseDto(Core.Entities.Announcement entity);
 }

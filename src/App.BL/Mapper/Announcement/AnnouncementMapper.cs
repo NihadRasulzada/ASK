@@ -1,6 +1,6 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Announcement;
@@ -15,7 +15,7 @@ public class AnnouncementMapper : IAnnouncementMapper
         this.languageService = languageService;
         this.mediaUrlBuilder = mediaUrlBuilder;
     }
-    public Core.Entities.Announcement CreateDtoToDomain(CreateAnnouncementDto dto, CloudinaryURL titleImageUrl)
+    public Core.Entities.Announcement CreateDtoToDomain(CreateAnnouncementDto dto, StoredFile titleImageUrl)
     {
         return new Core.Entities.Announcement(
             dto.TitleAz, 
@@ -30,10 +30,10 @@ public class AnnouncementMapper : IAnnouncementMapper
 
     public AnnouncementResponseDto DomainToResponseDto(Core.Entities.Announcement entity)
     {
-        //return new AnnouncementResponseDto(entity.Id, entity.TitleAz, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.TextAz, entity.Created);
+        //return new AnnouncementResponseDto(entity.Id, entity.TitleAz, mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey), entity.TextAz, entity.Created);
         return new AnnouncementResponseDto(
             Id: entity.Id,
-            TitleImageUrl: mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl),
+            TitleImageUrl: mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey),
             Title:languageService.Lang switch
             {
                 "az" => entity.TitleAz,
@@ -52,7 +52,7 @@ public class AnnouncementMapper : IAnnouncementMapper
         );
     }
 
-    public Core.Entities.Announcement UpdateDtoToDomain(Core.Entities.Announcement entity, UpdateAnnouncementDto dto, CloudinaryURL? titleImageUrl = null)
+    public Core.Entities.Announcement UpdateDtoToDomain(Core.Entities.Announcement entity, UpdateAnnouncementDto dto, StoredFile? titleImageUrl = null)
     {
         entity.Update(
             dto.TitleAz, 

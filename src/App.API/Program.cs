@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
+using Minio;
 using App.API.BackgroundJobs;
 using App.API.Extensions.FileSize;
 using App.API.Filters;
@@ -273,9 +274,9 @@ builder.Services.AddScoped<ValidationFilter>();
 // ── Memory Cache ──────────────────────────────────────────────────────────────
 builder.Services.AddMemoryCache();
 
-// ── Cloudinary ────────────────────────────────────────────────────────────────
-builder.Services.Configure<CloudinarySettings>(
-    builder.Configuration.GetSection("CloudinarySettings"));
+// ── MinIO ─────────────────────────────────────────────────────────────────────
+builder.Services.Configure<MinioSettings>(
+    builder.Configuration.GetSection("MinioSettings"));
 
 // ── ExchangeRate ──────────────────────────────────────────────────────────────
 builder.Services.Configure<ExchangeRateSettings>(
@@ -290,11 +291,6 @@ builder.Services.AddHttpClient("ExchangeRate", (sp, client) =>
         new MediaTypeWithQualityHeaderValue("application/json"));
 });
 
-builder.Services.AddHttpClient("CloudinaryProxy", client =>
-{
-    client.BaseAddress = new Uri("https://res.cloudinary.com/");
-    client.Timeout = TimeSpan.FromSeconds(30);
-});
 
 // ── HttpContextAccessor / CurrentUser ─────────────────────────────────────────
 builder.Services.AddHttpContextAccessor();
@@ -413,7 +409,16 @@ builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<IPresidentService, PresidentService>();
 builder.Services.AddScoped<ITrainingService, TrainingService>();
 builder.Services.AddScoped<IExhibitionService, ExhibitionService>();
-builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddSingleton<IMinioClient>(sp =>
+{
+    var s = sp.GetRequiredService<IOptions<MinioSettings>>().Value;
+    return new MinioClient()
+        .WithEndpoint(s.Endpoint)
+        .WithCredentials(s.AccessKey, s.SecretKey)
+        .WithSSL(s.UseSSL)
+        .Build();
+});
+builder.Services.AddScoped<IStorageService, MinioService>();
 builder.Services.AddScoped<IMediaUrlBuilder, MediaUrlBuilder>();
 builder.Services.AddScoped<INewsService, NewsService>();
 builder.Services.AddScoped<App.BL.NewsImages.Business.NewsIamge.INewsImageService, App.BL.Services.Business.NewsIamge.NewsImageService>();

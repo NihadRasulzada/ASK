@@ -1,13 +1,13 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Training;
 
 public class TrainingMapper(ILanguageService languageService, IMediaUrlBuilder mediaUrlBuilder) : ITrainingMapper
 {
-    public Core.Entities.Training CreateDtoToDomain(CreateTrainingDto dto, CloudinaryURL imageUrl)
+    public Core.Entities.Training CreateDtoToDomain(CreateTrainingDto dto, StoredFile imageUrl)
     {
         return new Core.Entities.Training(dto.TitleAz, dto.TitleEn, dto.TitleRu, imageUrl, dto.TextAz, dto.TextEn, dto.TextRu, dto.StartDate, dto.EndDate);
     }
@@ -31,7 +31,7 @@ public class TrainingMapper(ILanguageService languageService, IMediaUrlBuilder m
         };
 
 
-        return new TrainingResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created);
+        return new TrainingResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey), entity.IsDeactive, entity.Created);
     }
     public TrainingDateResponseDto DomainToResponseDateDto(Core.Entities.Training entity)
     {
@@ -52,10 +52,10 @@ public class TrainingMapper(ILanguageService languageService, IMediaUrlBuilder m
         };
 
 
-        return new TrainingDateResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created, entity.StartDate, entity.EndDate);
+        return new TrainingDateResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey), entity.IsDeactive, entity.Created, entity.StartDate, entity.EndDate);
     }
 
-    public Core.Entities.Training UpdateDtoToDomain(Core.Entities.Training entity, UpdateTrainingDto dto, CloudinaryURL? imageUrl = null)
+    public Core.Entities.Training UpdateDtoToDomain(Core.Entities.Training entity, UpdateTrainingDto dto, StoredFile? imageUrl = null)
     {
         entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu, dto.TextAz, dto.TextEn, dto.TextRu, dto.StartDate, dto.EndDate);
         if (imageUrl != null)

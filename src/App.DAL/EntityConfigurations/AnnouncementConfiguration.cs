@@ -36,8 +36,7 @@ public class AnnouncementConfiguration : BaseEntityConfiguration<Announcement>
             .IsRequired();
 
         builder.OwnsOne(a => a.TitleImageUrl, c => {
-            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
-            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+            c.Property(x => x.ObjectKey).HasColumnName("TitleImageUrl");
         });
 
     }

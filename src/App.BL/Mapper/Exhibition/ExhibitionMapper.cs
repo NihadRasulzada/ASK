@@ -1,13 +1,13 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Exhibition;
 
 public class ExhibitionMapper(ILanguageService languageService,IMediaUrlBuilder mediaUrlBuilder) : IExhibitionMapper
 {
-    public Core.Entities.Exhibition CreateDtoToDomain(CreateExhibitionDto dto, CloudinaryURL imageUrl)
+    public Core.Entities.Exhibition CreateDtoToDomain(CreateExhibitionDto dto, StoredFile imageUrl)
     {
         return new Core.Entities.Exhibition(dto.TitleAz, dto.TitleEn, dto.TitleRu, imageUrl, dto.TextAz, dto.TextEn, dto.TextRu, dto.StartDate,dto.EndDate);
     }
@@ -30,7 +30,7 @@ public class ExhibitionMapper(ILanguageService languageService,IMediaUrlBuilder 
             _ => entity.TextAz
         };
 
-        return new ExhibitionDateResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created, entity.StartDate,
+        return new ExhibitionDateResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey), entity.IsDeactive, entity.Created, entity.StartDate,
             entity.EndDate);
     }
 
@@ -52,10 +52,10 @@ public class ExhibitionMapper(ILanguageService languageService,IMediaUrlBuilder 
             _ => entity.TextAz
         };
 
-        return new ExhibitionResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.IsDeactive, entity.Created );
+        return new ExhibitionResponseDto(entity.Id, title, text, mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey), entity.IsDeactive, entity.Created );
     }
 
-    public Core.Entities.Exhibition UpdateDtoToDomain(Core.Entities.Exhibition entity, UpdateExhibitionDto dto, CloudinaryURL? imageUrl = null)
+    public Core.Entities.Exhibition UpdateDtoToDomain(Core.Entities.Exhibition entity, UpdateExhibitionDto dto, StoredFile? imageUrl = null)
     {
         entity.Update(dto.TitleAz, dto.TitleEn, dto.TitleRu, dto.TextAz, dto.TextEn, dto.TextRu, dto.StartDate, dto.EndDate);
         if (imageUrl != null)

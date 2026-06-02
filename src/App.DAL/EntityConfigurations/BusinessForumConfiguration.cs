@@ -20,8 +20,7 @@ public class BusinessForumConfiguration : IEntityTypeConfiguration<BusinessForum
         builder.HasBaseType<Event>();
 
         builder.OwnsOne(a => a.DetailImageUrl, c => {
-            c.Property(x => x.ImageURl).HasColumnName("DetailImageUrl");
-            c.Property(x => x.PublicId).HasColumnName("DetailPublicId");
+            c.Property(x => x.ObjectKey).HasColumnName("DetailImageUrl");
         });
     }
 }

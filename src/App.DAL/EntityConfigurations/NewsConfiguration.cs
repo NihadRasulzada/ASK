@@ -25,8 +25,7 @@ public class NewsConfiguration : SoftDeletableEntityConfiguration<News>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.OwnsOne(a => a.TitleImageUrl, c => {
-            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
-            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+            c.Property(x => x.ObjectKey).HasColumnName("TitleImageUrl");
         });
     }
 }

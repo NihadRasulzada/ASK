@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Director;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.Director;
 using App.Core.ResponseObject.Concreate;
 using App.DAL.Context;
@@ -12,9 +12,9 @@ namespace App.BL.Services.Business.Director;
 public class DirectorService(
     IDirectorReadRepository readRepository,
     IDirectorWriteRepository writeRepository,
-    ICloudinaryService cloudinaryService,
+    IStorageService storageService,
     IDirectorMapper directorMapper,
-    AppDbContext context) : CloudinaryEntityService(cloudinaryService), IDirectorService
+    AppDbContext context) : StorageEntityService(storageService), IDirectorService
 {
 
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
@@ -36,7 +36,7 @@ public class DirectorService(
 
     public async Task<Response<DirectorResponseDto>> CreateAsync(CreateDirectorDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL imageUrl = await cloudinaryService.UploadImageAsync(dto.Image);
+        StoredFile imageUrl = await storageService.UploadAsync(dto.Image);
 
         Core.Entities.Director entity = directorMapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -72,7 +72,7 @@ public class DirectorService(
         if (entity == null)
             return Response<bool>.NotFound("Director not found");
 
-        await DeleteImageAsync(entity.ImageUrl.PublicId);
+        await DeleteFileAsync(entity.ImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -127,16 +127,16 @@ public class DirectorService(
         if (entity == null)
             return Response<DirectorResponseDto?>.NotFound("Director not found");
 
-        CloudinaryURL imageUrl = entity.ImageUrl;
+        StoredFile imageUrl = entity.ImageUrl;
 
         if (dto.Image != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
-                entity.ImageUrl.PublicId,
+            var (newUrl, oldPublicId) = await ReplaceFileAsync(  
+                entity.ImageUrl.ObjectKey,
                 dto.Image);
 
             directorMapper.UpdateDtoToDamain(entity, dto, newUrl);
-            await DeleteImageAsync(oldPublicId); 
+            await DeleteFileAsync(oldPublicId); 
         }
         else
         {

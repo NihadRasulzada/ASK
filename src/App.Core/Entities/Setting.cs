@@ -1,16 +1,14 @@
-using System.ComponentModel.DataAnnotations.Schema;
 using App.Core.Entities.Common;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Enums;
 
 namespace App.Core.Entities;
-
 
 public class Setting : BaseEntity
 {
     public string Key { get; private set; }
     public string? StringValue { get; private set; }
-    public CloudinaryURL? CloudinaryValue { get; private set; }
+    public StoredFile? MediaValue { get; private set; }
     public SettingValueType ValueType { get; private set; }
 
     private Setting() : base(Guid.Empty) { Key = string.Empty; }
@@ -32,11 +30,11 @@ public class Setting : BaseEntity
         StringValue = value;
     }
 
-    public void UpdateCloudinaryValue(CloudinaryURL? value)
+    public void UpdateMediaValue(StoredFile? value)
     {
         if (ValueType != SettingValueType.Link)
             throw new InvalidOperationException("Bu setting link tipli deyil.");
 
-        CloudinaryValue = value;
+        MediaValue = value;
     }
 }

@@ -31,6 +31,6 @@ public class UpdatePartnerDto
 /// Client-ə qaytarılan Partner məlumatı.
 /// </summary>
 /// <param name="Id">Partnerin unikal identifikatoru.</param>
-/// <param name="ImageUrl">Cloudinary-dəki şəkil URL-i.</param>
+/// <param name="ImageUrl">MinIO-dakı fayl açarı (object key).</param>
 /// <param name="Site">Partnerin sayt URL-i.</param>
 public record PartnerResponseDto(Guid Id, string ImageUrl, string Site);

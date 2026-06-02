@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.BusinessForum;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.BusinessForum;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,8 +10,8 @@ namespace App.BL.Services.Business.BusinessForum;
 public class BusinessForumService(
     IBusinessForumReadRepository readRepository,
     IBusinessForumWriteRepository writeRepository,
-    ICloudinaryService cloudinaryService,
-    IBusinessForumMapper mapper) : CloudinaryEntityService(cloudinaryService), IBusinessForumService
+    IStorageService storageService,
+    IBusinessForumMapper mapper) : StorageEntityService(storageService), IBusinessForumService
 {
     public async Task<PagedResponse<IEnumerable<BusinessForumResponseDto>>> GetAllAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -30,8 +30,8 @@ public class BusinessForumService(
 
     public async Task<Response<BusinessForumResponseDto>> CreateAsync(CreateBusinessForumDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL titleImageUrl = await cloudinaryService.UploadImageAsync(dto.TitleImage);
-        CloudinaryURL detailImageUrl = await cloudinaryService.UploadImageAsync(dto.DetailImage);
+        StoredFile titleImageUrl = await storageService.UploadAsync(dto.TitleImage);
+        StoredFile detailImageUrl = await storageService.UploadAsync(dto.DetailImage);
 
         var entity = mapper.CreateDtoToDomain(dto, titleImageUrl, detailImageUrl);
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -47,12 +47,12 @@ public class BusinessForumService(
 
         if (dto.TitleImage != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceImageAsync(  // 👈 base metoddan
-                entity.TitleImageUrl.PublicId,
+            var (newUrl, oldPublicId) = await ReplaceFileAsync(  // 👈 base metoddan
+                entity.TitleImageUrl.ObjectKey,
                 dto.TitleImage);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteImageAsync(oldPublicId); // upload uğurlu oldu, indi sil
+            await DeleteFileAsync(oldPublicId); // upload uğurlu oldu, indi sil
         }
         else
         {
@@ -70,7 +70,7 @@ public class BusinessForumService(
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response.NotFound("Business forum not found");
 
-        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
+        await DeleteFileAsync(entity.TitleImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);

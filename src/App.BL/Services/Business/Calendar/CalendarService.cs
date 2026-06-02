@@ -80,15 +80,15 @@ public class CalendarService(
 
     private CalendarEventDto ToDto(ExhibitionEntity e, string eventType) =>
         new(e.Id, eventType, e.TitleAz, e.TitleEn, e.TitleRu,
-            mediaUrlBuilder.Build(e.TitleImageUrl.ImageURl), e.StartDate, e.EndDate);
+            mediaUrlBuilder.Build(e.TitleImageUrl.ObjectKey), e.StartDate, e.EndDate);
 
     private CalendarEventDto ToDto(TrainingEntity t, string eventType) =>
         new(t.Id, eventType, t.TitleAz, t.TitleEn, t.TitleRu,
-            mediaUrlBuilder.Build(t.TitleImageUrl.ImageURl), t.StartDate, t.EndDate);
+            mediaUrlBuilder.Build(t.TitleImageUrl.ObjectKey), t.StartDate, t.EndDate);
 
     private CalendarEventDto ToDto(BusinessForumEntity b, string eventType) =>
         new(b.Id, eventType, b.TitleAz, b.TitleEn, b.TitleRu,
-            mediaUrlBuilder.Build(b.TitleImageUrl.ImageURl), b.StartDate, b.EndDate);
+            mediaUrlBuilder.Build(b.TitleImageUrl.ObjectKey), b.StartDate, b.EndDate);
 
     private static void ExpandDatesIntoMonth(
         DateTime startDate,

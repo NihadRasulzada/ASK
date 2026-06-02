@@ -1,11 +1,11 @@
 using App.Core.Entities.Common;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 
 namespace App.Core.Entities;
 
 public class Director : SoftDeletableEntity
 {
-    public CloudinaryURL ImageUrl { get; private set; }
+    public StoredFile ImageUrl { get; private set; }
     public string FullNameAz { get; private set; }
     public string FullNameEn { get; private set; }
     public string FullNameRu { get; private set; }
@@ -16,25 +16,21 @@ public class Director : SoftDeletableEntity
     public string DepartmentEn { get; private set; }
     public string DepartmentRu { get; private set; }
     public string PhoneNumber { get; set; }
-    public string  Email { get; set; }
+    public string Email { get; set; }
 
-    public Guid CloudinaryURLId { get; private set; }
-
-
-    // EF Core materialization
     private Director() : base(Guid.Empty, false)
     {
     }
 
     public Director(
-        CloudinaryURL imageUrl,
+        StoredFile imageUrl,
         string fullNameAz, string fullNameEn, string fullNameRu,
         string dutyAz, string dutyEn, string dutyRu,
         string departmentAz, string departmentEn, string departmentRu,
         string phoneNumber, string email)
         : base(Guid.NewGuid(), false)
     {
-        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
+        if (StoredFile.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
         if (string.IsNullOrWhiteSpace(fullNameAz))
             throw new ArgumentException("Tam ad (AZ) boş ola bilməz.", nameof(fullNameAz));
@@ -63,25 +59,18 @@ public class Director : SoftDeletableEntity
         Email = email;
     }
 
-    /// <param name="imageUrl">Null ötürülərsə mövcud dəyər saxlanılır.</param>
     public void Update(
         string fullNameAz, string fullNameEn, string fullNameRu,
         string dutyAz, string dutyEn, string dutyRu,
         string departmentAz, string departmentEn, string departmentRu,
         string phoneNumber, string email)
     {
-        if (string.IsNullOrWhiteSpace(fullNameAz))
-            throw new ArgumentException("Tam ad (AZ) boş ola bilməz.", nameof(fullNameAz));
-        if (string.IsNullOrWhiteSpace(fullNameEn))
-            throw new ArgumentException("Tam ad (EN) boş ola bilməz.", nameof(fullNameEn));
-        if (string.IsNullOrWhiteSpace(fullNameRu))
-            throw new ArgumentException("Tam ad (RU) boş ola bilməz.", nameof(fullNameRu));
-        if (string.IsNullOrWhiteSpace(dutyAz))
-            throw new ArgumentException("Vəzifə (AZ) boş ola bilməz.", nameof(dutyAz));
-        if (string.IsNullOrWhiteSpace(dutyEn))
-            throw new ArgumentException("Vəzifə (EN) boş ola bilməz.", nameof(dutyEn));
-        if (string.IsNullOrWhiteSpace(dutyRu))
-            throw new ArgumentException("Vəzifə (RU) boş ola bilməz.", nameof(dutyRu));
+        if (string.IsNullOrWhiteSpace(fullNameAz)) throw new ArgumentException("Tam ad (AZ) boş ola bilməz.", nameof(fullNameAz));
+        if (string.IsNullOrWhiteSpace(fullNameEn)) throw new ArgumentException("Tam ad (EN) boş ola bilməz.", nameof(fullNameEn));
+        if (string.IsNullOrWhiteSpace(fullNameRu)) throw new ArgumentException("Tam ad (RU) boş ola bilməz.", nameof(fullNameRu));
+        if (string.IsNullOrWhiteSpace(dutyAz)) throw new ArgumentException("Vəzifə (AZ) boş ola bilməz.", nameof(dutyAz));
+        if (string.IsNullOrWhiteSpace(dutyEn)) throw new ArgumentException("Vəzifə (EN) boş ola bilməz.", nameof(dutyEn));
+        if (string.IsNullOrWhiteSpace(dutyRu)) throw new ArgumentException("Vəzifə (RU) boş ola bilməz.", nameof(dutyRu));
 
         FullNameAz = fullNameAz;
         FullNameEn = fullNameEn;
@@ -96,9 +85,9 @@ public class Director : SoftDeletableEntity
         Email = email;
     }
 
-    public void UpdateImageUrl(CloudinaryURL imageUrl)
+    public void UpdateImageUrl(StoredFile imageUrl)
     {
-        if (CloudinaryURL.IsNullOrEmpty(imageUrl))
+        if (StoredFile.IsNullOrEmpty(imageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         ImageUrl = imageUrl;

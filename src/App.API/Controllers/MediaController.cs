@@ -1,42 +1,47 @@
-using App.BL.Settings;
+using App.BL.Services.External;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace App.API.Controllers;
 
 /// <summary>
-/// Cloudinary media fayllarını öz domenindən proxy edir.
+/// MinIO-dan media fayllarını stream edir.
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-public class MediaController(
-    IHttpClientFactory httpClientFactory,
-    IOptions<CloudinarySettings> cloudinarySettings) : ControllerBase
+public class MediaController(IStorageService storageService) : ControllerBase
 {
-    private readonly string _cloudName = cloudinarySettings.Value.CloudName;
-
     /// <summary>
-    /// Verilmiş path-ə uyğun media faylını (şəkil, PDF və s.) Cloudinary-dən proxy edərək qaytarır.
+    /// Verilmiş object key-ə uyğun faylı MinIO-dan qaytarır.
     /// </summary>
-    /// <param name="path">Cloudinary resurs path-i (məs. image/upload/v123/file.jpg).</param>
-    /// <param name="cancellationToken">Ləğvetmə tokeni.</param>
-    /// <returns>Media faylının məzmunu.</returns>
-    /// <response code="200">Fayl uğurla qaytarıldı.</response>
-    /// <response code="404">Fayl tapılmadı.</response>
     [HttpGet("{**path}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(string path, CancellationToken cancellationToken)
     {
-        var cloudinaryUrl = $"https://res.cloudinary.com/{_cloudName}/{path}";
-        var client = httpClientFactory.CreateClient("CloudinaryProxy");
-        var response = await client.GetAsync(cloudinaryUrl, cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
+        try
+        {
+            var stream = await storageService.GetAsync(path);
+            var contentType = GetContentType(path);
+            return File(stream, contentType);
+        }
+        catch
+        {
             return NotFound();
+        }
+    }
 
-        var contentType = response.Content.Headers.ContentType?.ToString() ?? "application/octet-stream";
-        var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-        return File(stream, contentType);
+    private static string GetContentType(string path)
+    {
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        return ext switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            ".svg" => "image/svg+xml",
+            ".pdf" => "application/pdf",
+            _ => "application/octet-stream"
+        };
     }
 }

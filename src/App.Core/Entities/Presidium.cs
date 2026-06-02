@@ -1,5 +1,5 @@
 using App.Core.Entities.Common;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 
 namespace App.Core.Entities;
 
@@ -11,9 +11,7 @@ public class Presidium : BaseEntity
     public string PositionAz { get; private set; }
     public string PositionEn { get; private set; }
     public string PositionRu { get; private set; }
-    public CloudinaryURL ImageUrl { get; private set; }
-    public Guid CloudinaryURLId { get; private set; }
-
+    public StoredFile ImageUrl { get; private set; }
 
     private Presidium() : base(Guid.Empty)
     {
@@ -22,7 +20,7 @@ public class Presidium : BaseEntity
     public Presidium(
         string fullNameAz, string fullNameEn, string fullNameRu,
         string positionAz, string positionEn, string positionRu,
-        CloudinaryURL imageUrl)
+        StoredFile imageUrl)
         : base(Guid.NewGuid())
     {
         if (string.IsNullOrWhiteSpace(fullNameAz)) throw new ArgumentException("Tam ad (AZ) boş ola bilməz.", nameof(fullNameAz));
@@ -31,7 +29,7 @@ public class Presidium : BaseEntity
         if (string.IsNullOrWhiteSpace(positionAz)) throw new ArgumentException("Vəzifə (AZ) boş ola bilməz.", nameof(positionAz));
         if (string.IsNullOrWhiteSpace(positionEn)) throw new ArgumentException("Vəzifə (EN) boş ola bilməz.", nameof(positionEn));
         if (string.IsNullOrWhiteSpace(positionRu)) throw new ArgumentException("Vəzifə (RU) boş ola bilməz.", nameof(positionRu));
-        if (CloudinaryURL.IsNullOrEmpty(imageUrl)) throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
+        if (StoredFile.IsNullOrEmpty(imageUrl)) throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
 
         FullNameAz = fullNameAz;
         FullNameEn = fullNameEn;
@@ -61,9 +59,9 @@ public class Presidium : BaseEntity
         PositionRu = positionRu;
     }
 
-    public void UpdateImageUrl(CloudinaryURL imageUrl)
+    public void UpdateImageUrl(StoredFile imageUrl)
     {
-        if (CloudinaryURL.IsNullOrEmpty(imageUrl)) throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
+        if (StoredFile.IsNullOrEmpty(imageUrl)) throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(imageUrl));
         ImageUrl = imageUrl;
     }
 }

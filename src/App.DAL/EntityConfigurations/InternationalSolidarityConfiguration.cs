@@ -16,8 +16,7 @@ public class InternationalSolidarityConfiguration : BaseEntityConfiguration<Inte
         builder.Property(e => e.Link).IsRequired().HasMaxLength(2048);
 
         builder.OwnsOne(a => a.IconUrl, c => {
-            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
-            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+            c.Property(x => x.ObjectKey).HasColumnName("TitleImageUrl");
         });
     }
 }

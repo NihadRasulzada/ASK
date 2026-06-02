@@ -16,8 +16,7 @@ public class GalleryConfiguration : BaseEntityConfiguration<Gallery>
 
 
         builder.OwnsOne(a => a.ImageUrl, c => {
-            c.Property(x => x.ImageURl).HasColumnName("TitleImageUrl");
-            c.Property(x => x.PublicId).HasColumnName("TitlePublicId");
+            c.Property(x => x.ObjectKey).HasColumnName("TitleImageUrl");
         });
     }
 }
