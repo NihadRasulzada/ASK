@@ -23,6 +23,18 @@ public class UpdateNewsDtoValidator : AbstractValidator<UpdateNewsDto>
                     .WithMessage(ValidationMessages.ImageInvalidFormat(languageService.Lang));
         });
 
+        RuleFor(x => x.TitleAz)
+            .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+
+        RuleFor(x => x.TitleEn)
+            .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+
+        RuleFor(x => x.TitleRu)
+            .NotEmpty().WithMessage(ValidationMessages.TitleRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
+
         // FIX: En və Ru sahələri əlavə edildi
         RuleFor(x => x.NewsTextAz)
             .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))

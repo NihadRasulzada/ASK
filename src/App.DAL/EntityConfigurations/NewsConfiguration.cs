@@ -15,6 +15,9 @@ public class NewsConfiguration : SoftDeletableEntityConfiguration<News>
 
         builder.ToTable("News");
 
+        builder.Property(n => n.TitleAz).IsRequired().HasMaxLength(500);
+        builder.Property(n => n.TitleEn).IsRequired().HasMaxLength(500);
+        builder.Property(n => n.TitleRu).IsRequired().HasMaxLength(500);
         builder.Property(n => n.NewsTextAz).IsRequired();
         builder.Property(n => n.NewsTextEn).IsRequired();
         builder.Property(n => n.NewsTextRu).IsRequired();

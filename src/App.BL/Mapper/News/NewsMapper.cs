@@ -22,7 +22,10 @@ public class NewsMapper : INewsMapper
             titleImageUrl,
             dto.NewsTextAz,
             dto.NewsTextEn,
-            dto.NewsTextRu
+            dto.NewsTextRu,
+            dto.TitleAz,
+            dto.TitleEn,
+            dto.TitleRu
         );
 
         return entity;
@@ -33,6 +36,13 @@ public class NewsMapper : INewsMapper
         return new NewsResponseDto(
             entity.Id,
             mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey),
+            languageService.Lang switch
+            {
+                "az" => entity.TitleAz,
+                "en" => entity.TitleEn,
+                "ru" => entity.TitleRu,
+                _ => entity.TitleAz
+            },
             languageService.Lang switch
             {
                 "az" => entity.NewsTextAz,
@@ -51,7 +61,10 @@ public class NewsMapper : INewsMapper
         entity.Update(
             dto.NewsTextAz,
             dto.NewsTextEn,
-            dto.NewsTextRu
+            dto.NewsTextRu,
+            dto.TitleAz,
+            dto.TitleEn,
+            dto.TitleRu
         );
         if (titleImageUrl != null)
         {
