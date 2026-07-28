@@ -126,10 +126,6 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 const long maxUploadRequestBodySize = 12 * 1024 * 1024; // 12 MB
 
-var allowedOrigins = builder.Configuration["Cors:AllowedOrigins"]
-    ?.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-    ?? [];
-
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSection["Key"];
 
@@ -143,20 +139,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ConfiguredOrigins", policy =>
     {
-        if (allowedOrigins.Length > 0)
-        {
-            policy.WithOrigins(allowedOrigins)
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-            return;
-        }
-
-        if (builder.Environment.IsDevelopment())
-        {
-            policy.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader();
-        }
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
     });
 });
 
