@@ -9,21 +9,21 @@ public class MediaUrlBuilder(IHttpContextAccessor httpContextAccessor) : IMediaU
     private const string SeedMediaApiPrefix = "/api/seed-media/";
     private const string MinioSeedPrefix = "wordpress-seed/";
 
-    public string? Build(string? cloudinaryUrlOrPath)
+    public string? Build(string? objectKeyOrUrl)
     {
-        if (string.IsNullOrEmpty(cloudinaryUrlOrPath)) return null;
+        if (string.IsNullOrEmpty(objectKeyOrUrl)) return null;
 
-        if (cloudinaryUrlOrPath.StartsWith(SeedMediaPrefix, StringComparison.OrdinalIgnoreCase))
-            return Build($"{MinioSeedPrefix}{cloudinaryUrlOrPath[SeedMediaPrefix.Length..]}");
+        if (objectKeyOrUrl.StartsWith(SeedMediaPrefix, StringComparison.OrdinalIgnoreCase))
+            return Build($"{MinioSeedPrefix}{objectKeyOrUrl[SeedMediaPrefix.Length..]}");
 
-        if (cloudinaryUrlOrPath.StartsWith(SeedMediaApiPrefix, StringComparison.OrdinalIgnoreCase))
-            return Build($"{MinioSeedPrefix}{cloudinaryUrlOrPath[SeedMediaApiPrefix.Length..]}");
+        if (objectKeyOrUrl.StartsWith(SeedMediaApiPrefix, StringComparison.OrdinalIgnoreCase))
+            return Build($"{MinioSeedPrefix}{objectKeyOrUrl[SeedMediaApiPrefix.Length..]}");
 
-        if (Uri.TryCreate(cloudinaryUrlOrPath, UriKind.Absolute, out var absoluteUri) &&
+        if (Uri.TryCreate(objectKeyOrUrl, UriKind.Absolute, out var absoluteUri) &&
             (absoluteUri.Scheme == Uri.UriSchemeHttp || absoluteUri.Scheme == Uri.UriSchemeHttps))
-            return cloudinaryUrlOrPath;
+            return objectKeyOrUrl;
 
-        var path = cloudinaryUrlOrPath.TrimStart('/');
+        var path = objectKeyOrUrl.TrimStart('/');
 
         var req = httpContextAccessor.HttpContext?.Request;
         return req is null
