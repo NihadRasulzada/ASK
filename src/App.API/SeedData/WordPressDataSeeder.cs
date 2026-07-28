@@ -678,10 +678,33 @@ public static class WordPressDataSeeder
 
     private static void Set<T>(T entity, string propertyName, object value)
     {
-        var property = typeof(T).GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-            ?? entity!.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var type = entity!.GetType();
 
-        property?.SetValue(entity, value);
+        while (type is not null)
+        {
+            var property = type.GetProperty(
+                propertyName,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+
+            if (property is not null)
+            {
+                var setter = property.GetSetMethod(nonPublic: true);
+                if (setter is not null)
+                {
+                    setter.Invoke(entity, [value]);
+                    return;
+                }
+
+                var backingField = type.GetField(
+                    $"<{propertyName}>k__BackingField",
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+
+                backingField?.SetValue(entity, value);
+                return;
+            }
+
+            type = type.BaseType;
+        }
     }
 
     private static readonly JsonSerializerOptions JsonOptions = new()
