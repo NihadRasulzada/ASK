@@ -46,7 +46,7 @@ public static class WordPressDataSeeder
 
         var added = 0;
         Task<StoredFile> ToStoredMediaAsync(MediaSeed? mediaSeed)
-            => ToStoredMediaAsync(mediaSeed, objectStorageService, logger, cancellationToken);
+            => WordPressDataSeeder.ToStoredMediaAsync(mediaSeed, objectStorageService, logger, cancellationToken);
 
         if (!await db.News.AnyAsync(cancellationToken))
         {
