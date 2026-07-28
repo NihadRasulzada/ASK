@@ -34,4 +34,9 @@
 	  <ProjectReference Include="..\App.BL\App.BL.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Content Update="SeedData\wordpress-seed.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+	  <Content Include="SeedData\wordpress-media\**\*.*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+	</ItemGroup>
+
 </Project>

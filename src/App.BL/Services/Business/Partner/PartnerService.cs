@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Partner;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Partner;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,12 +10,12 @@ namespace App.BL.Services.Business.Partner;
 public class PartnerService(
     IPartnerReadRepository readRepository,
     IPartnerWriteRepository writeRepository,
-    IStorageService storageService,
-    IPartnerMapper mapper) : StorageEntityService(storageService), IPartnerService
+    IObjectStorageService objectStorageService,
+    IPartnerMapper mapper) : ObjectStorageEntityService(objectStorageService), IPartnerService
 {
     public async Task<Response> CreateAsync(CreatePartnerDto dto, CancellationToken cancellationToken = default)
     {
-        StoredFile imageUrl = await storageService.UploadAsync(dto.Image);
+        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
 
         Core.Entities.Partner entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -32,7 +32,7 @@ public class PartnerService(
         if (entity == null)
             return Response.NotFound("Partner not found");
 
-        await DeleteFileAsync(entity.ImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.ImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -73,15 +73,15 @@ public class PartnerService(
         if (entity == null)
             return Response<PartnerResponseDto?>.NotFound("Partner not found");
 
-        StoredFile? newImageUrl = null;
+        CloudinaryURL? newImageUrl = null;
         if (dto.Image != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceFileAsync(  
-                entity.ImageUrl.ObjectKey,
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
+                entity.ImageUrl.PublicId,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteFileAsync(oldPublicId); 
+            await DeleteImageAsync(oldPublicId); 
         }
         else
         {

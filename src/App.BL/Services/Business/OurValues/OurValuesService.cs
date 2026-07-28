@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.OurValues;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.OurValues;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,8 +10,8 @@ namespace App.BL.Services.Business.OurValues;
 public class OurValuesService(
     IOurValuesReadRepository readRepository,
     IOurValuesWriteRepository writeRepository,
-    IStorageService storageService,
-    IOurValuesMapper mapper) : StorageEntityService(storageService), IOurValuesService
+    IObjectStorageService objectStorageService,
+    IOurValuesMapper mapper) : ObjectStorageEntityService(objectStorageService), IOurValuesService
 {
     public async Task<Response<IEnumerable<OurValuesResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -35,7 +35,7 @@ public class OurValuesService(
 
     public async Task<Response<OurValuesResponseDto>> CreateAsync(CreateOurValuesDto dto, CancellationToken cancellationToken = default)
     {
-        StoredFile imageUrl = await storageService.UploadAsync(dto.Image);
+        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
 
         Core.Entities.OurValues entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -52,15 +52,15 @@ public class OurValuesService(
         if (entity == null)
             return Response<OurValuesResponseDto?>.NotFound("Value not found");
 
-        StoredFile imageUrl = entity.ImageUrl;
+        CloudinaryURL imageUrl = entity.ImageUrl;
         if (dto.Image != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceFileAsync(  
-                entity.ImageUrl.ObjectKey,
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
+                entity.ImageUrl.PublicId,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteFileAsync(oldPublicId); 
+            await DeleteImageAsync(oldPublicId); 
         }
         else
         {
@@ -80,7 +80,7 @@ public class OurValuesService(
         if (entity == null)
             return Response<bool>.NotFound("Value not found");
 
-        await DeleteFileAsync(entity.ImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.ImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);

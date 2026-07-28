@@ -1,6 +1,6 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.Announcement;
@@ -15,7 +15,7 @@ public class AnnouncementMapper : IAnnouncementMapper
         this.languageService = languageService;
         this.mediaUrlBuilder = mediaUrlBuilder;
     }
-    public Core.Entities.Announcement CreateDtoToDomain(CreateAnnouncementDto dto, StoredFile titleImageUrl)
+    public Core.Entities.Announcement CreateDtoToDomain(CreateAnnouncementDto dto, CloudinaryURL titleImageUrl)
     {
         return new Core.Entities.Announcement(
             dto.TitleAz, 
@@ -30,10 +30,18 @@ public class AnnouncementMapper : IAnnouncementMapper
 
     public AnnouncementResponseDto DomainToResponseDto(Core.Entities.Announcement entity)
     {
-        //return new AnnouncementResponseDto(entity.Id, entity.TitleAz, mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey), entity.TextAz, entity.Created);
+        var text = languageService.Lang switch
+        {
+            "az" => entity.TextAz,
+            "en" => entity.TextEn,
+            "ru" => entity.TextRu,
+            _ => throw new NotImplementedException($"Language {languageService.Lang} is not implemented")
+        };
+
+        //return new AnnouncementResponseDto(entity.Id, entity.TitleAz, mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl), entity.TextAz, entity.Created);
         return new AnnouncementResponseDto(
             Id: entity.Id,
-            TitleImageUrl: mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey),
+            TitleImageUrl: mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl),
             Title:languageService.Lang switch
             {
                 "az" => entity.TitleAz,
@@ -41,18 +49,12 @@ public class AnnouncementMapper : IAnnouncementMapper
                 "ru" => entity.TitleRu,
                 _ => throw new NotImplementedException($"Language {languageService.Lang} is not implemented")
             },
-            Text: languageService.Lang switch
-            {
-                "az" => entity.TextAz,
-                "en" => entity.TextEn,
-                "ru" => entity.TextRu,
-                _ => throw new NotImplementedException($"Language {languageService.Lang} is not implemented")
-            },
+            Text: mediaUrlBuilder.BuildHtml(text),
             Created: entity.Created
         );
     }
 
-    public Core.Entities.Announcement UpdateDtoToDomain(Core.Entities.Announcement entity, UpdateAnnouncementDto dto, StoredFile? titleImageUrl = null)
+    public Core.Entities.Announcement UpdateDtoToDomain(Core.Entities.Announcement entity, UpdateAnnouncementDto dto, CloudinaryURL? titleImageUrl = null)
     {
         entity.Update(
             dto.TitleAz, 

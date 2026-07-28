@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Training;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Training;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,8 +10,8 @@ namespace App.BL.Services.Business.Training;
 public class TrainingService(
     ITrainingReadRepository readRepository,
     ITrainingWriteRepository writeRepository,
-    IStorageService storageService,
-    ITrainingMapper mapper) : StorageEntityService(storageService), ITrainingService
+    IObjectStorageService objectStorageService,
+    ITrainingMapper mapper) : ObjectStorageEntityService(objectStorageService), ITrainingService
 {
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -26,7 +26,7 @@ public class TrainingService(
 
     public async Task<Response<TrainingResponseDto>> CreateAsync(CreateTrainingDto dto, CancellationToken cancellationToken = default)
     {
-        StoredFile imageUrl = await storageService.UploadAsync(dto.Image);
+        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
         Core.Entities.Training entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -52,7 +52,7 @@ public class TrainingService(
         Core.Entities.Training? entity = await readRepository.GetByIdIncludingDeletedAsync(id, true, cancellationToken);
         if (entity == null) return Response.NotFound("Training not found");
 
-        await DeleteFileAsync(entity.TitleImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -94,15 +94,15 @@ public class TrainingService(
         Core.Entities.Training? entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity == null) return Response<TrainingResponseDto?>.NotFound("Training not found");
 
-        StoredFile? newImageUrl = null;
+        CloudinaryURL? newImageUrl = null;
         if (dto.Image != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceFileAsync(
-                entity.TitleImageUrl.ObjectKey,
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
+                entity.TitleImageUrl.PublicId,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteFileAsync(oldPublicId);
+            await DeleteImageAsync(oldPublicId);
         }
         else
         {

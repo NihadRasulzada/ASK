@@ -1,6 +1,6 @@
 using App.BL.DTOs;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 
 namespace App.BL.Mapper.News;
@@ -16,16 +16,16 @@ public class NewsMapper : INewsMapper
         this.mediaUrlBuilder = mediaUrlBuilder;
     }
 
-    public Core.Entities.News CreateDtoToDomain(CreateNewsDto dto, StoredFile titleImageUrl)
+    public Core.Entities.News CreateDtoToDomain(CreateNewsDto dto, CloudinaryURL titleImageUrl)
     {
         var entity = new Core.Entities.News(
             titleImageUrl,
-            dto.NewsTextAz,
-            dto.NewsTextEn,
-            dto.NewsTextRu,
             dto.TitleAz,
             dto.TitleEn,
-            dto.TitleRu
+            dto.TitleRu,
+            dto.NewsTextAz,
+            dto.NewsTextEn,
+            dto.NewsTextRu
         );
 
         return entity;
@@ -33,9 +33,17 @@ public class NewsMapper : INewsMapper
 
     public NewsResponseDto DomainToResponseDto(Core.Entities.News entity)
     {
+        var text = languageService.Lang switch
+        {
+            "az" => entity.NewsTextAz,
+            "en" => entity.NewsTextEn,
+            "ru" => entity.NewsTextRu,
+            _ => entity.NewsTextAz
+        };
+
         return new NewsResponseDto(
             entity.Id,
-            mediaUrlBuilder.Build(entity.TitleImageUrl.ObjectKey),
+            mediaUrlBuilder.Build(entity.TitleImageUrl.ImageURl),
             languageService.Lang switch
             {
                 "az" => entity.TitleAz,
@@ -43,28 +51,22 @@ public class NewsMapper : INewsMapper
                 "ru" => entity.TitleRu,
                 _ => entity.TitleAz
             },
-            languageService.Lang switch
-            {
-                "az" => entity.NewsTextAz,
-                "en" => entity.NewsTextEn,
-                "ru" => entity.NewsTextRu,
-                _ => entity.NewsTextAz
-            },
-            entity.Images?.Select(x => mediaUrlBuilder.Build(x.ImageUrl.ObjectKey)!).ToList() ?? new List<string>(),
+            mediaUrlBuilder.BuildHtml(text),
+            entity.Images?.Select(x => mediaUrlBuilder.Build(x.ImageUrl.ImageURl)!).ToList() ?? new List<string>(),
             entity.IsDeactive,
             entity.CreateDate
         );
     }
 
-    public void UpdateDtoToDomain(Core.Entities.News entity, UpdateNewsDto dto, StoredFile titleImageUrl)
+    public void UpdateDtoToDomain(Core.Entities.News entity, UpdateNewsDto dto, CloudinaryURL titleImageUrl)
     {
         entity.Update(
-            dto.NewsTextAz,
-            dto.NewsTextEn,
-            dto.NewsTextRu,
             dto.TitleAz,
             dto.TitleEn,
-            dto.TitleRu
+            dto.TitleRu,
+            dto.NewsTextAz,
+            dto.NewsTextEn,
+            dto.NewsTextRu
         );
         if (titleImageUrl != null)
         {

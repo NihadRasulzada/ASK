@@ -1,20 +1,4 @@
 services:
-  minio:
-    image: minio/minio:latest
-    container_name: ${MINIO_CONTAINER_NAME:-ask-minio}
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
-    volumes:
-      - minio-data:/data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    restart: unless-stopped
-    networks:
-      - ask-network
-
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: ${DB_CONTAINER_NAME}
@@ -31,6 +15,22 @@ services:
       timeout: 5s
       retries: 20
       start_period: 45s
+    networks:
+      - ask-network
+
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: ${MINIO_CONTAINER_NAME}
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
     networks:
       - ask-network
 
@@ -51,10 +51,12 @@ services:
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: Server=db,1433;Database=${MSSQL_DATABASE};User Id=sa;Password=${DB_SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;MultipleActiveResultSets=True
       MinioSettings__Endpoint: minio:9000
-      MinioSettings__AccessKey: ${MINIO_ACCESS_KEY}
-      MinioSettings__SecretKey: ${MINIO_SECRET_KEY}
-      MinioSettings__BucketName: ${MINIO_BUCKET_NAME:-ask}
-      MinioSettings__UseSSL: "false"
+      MinioSettings__PublicEndpoint: ${MINIO_PUBLIC_ENDPOINT}
+      MinioSettings__AccessKey: ${MINIO_ROOT_USER}
+      MinioSettings__SecretKey: ${MINIO_ROOT_PASSWORD}
+      MinioSettings__BucketName: ${MINIO_BUCKET_NAME}
+      MinioSettings__UseSsl: "false"
+      WordPressSeed__Enabled: ${WORDPRESS_SEED_ENABLED:-true}
     expose:
       - "8080"
     restart: unless-stopped

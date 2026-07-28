@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Announcement;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Announcement;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,12 +10,12 @@ namespace App.BL.Services.Business.Announcement;
 public class AnnouncementService(
     IAnnouncementReadRepository readRepository,
     IAnnouncementWriteRepository writeRepository,
-    IStorageService storageService,
-    IAnnouncementMapper mapper) : StorageEntityService(storageService), IAnnouncementService
+    IObjectStorageService objectStorageService,
+    IAnnouncementMapper mapper) : ObjectStorageEntityService(objectStorageService), IAnnouncementService
 {
     public async Task<Response> CreateAsync(CreateAnnouncementDto dto, CancellationToken cancellationToken = default)
     {
-        StoredFile titleImageUrl = await storageService.UploadAsync(dto.TitleImage);
+        CloudinaryURL titleImageUrl = await objectStorageService.UploadImageAsync(dto.TitleImage);
 
         Core.Entities.Announcement entity = mapper.CreateDtoToDomain(dto, titleImageUrl);
 
@@ -32,7 +32,7 @@ public class AnnouncementService(
         if (entity == null)
             return Response.NotFound("Announcement not found");
 
-        await DeleteFileAsync(entity.TitleImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -75,12 +75,12 @@ public class AnnouncementService(
 
         if (dto.TitleImage != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceFileAsync(  // 👈 base metoddan
-                entity.TitleImageUrl.ObjectKey,
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  // 👈 base metoddan
+                entity.TitleImageUrl.PublicId,
                 dto.TitleImage);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteFileAsync(oldPublicId); // upload uğurlu oldu, indi sil
+            await DeleteImageAsync(oldPublicId); // upload uğurlu oldu, indi sil
         }
         else
         {

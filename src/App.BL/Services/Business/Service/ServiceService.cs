@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Service;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces;
 using App.Core.Interfaces.Repository.Service;
 using App.Core.ResponseObject.Concreate;
@@ -12,10 +12,10 @@ namespace App.BL.Services.Business.Service;
 public class ServiceService(
     IServiceReadRepository readRepository,
     IServiceWriteRepository writeRepository,
-    IStorageService storageService,
+    IObjectStorageService objectStorageService,
     ILanguageService languageService,
     IServiceMapper serviceMapper,
-    AppDbContext context) : StorageEntityService(storageService), IServiceService
+    AppDbContext context) : ObjectStorageEntityService(objectStorageService), IServiceService
 {
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -45,7 +45,7 @@ public class ServiceService(
 
     public async Task<Response> CreateAsync(CreateServiceDto dto, CancellationToken cancellationToken = default)
     {
-        StoredFile imageUrl = await storageService.UploadAsync(dto.Image);
+        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
         Core.Entities.Service newService = serviceMapper.CreateDtoToDomain(dto, imageUrl);
 
         IEnumerable<Core.Entities.Service> services = await readRepository.GetAllIncludingDeletedAsync(cancellationToken, predicate: x => !x.IsDeactive, orderBy: q => q.OrderBy(x => x.ActivateAt));
@@ -89,7 +89,7 @@ public class ServiceService(
             return Response.NotFound($"Service not found");
         }
 
-        await DeleteFileAsync(entity.ImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.ImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -154,12 +154,12 @@ public class ServiceService(
 
         if (dto.Image != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceFileAsync(
-                entity.ImageUrl.ObjectKey,
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
+                entity.ImageUrl.PublicId,
                 dto.Image);
 
             serviceMapper.UpdateDtoToDamain(entity, dto, newUrl);
-            await DeleteFileAsync(oldPublicId);
+            await DeleteImageAsync(oldPublicId);
         }
         else
         {

@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Setting;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Enums;
 using App.Core.Interfaces.Repository.Settings;
 using App.Core.ResponseObject.Concreate;
@@ -11,9 +11,9 @@ namespace App.BL.Services.Business.Setting;
 public class SettingService(
     ISettingReadRepository readRepository,
     ISettingWriteRepository writeRepository,
-    IStorageService storageService,
+    IObjectStorageService objectStorageService,
     ISettingMapper mapper)
-    : StorageEntityService(storageService), ISettingService  
+    : ObjectStorageEntityService(objectStorageService), ISettingService  
 {
     public async Task<Response<IEnumerable<SettingResponseDto>>> GetAllAsync(
         CancellationToken ct = default)
@@ -49,17 +49,17 @@ public class SettingService(
 
             entity.UpdateStringValue(dto.Value.Trim());
         }
-        else // Link → MinIO
+        else // Link -> object storage
         {
             if (dto.File is null)
                 return Response<SettingResponseDto?>.BadRequest("Fayl mütləq yüklənməlidir.");
 
-            string? oldPublicId = entity.MediaValue?.ObjectKey;
+            string? oldPublicId = entity.CloudinaryValue?.PublicId;
 
-            StoredFile newUrl = await storageService.UploadAsync(dto.File);
-            entity.UpdateMediaValue(newUrl);
+            CloudinaryURL newUrl = await objectStorageService.UploadImageAsync(dto.File);
+            entity.UpdateCloudinaryValue(newUrl);
 
-            await DeleteFileAsync(oldPublicId); 
+            await DeleteImageAsync(oldPublicId); 
         }
 
         writeRepository.Update(entity);
@@ -80,11 +80,11 @@ public class SettingService(
         {
             entity.UpdateStringValue(null);
         }
-        else // Link → MinIO
+        else // Link -> object storage
         {
-            string? publicId = entity.MediaValue?.ObjectKey;
-            entity.UpdateMediaValue(null);
-            await DeleteFileAsync(publicId); 
+            string? publicId = entity.CloudinaryValue?.PublicId;
+            entity.UpdateCloudinaryValue(null);
+            await DeleteImageAsync(publicId); 
         }
 
         writeRepository.Update(entity);
@@ -93,4 +93,3 @@ public class SettingService(
         return Response.Success("Setting dəyəri silindi");
     }
 }
-

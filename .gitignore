@@ -85,3 +85,4 @@ appsettings.Development.json
 appsettings.json
 .env
 dokploy.md
+backup.sql

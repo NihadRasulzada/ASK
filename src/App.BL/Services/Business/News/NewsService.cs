@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.News;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.News;
 using App.Core.ResponseObject.Concreate;
 using App.DAL.Context;
@@ -12,8 +12,8 @@ namespace App.BL.Services.Business.News;
 public class NewsService(
     INewsReadRepository readRepository,
     INewsWriteRepository writeRepository,
-    IStorageService storageService,
-    INewsMapper newsMapper) : StorageEntityService(storageService), INewsService
+    IObjectStorageService objectStorageService,
+    INewsMapper newsMapper) : ObjectStorageEntityService(objectStorageService), INewsService
 {
 
     public async Task<Response> ActivateAsync(Guid id, CancellationToken cancellationToken = default)
@@ -35,7 +35,7 @@ public class NewsService(
 
     public async Task<Response<NewsResponseDto>> CreateAsync(CreateNewsDto dto, CancellationToken cancellationToken = default)
     {
-        StoredFile titleImageUrl = await storageService.UploadAsync(dto.TitleImage);
+        CloudinaryURL titleImageUrl = await objectStorageService.UploadImageAsync(dto.TitleImage);
 
         Core.Entities.News entity = newsMapper.CreateDtoToDomain(dto, titleImageUrl);
 
@@ -71,7 +71,7 @@ public class NewsService(
         if (entity == null)
             return Response<bool>.NotFound("News not found");
 
-        await DeleteFileAsync(entity.TitleImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -128,16 +128,16 @@ public class NewsService(
         if (entity == null)
             return Response<NewsResponseDto?>.NotFound("News not found");
 
-        StoredFile titleImageUrl = entity.TitleImageUrl;
+        CloudinaryURL titleImageUrl = entity.TitleImageUrl;
 
         if (dto.TitleImage != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceFileAsync(  
-                entity.TitleImageUrl.ObjectKey,
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(  
+                entity.TitleImageUrl.PublicId,
                 dto.TitleImage);
 
             newsMapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteFileAsync(oldPublicId); 
+            await DeleteImageAsync(oldPublicId); 
         }
         else
         {

@@ -40,6 +40,18 @@ public class CreateNewsDtoValidator : AbstractValidator<CreateNewsDto>
             .MaximumLength(500).WithMessage(ValidationMessages.TitleTooLong(languageService.Lang));
 
         // FIX: Yalnız Az deyil, En və Ru sahələri də validasiya edilir
+        RuleFor(x => x.TitleAz)
+            .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));
+
+        RuleFor(x => x.TitleEn)
+            .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));
+
+        RuleFor(x => x.TitleRu)
+            .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
+            .MaximumLength(500).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));
+
         RuleFor(x => x.NewsTextAz)
             .NotEmpty().WithMessage(ValidationMessages.NewsTextRequired(languageService.Lang))
             .MaximumLength(10000).WithMessage(ValidationMessages.NewsTextTooLong(languageService.Lang));

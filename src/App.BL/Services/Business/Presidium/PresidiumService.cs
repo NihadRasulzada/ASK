@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Presidium;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Storage;
+using App.Core.Entities.Common.Cloudinary;
 using App.Core.Interfaces.Repository.Presidium;
 using App.Core.ResponseObject.Concreate;
 
@@ -10,8 +10,8 @@ namespace App.BL.Services.Business.Presidium;
 public class PresidiumService(
     IPresidiumReadRepository readRepository,
     IPresidiumWriteRepository writeRepository,
-    IStorageService storageService,
-    IPresidiumMapper mapper) : StorageEntityService(storageService), IPresidiumService
+    IObjectStorageService objectStorageService,
+    IPresidiumMapper mapper) : ObjectStorageEntityService(objectStorageService), IPresidiumService
 {
     public async Task<Response<IEnumerable<PresidiumResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -35,7 +35,7 @@ public class PresidiumService(
 
     public async Task<Response<PresidiumResponseDto>> CreateAsync(CreatePresidiumDto dto, CancellationToken cancellationToken = default)
     {
-        StoredFile imageUrl = await storageService.UploadAsync(dto.Image);
+        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
 
         Core.Entities.Presidium entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -52,15 +52,15 @@ public class PresidiumService(
         if (entity == null)
             return Response<PresidiumResponseDto?>.NotFound("Presidium member not found");
 
-        StoredFile imageUrl = entity.ImageUrl;
+        CloudinaryURL imageUrl = entity.ImageUrl;
         if (dto.Image != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceFileAsync(
-                entity.ImageUrl.ObjectKey,
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
+                entity.ImageUrl.PublicId,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteFileAsync(oldPublicId);
+            await DeleteImageAsync(oldPublicId);
         }
         else
         {
@@ -80,7 +80,7 @@ public class PresidiumService(
         if (entity == null)
             return Response<bool>.NotFound("Presidium member not found");
 
-        await DeleteFileAsync(entity.ImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.ImageUrl.PublicId);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
