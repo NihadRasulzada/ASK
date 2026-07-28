@@ -14,16 +14,16 @@ public class PagedResponse<T> : Response<T>
     public PagedResponse(T data, int pageIndex, int pageSize, int totalCount)
         : base(ResponseStatusCode.Success, data)
     {
-        PageIndex = pageIndex;
-        PageSize = pageSize;
+        PageIndex = Math.Max(1, pageIndex);
+        PageSize = Math.Clamp(pageSize, 1, 100);
         TotalCount = totalCount;
     }
 
     public PagedResponse(T data, int pageIndex, int pageSize, int totalCount, string message)
         : base(ResponseStatusCode.Success, data, message)
     {
-        PageIndex = pageIndex;
-        PageSize = pageSize;
+        PageIndex = Math.Max(1, pageIndex);
+        PageSize = Math.Clamp(pageSize, 1, 100);
         TotalCount = totalCount;
     }
 

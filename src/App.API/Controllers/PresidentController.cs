@@ -23,12 +23,12 @@ public class PresidentController(IPresidentService presidentService) : Controlle
     /// <response code="200">Məlumatlar uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<PresidentResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<PresidentResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await presidentService.GetAllAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        return this.HandlePaginatedEnumerableResponse(response, pageIndex, pageSize);
     }
 
     /// <summary>

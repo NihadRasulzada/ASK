@@ -25,7 +25,7 @@ public class PublicationController(IPublicationService publicationService) : Con
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(PagedDataResponse<PublicationResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<PublicationResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {

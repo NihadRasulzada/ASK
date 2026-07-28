@@ -108,6 +108,9 @@ public class ReadRepository<TEntity>(AppDbContext context) : Repository<TEntity>
 
     public async Task<(IEnumerable<TEntity> Items, int TotalCount)> GetPagedAsync(bool enableTracking, bool ignoreQueryFilters, int pageIndex, int pageSize, CancellationToken cancellationToken, Expression<Func<TEntity, bool>>? predicate = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null)
     {
+        pageIndex = Math.Max(1, pageIndex);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
         IQueryable<TEntity> query = Table;
 
         if (!enableTracking)

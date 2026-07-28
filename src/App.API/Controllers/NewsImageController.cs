@@ -34,12 +34,12 @@ public class NewsImageController : ControllerBase
     /// <response code="200">Şəkillər uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<NewsImageResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<NewsImageResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await _newsImageService.GetAllAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        return this.HandlePaginatedEnumerableResponse(response, pageIndex, pageSize);
     }
 
     /// <summary>

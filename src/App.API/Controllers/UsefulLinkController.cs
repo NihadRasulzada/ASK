@@ -19,24 +19,24 @@ public class UsefulLinkController(IUsefulLinkService usefulLinkService) : Contro
     /// Aktiv faydalı linklərin siyahısını qaytarır.
     /// </summary>
     [HttpGet]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<UsefulLinkResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<UsefulLinkResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await usefulLinkService.GetAllAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        return this.HandlePaginatedEnumerableResponse(response, pageIndex, pageSize);
     }
 
     /// <summary>
     /// Bütün faydalı linklərin (deaktivlər daxil olmaqla) siyahısını qaytarır.
     /// </summary>
     [HttpGet("all")]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<UsefulLinkResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<UsefulLinkResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllIncludingDeleted(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllIncludingDeleted([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await usefulLinkService.GetAllIncludingDeletedAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        return this.HandlePaginatedEnumerableResponse(response, pageIndex, pageSize);
     }
 
     /// <summary>

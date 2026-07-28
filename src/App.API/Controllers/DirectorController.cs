@@ -23,12 +23,12 @@ public class DirectorController(IDirectorService directorService) : ControllerBa
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<DirectorResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<DirectorResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await directorService.GetAllAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        return this.HandlePaginatedEnumerableResponse(response, pageIndex, pageSize);
     }
 
     /// <summary>
@@ -39,12 +39,12 @@ public class DirectorController(IDirectorService directorService) : ControllerBa
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("all")]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<DirectorResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<DirectorResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllIncludingDeleted(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllIncludingDeleted([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await directorService.GetAllIncludingDeletedAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        return this.HandlePaginatedEnumerableResponse(response, pageIndex, pageSize);
     }
 
     /// <summary>

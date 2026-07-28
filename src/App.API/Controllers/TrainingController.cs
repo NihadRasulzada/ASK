@@ -23,7 +23,7 @@ public class TrainingController(ITrainingService trainingService) : ControllerBa
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet()]
-    [ProducesResponseType(typeof(PagedDataResponse<TrainingResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<TrainingResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
@@ -40,7 +40,7 @@ public class TrainingController(ITrainingService trainingService) : ControllerBa
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("alldatedata")]
     [Authorize]
-    [ProducesResponseType(typeof(PagedDataResponse<TrainingDateResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<TrainingDateResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetDateAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
@@ -58,7 +58,7 @@ public class TrainingController(ITrainingService trainingService) : ControllerBa
     /// <response code="200">Siyahı uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("all")]
-    [ProducesResponseType(typeof(PagedDataResponse<TrainingResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<TrainingResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetAllIncludingDeleted([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {

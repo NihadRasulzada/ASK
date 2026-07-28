@@ -93,4 +93,33 @@ public static class ControllerExtensions
             _ => controller.StatusCode(500, new ErrorResponse(response.Message ?? "An internal server error occurred"))
         };
     }
+
+    public static IActionResult HandlePaginatedEnumerableResponse<T>(
+        this ControllerBase controller,
+        Response<IEnumerable<T>> response,
+        int pageIndex,
+        int pageSize)
+    {
+        if (response.ResponseStatusCode != ResponseStatusCode.Success)
+            return controller.HandleServiceResponse(response);
+
+        pageIndex = Math.Max(1, pageIndex);
+        pageSize = Math.Clamp(pageSize, 1, 100);
+
+        var source = response.Data ?? Enumerable.Empty<T>();
+        var totalCount = source.Count();
+        var items = source
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var pagedResponse = PagedResponse<IEnumerable<T>>.Create(
+            items,
+            pageIndex,
+            pageSize,
+            totalCount,
+            response.Message ?? "Items retrieved successfully");
+
+        return controller.HandlePagedServiceResponse(pagedResponse);
+    }
 }

@@ -34,12 +34,12 @@ public class ServiceController : ControllerBase
     /// <response code="200">Xidmətlər uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<ServiceResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<ServiceResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAll([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await _serviceService.GetAllAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        return this.HandlePaginatedEnumerableResponse(response, pageIndex, pageSize);
     }
 
     /// <summary>
@@ -50,12 +50,12 @@ public class ServiceController : ControllerBase
     /// <response code="200">Xidmətlər uğurla qaytarıldı.</response>
     /// <response code="500">Server xətası baş verdi.</response>
     [HttpGet("including-deleted")]
-    [ProducesResponseType(typeof(SuccessResponse<IEnumerable<ServiceResponseDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(PagedDataResponse<IEnumerable<ServiceResponseDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ServerErrorResponse), StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllIncludingDeleted(CancellationToken cancellationToken = default)
+    public async Task<IActionResult> GetAllIncludingDeleted([FromQuery] int pageIndex = 1, [FromQuery] int pageSize = 10, CancellationToken cancellationToken = default)
     {
         var response = await _serviceService.GetAllIncludingDeletedAsync(cancellationToken);
-        return this.HandleServiceResponse(response);
+        return this.HandlePaginatedEnumerableResponse(response, pageIndex, pageSize);
     }
 
     /// <summary>
