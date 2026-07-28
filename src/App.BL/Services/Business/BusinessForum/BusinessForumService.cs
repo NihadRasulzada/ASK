@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.BusinessForum;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.BusinessForum;
 using App.Core.ResponseObject.Concreate;
 
@@ -30,8 +30,8 @@ public class BusinessForumService(
 
     public async Task<Response<BusinessForumResponseDto>> CreateAsync(CreateBusinessForumDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL titleImageUrl = await objectStorageService.UploadImageAsync(dto.TitleImage);
-        CloudinaryURL detailImageUrl = await objectStorageService.UploadImageAsync(dto.DetailImage);
+        StoredFile titleImageUrl = await objectStorageService.UploadImageAsync(dto.TitleImage);
+        StoredFile detailImageUrl = await objectStorageService.UploadImageAsync(dto.DetailImage);
 
         var entity = mapper.CreateDtoToDomain(dto, titleImageUrl, detailImageUrl);
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -48,7 +48,7 @@ public class BusinessForumService(
         if (dto.TitleImage != null)
         {
             var (newUrl, oldPublicId) = await ReplaceImageAsync(  // 👈 base metoddan
-                entity.TitleImageUrl.PublicId,
+                entity.TitleImageUrl.ObjectKey,
                 dto.TitleImage);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
@@ -70,7 +70,7 @@ public class BusinessForumService(
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response.NotFound("Business forum not found");
 
-        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
+        await DeleteImageAsync(entity.TitleImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);

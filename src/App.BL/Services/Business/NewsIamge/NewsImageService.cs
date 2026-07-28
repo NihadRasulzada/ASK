@@ -2,7 +2,7 @@ using App.BL.DTOs;
 using App.BL.Mapper.NewsImage;
 using App.BL.NewsImages.Business.NewsIamge;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.NewsImage;
 using App.Core.ResponseObject.Concreate;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +26,7 @@ public class NewsImageService : ObjectStorageEntityService , INewsImageService
 
     public async Task<Response> CreateAsync(CreateNewsImageDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
+        StoredFile imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
 
         Core.Entities.NewsImage entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -44,7 +44,7 @@ public class NewsImageService : ObjectStorageEntityService , INewsImageService
         if (entity == null)
             return Response.NotFound("News image not found");
 
-        await DeleteImageAsync(entity.ImageUrl.PublicId);
+        await DeleteImageAsync(entity.ImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -85,12 +85,12 @@ public class NewsImageService : ObjectStorageEntityService , INewsImageService
         if (entity == null)
             return Response<NewsImageResponseDto?>.NotFound("News image not found");
 
-        CloudinaryURL imageUrl = entity.ImageUrl;
+        StoredFile imageUrl = entity.ImageUrl;
 
         if (dto.Image != null)
         {
             var (newUrl, oldPublicId) = await ReplaceImageAsync(  
-                entity.ImageUrl.PublicId,
+                entity.ImageUrl.ObjectKey,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);

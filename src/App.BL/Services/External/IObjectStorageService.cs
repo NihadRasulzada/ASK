@@ -1,14 +1,14 @@
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using Microsoft.AspNetCore.Http;
 
 namespace App.BL.Services.External;
 
 public interface IObjectStorageService
 {
-    Task<CloudinaryURL> UploadImageAsync(IFormFile file);
-    Task<IList<CloudinaryURL>> UploadImagesAsync(IEnumerable<IFormFile> files);
-    Task<CloudinaryURL> UploadPdfAsync(IFormFile file);
-    Task<CloudinaryURL> UploadAsync(Stream stream, string objectName, string contentType, long size, CancellationToken cancellationToken = default);
+    Task<StoredFile> UploadImageAsync(IFormFile file);
+    Task<IList<StoredFile>> UploadImagesAsync(IEnumerable<IFormFile> files);
+    Task<StoredFile> UploadPdfAsync(IFormFile file);
+    Task<StoredFile> UploadAsync(Stream stream, string objectName, string contentType, long size, CancellationToken cancellationToken = default);
     Task DeleteAsync(string objectName);
     Task<ObjectStorageFile?> GetAsync(string objectName, CancellationToken cancellationToken = default);
 }

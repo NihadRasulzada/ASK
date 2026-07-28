@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.OurValues;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.OurValues;
 using App.Core.ResponseObject.Concreate;
 
@@ -35,7 +35,7 @@ public class OurValuesService(
 
     public async Task<Response<OurValuesResponseDto>> CreateAsync(CreateOurValuesDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
+        StoredFile imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
 
         Core.Entities.OurValues entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -52,11 +52,11 @@ public class OurValuesService(
         if (entity == null)
             return Response<OurValuesResponseDto?>.NotFound("Value not found");
 
-        CloudinaryURL imageUrl = entity.ImageUrl;
+        StoredFile imageUrl = entity.ImageUrl;
         if (dto.Image != null)
         {
             var (newUrl, oldPublicId) = await ReplaceImageAsync(  
-                entity.ImageUrl.PublicId,
+                entity.ImageUrl.ObjectKey,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
@@ -80,7 +80,7 @@ public class OurValuesService(
         if (entity == null)
             return Response<bool>.NotFound("Value not found");
 
-        await DeleteImageAsync(entity.ImageUrl.PublicId);
+        await DeleteImageAsync(entity.ImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);

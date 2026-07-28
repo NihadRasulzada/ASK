@@ -1,5 +1,5 @@
 using App.Core.Entities.Common;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 
 namespace App.Core.Entities;
 
@@ -7,7 +7,7 @@ namespace App.Core.Entities;
 //      düzgün relational əlaqə istifadə olunur. İkiqat yanaşma ziddiyyət yaradır.
 public class News : SoftDeletableEntity
 {
-    public CloudinaryURL TitleImageUrl { get; private set; }
+    public StoredFile TitleImageUrl { get; private set; }
     public string TitleAz { get; private set; }
     public string TitleEn { get; private set; }
     public string TitleRu { get; private set; }
@@ -16,8 +16,6 @@ public class News : SoftDeletableEntity
     public string NewsTextRu { get; private set; }
     public DateTime CreateDate { get; private set; }
 
-    public Guid CloudinaryURLId { get; private set; }
-
     public ICollection<NewsImage> Images { get; private set; } = new List<NewsImage>();
 
     private News() : base(Guid.Empty, false)
@@ -25,7 +23,7 @@ public class News : SoftDeletableEntity
     }
 
     public News(
-        CloudinaryURL titleImageUrl,
+        StoredFile titleImageUrl,
         string titleAz,
         string titleEn,
         string titleRu,
@@ -34,7 +32,7 @@ public class News : SoftDeletableEntity
         string newsTextRu)
         : base(Guid.NewGuid(), false)
     {
-        if (CloudinaryURL.IsNullOrEmpty(titleImageUrl))
+        if (StoredFile.IsNullOrEmpty(titleImageUrl))
             throw new ArgumentException("Title image url cannot be empty.", nameof(titleImageUrl));
         if (string.IsNullOrWhiteSpace(titleAz))
             throw new ArgumentException("AZ news title cannot be empty.", nameof(titleAz));
@@ -88,9 +86,9 @@ public class News : SoftDeletableEntity
         NewsTextRu = newsTextRu;
     }
 
-    public void UpdateImageUrl(CloudinaryURL titleImageUrl)
+    public void UpdateImageUrl(StoredFile titleImageUrl)
     {
-        if (CloudinaryURL.IsNullOrEmpty(titleImageUrl))
+        if (StoredFile.IsNullOrEmpty(titleImageUrl))
             throw new ArgumentException("Şəkil URL-i boş ola bilməz.", nameof(titleImageUrl));
 
         TitleImageUrl = titleImageUrl;

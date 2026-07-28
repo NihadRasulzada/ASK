@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.President;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.President;
 using App.Core.ResponseObject.Concreate;
 
@@ -15,7 +15,7 @@ public class PresidentService(
 {
     public async Task<Response> CreateAsync(CreatePresidentDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
+        StoredFile imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
 
         Core.Entities.President entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -32,7 +32,7 @@ public class PresidentService(
         if (entity == null)
             return Response.NotFound("President info not found");
 
-        await DeleteImageAsync(entity.ImageUrl.PublicId);
+        await DeleteImageAsync(entity.ImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -73,11 +73,11 @@ public class PresidentService(
         if (entity == null)
             return Response<PresidentResponseDto?>.NotFound("President info not found");
 
-        CloudinaryURL? newImageUrl = null;
+        StoredFile? newImageUrl = null;
         if (dto.Image != null)
         {
             var (newUrl, oldPublicId) = await ReplaceImageAsync(  
-                entity.ImageUrl.PublicId,
+                entity.ImageUrl.ObjectKey,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);

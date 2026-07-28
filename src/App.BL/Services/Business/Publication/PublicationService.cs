@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Publication;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.Publication;
 using App.Core.ResponseObject.Concreate;
 
@@ -30,8 +30,8 @@ public class PublicationService(
 
     public async Task<Response<PublicationResponseDto>> CreateAsync(CreatePublicationDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL titleImageUrl = await objectStorageService.UploadImageAsync(dto.TitleImage);
-        CloudinaryURL pdfUrl = await objectStorageService.UploadPdfAsync(dto.PdfFile);
+        StoredFile titleImageUrl = await objectStorageService.UploadImageAsync(dto.TitleImage);
+        StoredFile pdfUrl = await objectStorageService.UploadPdfAsync(dto.PdfFile);
 
         var entity = mapper.CreateDtoToDomain(dto, titleImageUrl, pdfUrl);
         await writeRepository.AddAsync(entity, cancellationToken);
@@ -45,11 +45,10 @@ public class PublicationService(
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response<PublicationResponseDto?>.NotFound("Publication not found");
 
-        CloudinaryURL? newTitleImageUrl = null;
         if (dto.TitleImage != null)
         {
             var (newUrl, oldPublicId) = await ReplaceImageAsync(
-                entity.TitleImageUrl.PublicId,
+                entity.TitleImageUrl.ObjectKey,
                 dto.TitleImage);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
@@ -60,14 +59,13 @@ public class PublicationService(
             mapper.UpdateDtoToDomain(entity, dto, null);
         }
 
-        CloudinaryURL? newPdfUrl = null;
         if (dto.PdfFile != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceImageAsync(
-                entity.PdfUrl.PublicId,
+            var (newUrl, oldPublicId) = await ReplacePdfAsync(
+                entity.PdfUrl.ObjectKey,
                 dto.PdfFile);
 
-            mapper.UpdateDtoToDomain(entity, dto, newUrl);
+            mapper.UpdateDtoToDomain(entity, dto, pdfUrl: newUrl);
             await DeleteImageAsync(oldPublicId);
         }
         else
@@ -86,8 +84,8 @@ public class PublicationService(
         var entity = await readRepository.GetByIdAsync(id, true, cancellationToken);
         if (entity is null) return Response.NotFound("Publication not found");
 
-        await DeleteImageAsync(entity.TitleImageUrl.PublicId);   //imahge silmey ucun 
-        await DeleteImageAsync(entity.PdfUrl.PublicId);          // pdf silmey ucun
+        await DeleteImageAsync(entity.TitleImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.PdfUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);

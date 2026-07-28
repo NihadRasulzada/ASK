@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using App.BL.Services.External;
 using App.Core.Entities;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Enums;
 using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
@@ -45,7 +45,7 @@ public static class WordPressDataSeeder
         await UploadSeedMediaDirectoryAsync(objectStorageService, logger, cancellationToken);
 
         var added = 0;
-        Task<CloudinaryURL> ToStoredMediaAsync(MediaSeed? mediaSeed)
+        Task<StoredFile> ToStoredMediaAsync(MediaSeed? mediaSeed)
             => ToStoredMediaAsync(mediaSeed, objectStorageService, logger, cancellationToken);
 
         if (!await db.News.AnyAsync(cancellationToken))
@@ -345,13 +345,12 @@ public static class WordPressDataSeeder
         }
     }
 
-    private static async Task<CloudinaryURL> ToStoredMediaAsync(MediaSeed? mediaSeed, IObjectStorageService objectStorageService, ILogger logger, CancellationToken cancellationToken)
+    private static async Task<StoredFile> ToStoredMediaAsync(MediaSeed? mediaSeed, IObjectStorageService objectStorageService, ILogger logger, CancellationToken cancellationToken)
     {
         var url = Required(mediaSeed?.Url, FallbackImage);
-        var publicId = Required(mediaSeed?.PublicId, "wordpress/fallback");
 
         if (!url.StartsWith(SeedMediaPrefix, StringComparison.OrdinalIgnoreCase))
-            return new CloudinaryURL(url, publicId);
+            return new StoredFile(url);
 
         var relativePath = url[SeedMediaPrefix.Length..].TrimStart('/');
         var objectName = $"{MinioSeedPrefix}{relativePath}";
@@ -360,7 +359,7 @@ public static class WordPressDataSeeder
         if (!File.Exists(mediaPath))
         {
             logger.LogWarning("Seed media file was not found: {MediaPath}", mediaPath);
-            return new CloudinaryURL(objectName, objectName);
+            return new StoredFile(objectName);
         }
 
         try
@@ -371,7 +370,7 @@ public static class WordPressDataSeeder
         catch (Exception ex)
         {
             logger.LogWarning(ex, "Failed to upload seed media {MediaPath}. Keeping object key in database.", mediaPath);
-            return new CloudinaryURL(objectName, objectName);
+            return new StoredFile(objectName);
         }
     }
 
@@ -432,7 +431,7 @@ public static class WordPressDataSeeder
         public List<UsefulLinkSeed> UsefulLinks { get; init; } = [];
     }
 
-    private sealed record MediaSeed(string Url, string PublicId);
+    private sealed record MediaSeed(string Url, string? PublicId = null);
 
     private sealed record WordPressNewsSeed(
         string Created,

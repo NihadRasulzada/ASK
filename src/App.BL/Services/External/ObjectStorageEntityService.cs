@@ -1,15 +1,23 @@
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using Microsoft.AspNetCore.Http;
 
 namespace App.BL.Services.External;
 
 public abstract class ObjectStorageEntityService(IObjectStorageService objectStorageService)
 {
-    protected async Task<(CloudinaryURL newUrl, string oldObjectName)> ReplaceImageAsync(
+    protected async Task<(StoredFile newUrl, string oldObjectName)> ReplaceImageAsync(
         string oldObjectName,
         IFormFile newFile)
     {
-        CloudinaryURL newUrl = await objectStorageService.UploadImageAsync(newFile);
+        StoredFile newUrl = await objectStorageService.UploadImageAsync(newFile);
+        return (newUrl, oldObjectName);
+    }
+
+    protected async Task<(StoredFile newUrl, string oldObjectName)> ReplacePdfAsync(
+        string oldObjectName,
+        IFormFile newFile)
+    {
+        StoredFile newUrl = await objectStorageService.UploadPdfAsync(newFile);
         return (newUrl, oldObjectName);
     }
 

@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Gallery;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.Gallery;
 using App.Core.ResponseObject.Concreate;
 
@@ -15,7 +15,7 @@ public class GalleryService(
 {
     public async Task<Response> CreateAsync(CreateGalleryDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
+        StoredFile imageUrl = await objectStorageService.UploadImageAsync(dto.Image);
 
         Core.Entities.Gallery entity = mapper.CreateDtoToDomain(dto, imageUrl);
 
@@ -32,7 +32,7 @@ public class GalleryService(
         if (entity == null)
             return Response.NotFound("Gallery image not found");
 
-        await DeleteImageAsync(entity.ImageUrl.PublicId);
+        await DeleteImageAsync(entity.ImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -73,11 +73,11 @@ public class GalleryService(
         if (entity == null)
             return Response<GalleryResponseDto?>.NotFound("Gallery image not found");
 
-        CloudinaryURL? newImageUrl = null;
+        StoredFile? newImageUrl = null;
         if (dto.Image != null)
         {
             var (newUrl, oldPublicId) = await ReplaceImageAsync(  
-                entity.ImageUrl.PublicId,
+                entity.ImageUrl.ObjectKey,
                 dto.Image);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);

@@ -1,5 +1,5 @@
 using App.BL.Settings;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Minio;
@@ -24,24 +24,24 @@ public class MinioObjectStorageService : IObjectStorageService
             .Build();
     }
 
-    public async Task<CloudinaryURL> UploadImageAsync(IFormFile file)
+    public async Task<StoredFile> UploadImageAsync(IFormFile file)
     {
         await EnsureBucketAsync();
         var objectName = BuildObjectName("images", file.FileName);
         await PutAsync(file, objectName);
-        return new CloudinaryURL(objectName, objectName);
+        return new StoredFile(objectName);
     }
 
-    public async Task<IList<CloudinaryURL>> UploadImagesAsync(IEnumerable<IFormFile> files)
+    public async Task<IList<StoredFile>> UploadImagesAsync(IEnumerable<IFormFile> files)
     {
-        var result = new List<CloudinaryURL>();
+        var result = new List<StoredFile>();
         foreach (var file in files)
             result.Add(await UploadImageAsync(file));
 
         return result;
     }
 
-    public async Task<CloudinaryURL> UploadPdfAsync(IFormFile file)
+    public async Task<StoredFile> UploadPdfAsync(IFormFile file)
     {
         const string pdfContentType = "application/pdf";
         if (!string.Equals(file.ContentType, pdfContentType, StringComparison.OrdinalIgnoreCase))
@@ -50,7 +50,7 @@ public class MinioObjectStorageService : IObjectStorageService
         await EnsureBucketAsync();
         var objectName = BuildObjectName("documents", file.FileName);
         await PutAsync(file, objectName);
-        return new CloudinaryURL(objectName, objectName);
+        return new StoredFile(objectName);
     }
 
     public async Task DeleteAsync(string objectName)
@@ -72,7 +72,7 @@ public class MinioObjectStorageService : IObjectStorageService
         }
     }
 
-    public async Task<CloudinaryURL> UploadAsync(Stream stream, string objectName, string contentType, long size, CancellationToken cancellationToken = default)
+    public async Task<StoredFile> UploadAsync(Stream stream, string objectName, string contentType, long size, CancellationToken cancellationToken = default)
     {
         await EnsureBucketAsync();
         await client.PutObjectAsync(new PutObjectArgs()
@@ -82,7 +82,7 @@ public class MinioObjectStorageService : IObjectStorageService
             .WithObjectSize(size)
             .WithContentType(contentType), cancellationToken);
 
-        return new CloudinaryURL(objectName, objectName);
+        return new StoredFile(objectName);
     }
 
     public async Task<ObjectStorageFile?> GetAsync(string objectName, CancellationToken cancellationToken = default)

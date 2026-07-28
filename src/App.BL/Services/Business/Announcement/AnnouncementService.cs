@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Announcement;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.Announcement;
 using App.Core.ResponseObject.Concreate;
 
@@ -15,7 +15,7 @@ public class AnnouncementService(
 {
     public async Task<Response> CreateAsync(CreateAnnouncementDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL titleImageUrl = await objectStorageService.UploadImageAsync(dto.TitleImage);
+        StoredFile titleImageUrl = await objectStorageService.UploadImageAsync(dto.TitleImage);
 
         Core.Entities.Announcement entity = mapper.CreateDtoToDomain(dto, titleImageUrl);
 
@@ -32,7 +32,7 @@ public class AnnouncementService(
         if (entity == null)
             return Response.NotFound("Announcement not found");
 
-        await DeleteImageAsync(entity.TitleImageUrl.PublicId);
+        await DeleteImageAsync(entity.TitleImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
@@ -76,7 +76,7 @@ public class AnnouncementService(
         if (dto.TitleImage != null)
         {
             var (newUrl, oldPublicId) = await ReplaceImageAsync(  // 👈 base metoddan
-                entity.TitleImageUrl.PublicId,
+                entity.TitleImageUrl.ObjectKey,
                 dto.TitleImage);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);

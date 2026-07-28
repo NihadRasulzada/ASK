@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.Setting;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Enums;
 using App.Core.Interfaces.Repository.Settings;
 using App.Core.ResponseObject.Concreate;
@@ -54,10 +54,10 @@ public class SettingService(
             if (dto.File is null)
                 return Response<SettingResponseDto?>.BadRequest("Fayl mütləq yüklənməlidir.");
 
-            string? oldPublicId = entity.CloudinaryValue?.PublicId;
+            string? oldPublicId = entity.MediaValue?.ObjectKey;
 
-            CloudinaryURL newUrl = await objectStorageService.UploadImageAsync(dto.File);
-            entity.UpdateCloudinaryValue(newUrl);
+            StoredFile newUrl = await objectStorageService.UploadImageAsync(dto.File);
+            entity.UpdateMediaValue(newUrl);
 
             await DeleteImageAsync(oldPublicId); 
         }
@@ -82,8 +82,8 @@ public class SettingService(
         }
         else // Link -> object storage
         {
-            string? publicId = entity.CloudinaryValue?.PublicId;
-            entity.UpdateCloudinaryValue(null);
+            string? publicId = entity.MediaValue?.ObjectKey;
+            entity.UpdateMediaValue(null);
             await DeleteImageAsync(publicId); 
         }
 

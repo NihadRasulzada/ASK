@@ -1,7 +1,7 @@
 using App.BL.DTOs;
 using App.BL.Mapper.InternationalSolidarity;
 using App.BL.Services.External;
-using App.Core.Entities.Common.Cloudinary;
+using App.Core.Entities.Common.Storage;
 using App.Core.Interfaces.Repository.InternationalSolidarity;
 using App.Core.ResponseObject.Concreate;
 
@@ -35,7 +35,7 @@ public class InternationalSolidarityService(
 
     public async Task<Response<InternationalSolidarityResponseDto>> CreateAsync(CreateInternationalSolidarityDto dto, CancellationToken cancellationToken = default)
     {
-        CloudinaryURL iconUrl = await objectStorageService.UploadImageAsync(dto.Icon);
+        StoredFile iconUrl = await objectStorageService.UploadImageAsync(dto.Icon);
 
         Core.Entities.InternationalSolidarity entity = mapper.CreateDtoToDomain(dto, iconUrl);
 
@@ -52,12 +52,12 @@ public class InternationalSolidarityService(
         if (entity == null)
             return Response<InternationalSolidarityResponseDto?>.NotFound("International solidarity not found");
 
-        CloudinaryURL iconUrl = entity.IconUrl;
+        StoredFile iconUrl = entity.IconUrl;
 
         if (dto.Icon != null)
         {
             var (newUrl, oldPublicId) = await ReplaceImageAsync(  
-                entity.IconUrl.PublicId,
+                entity.IconUrl.ObjectKey,
                 dto.Icon);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
@@ -84,7 +84,7 @@ public class InternationalSolidarityService(
         if (entity == null)
             return Response<bool>.NotFound("International solidarity not found");
 
-        await DeleteImageAsync(entity.IconUrl.PublicId);
+        await DeleteImageAsync(entity.IconUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);
