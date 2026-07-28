@@ -207,6 +207,8 @@ public static class WordPressDataSeeder
                 Required(x.TitleRu, x.TitleAz, "Публикация"),
                 await ToStoredMediaAsync(x.Pdf)));
 
+        added += await BackfillPublicationMediaAsync(db, seed.Publications, ToStoredMediaAsync, logger, cancellationToken);
+
         if (!await db.Partners.AnyAsync(cancellationToken))
             added += await AddRangeAsync(db, seed.Partners, async x => new Partner(await ToStoredMediaAsync(x.Image), Required(x.Site, "#")));
 
@@ -291,6 +293,52 @@ public static class WordPressDataSeeder
         var list = entities.ToList();
         db.Set<TEntity>().AddRange(list);
         return list.Count;
+    }
+
+    private static async Task<int> BackfillPublicationMediaAsync(
+        AppDbContext db,
+        IEnumerable<PublicationSeed> items,
+        Func<MediaSeed?, Task<StoredFile>> toStoredMediaAsync,
+        ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        var updated = 0;
+
+        foreach (var item in items)
+        {
+            var titleAz = Required(item.TitleAz, "Nəşr");
+            var titleEn = Required(item.TitleEn, item.TitleAz, "Publication");
+            var titleRu = Required(item.TitleRu, item.TitleAz, "Публикация");
+
+            var publication = await db.Publications.FirstOrDefaultAsync(x =>
+                x.TitleAz == titleAz || x.TitleEn == titleEn || x.TitleRu == titleRu,
+                cancellationToken);
+
+            if (publication is null)
+                continue;
+
+            var changed = false;
+
+            if (ShouldBackfillSeedMedia(publication.TitleImageUrl.ObjectKey))
+            {
+                publication.UpdateTitleImage(await toStoredMediaAsync(item.TitleImage));
+                changed = true;
+            }
+
+            if (ShouldBackfillSeedMedia(publication.PdfUrl.ObjectKey))
+            {
+                publication.UpdatePdf(await toStoredMediaAsync(item.Pdf));
+                changed = true;
+            }
+
+            if (changed)
+                updated++;
+        }
+
+        if (updated > 0)
+            logger.LogInformation("WordPress seed backfilled media for {Count} existing publications.", updated);
+
+        return updated;
     }
 
     private static async Task UploadSeedMediaDirectoryAsync(IObjectStorageService objectStorageService, ILogger logger, CancellationToken cancellationToken)
@@ -390,6 +438,30 @@ public static class WordPressDataSeeder
             ".pdf" => "application/pdf",
             _ => "application/octet-stream"
         };
+    }
+
+    private static bool ShouldBackfillSeedMedia(string? objectKey)
+    {
+        if (string.IsNullOrWhiteSpace(objectKey))
+            return true;
+
+        if (objectKey.StartsWith(MinioSeedPrefix, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (objectKey.StartsWith("images/", StringComparison.OrdinalIgnoreCase) ||
+            objectKey.StartsWith("documents/", StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (objectKey.StartsWith(SeedMediaPrefix, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (Uri.TryCreate(objectKey, UriKind.Absolute, out var absoluteUri))
+        {
+            return absoluteUri.Host.Contains("cloudinary", StringComparison.OrdinalIgnoreCase) ||
+                   absoluteUri.Host.Contains("ask.org.az", StringComparison.OrdinalIgnoreCase);
+        }
+
+        return !objectKey.Contains('/');
     }
 
     private static DateTime ParseDate(string? value)
