@@ -47,16 +47,26 @@ public class BusinessForumService(
 
         if (dto.TitleImage != null)
         {
-            var (newUrl, oldPublicId) = await ReplaceImageAsync(  // 👈 base metoddan
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
                 entity.TitleImageUrl.ObjectKey,
                 dto.TitleImage);
 
             mapper.UpdateDtoToDomain(entity, dto, newUrl);
-            await DeleteImageAsync(oldPublicId); // upload uğurlu oldu, indi sil
+            await DeleteImageAsync(oldPublicId);
         }
         else
         {
             mapper.UpdateDtoToDomain(entity, dto, null);
+        }
+
+        if (dto.DetailImage != null)
+        {
+            var (newUrl, oldPublicId) = await ReplaceImageAsync(
+                entity.DetailImageUrl.ObjectKey,
+                dto.DetailImage);
+
+            mapper.UpdateDtoToDomain(entity, dto, detailImageUrl: newUrl);
+            await DeleteImageAsync(oldPublicId);
         }
 
         writeRepository.Update(entity);
@@ -71,6 +81,7 @@ public class BusinessForumService(
         if (entity is null) return Response.NotFound("Business forum not found");
 
         await DeleteImageAsync(entity.TitleImageUrl.ObjectKey);
+        await DeleteImageAsync(entity.DetailImageUrl.ObjectKey);
 
         await writeRepository.HardDeleteAsync(id, cancellationToken);
         await writeRepository.SaveChangesAsync(cancellationToken);

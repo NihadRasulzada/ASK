@@ -120,14 +120,17 @@ public static class WordPressDataSeeder
         {
             foreach (var item in seed.BusinessForums)
             {
+                var eventDate = ParseDate(item.Created);
                 db.BusinessForums.Add(new BusinessForum(
-                    await ToStoredMediaAsync(item.TitleImage),
                     Required(item.TitleAz, "Biznes forum"),
                     Required(item.TitleEn, item.TitleAz, "Business forum"),
                     Required(item.TitleRu, item.TitleAz, "Бизнес форум"),
+                    await ToStoredMediaAsync(item.TitleImage),
                     Required(item.TextAz, item.TitleAz),
                     Required(item.TextEn, item.TextAz, item.TitleAz),
                     Required(item.TextRu, item.TextAz, item.TitleAz),
+                    eventDate,
+                    eventDate,
                     await ToStoredMediaAsync(item.DetailImage)));
                 added++;
             }
