@@ -16,6 +16,7 @@ public static class WordPressDataSeeder
     private const string SeedMediaPrefix = "seed-media/";
     private const string MinioSeedPrefix = "wordpress-seed/";
     private const string SeedMediaReadyMarker = $"{MinioSeedPrefix}.seed-media-ready";
+    private const string SeedDataReadyMarker = $"{MinioSeedPrefix}.seed-data-ready-20260728";
     private const string FallbackImage = "https://ask.org.az/wp-content/uploads/2025/08/ASK-logo-600x400.jpg";
 
     public static async Task SeedAsync(IServiceProvider services, IConfiguration configuration, ILogger logger, CancellationToken cancellationToken = default)
@@ -34,6 +35,12 @@ public static class WordPressDataSeeder
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         var objectStorageService = scope.ServiceProvider.GetRequiredService<IObjectStorageService>();
 
+        if (await MarkerExistsAsync(objectStorageService, SeedDataReadyMarker, logger, cancellationToken))
+        {
+            logger.LogInformation("WordPress seed data marker exists. Skipping WordPress data seed.");
+            return;
+        }
+
         await using var stream = File.OpenRead(fullPath);
         var seed = await JsonSerializer.DeserializeAsync<WordPressSeed>(stream, JsonOptions, cancellationToken);
         if (seed is null)
@@ -48,33 +55,55 @@ public static class WordPressDataSeeder
         Task<StoredFile> ToStoredMediaAsync(MediaSeed? mediaSeed)
             => WordPressDataSeeder.ToStoredMediaAsync(mediaSeed, objectStorageService, logger, cancellationToken);
 
-        if (!await db.News.AnyAsync(cancellationToken))
-        {
-            foreach (var item in seed.News)
+        var existingNewsKeys = await db.News
+            .Select(x => new
             {
-                var titleAz = Required(item.TitleAz, "Xəbər");
-                var news = new News(
-                    await ToStoredMediaAsync(item.TitleImage),
-                    titleAz,
-                    Required(item.TitleEn, titleAz),
-                    Required(item.TitleRu, titleAz),
-                    Required(item.TextAz, titleAz),
-                    Required(item.TextEn, item.TextAz, titleAz),
-                    Required(item.TextRu, item.TextAz, titleAz));
+                x.TitleAz,
+                x.CreateDate
+            })
+            .ToListAsync(cancellationToken);
 
-                Set(news, nameof(News.CreateDate), ParseDate(item.Created));
-                db.News.Add(news);
+        var existingNews = existingNewsKeys
+            .Select(x => BuildSeedIdentity(x.TitleAz, x.CreateDate))
+            .ToHashSet(StringComparer.Ordinal);
 
-                foreach (var image in item.Images)
-                    db.Set<NewsImage>().Add(new NewsImage(await ToStoredMediaAsync(image), news.Id));
+        foreach (var item in seed.News)
+        {
+            var titleAz = Required(item.TitleAz, "Xəbər");
+            var created = ParseDate(item.Created);
+            var identity = BuildSeedIdentity(titleAz, created);
 
-                added++;
-            }
+            if (existingNews.Contains(identity))
+                continue;
+
+            var news = new News(
+                await ToStoredMediaAsync(item.TitleImage),
+                titleAz,
+                Required(item.TitleEn, titleAz),
+                Required(item.TitleRu, titleAz),
+                Required(item.TextAz, titleAz),
+                Required(item.TextEn, item.TextAz, titleAz),
+                Required(item.TextRu, item.TextAz, titleAz));
+
+            Set(news, nameof(News.CreateDate), created);
+            db.News.Add(news);
+
+            foreach (var image in item.Images)
+                db.Set<NewsImage>().Add(new NewsImage(await ToStoredMediaAsync(image), news.Id));
+
+            existingNews.Add(identity);
+            added++;
         }
 
-        if (!await db.Announcements.AnyAsync(cancellationToken))
-        {
-            foreach (var item in seed.Announcements)
+        added += await AddMissingAsync(db,
+            seed.Announcements,
+            (await db.Announcements
+                .Select(x => new { x.TitleAz, x.Created })
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x.TitleAz, x.Created))
+                .ToHashSet(StringComparer.Ordinal),
+            item => BuildSeedIdentity(Required(item.TitleAz, "Elan"), ParseDate(item.Created)),
+            async item =>
             {
                 var titleAz = Required(item.TitleAz, "Elan");
                 var announcement = new Announcement(
@@ -87,13 +116,16 @@ public static class WordPressDataSeeder
                     Required(item.TextRu, item.TextAz, titleAz));
 
                 Set(announcement, nameof(Announcement.Created), ParseDate(item.Created));
-                db.Announcements.Add(announcement);
-                added++;
-            }
-        }
+                return announcement;
+            });
 
-        if (!await db.Exhibitions.AnyAsync(cancellationToken))
-            added += await AddEventsAsync(db, seed.Exhibitions, async item => new Exhibition(
+        added += await AddMissingAsync(db,
+            seed.Exhibitions,
+            await GetExistingEventIdentitiesAsync<Exhibition>(db, cancellationToken),
+            item => BuildSeedIdentity(Required(item.TitleAz, "Sərgi"), ParseDate(item.Created)),
+            async item =>
+            {
+                var entity = new Exhibition(
                 Required(item.TitleAz, "Sərgi"),
                 Required(item.TitleEn, item.TitleAz, "Exhibition"),
                 Required(item.TitleRu, item.TitleAz, "Выставка"),
@@ -102,10 +134,18 @@ public static class WordPressDataSeeder
                 Required(item.TextEn, item.TextAz, item.TitleAz),
                 Required(item.TextRu, item.TextAz, item.TitleAz),
                 ParseDate(item.StartDate),
-                ParseDate(item.EndDate)));
+                    ParseDate(item.EndDate));
+                Set(entity, nameof(Event.Created), ParseDate(item.Created));
+                return entity;
+            });
 
-        if (!await db.Training.AnyAsync(cancellationToken))
-            added += await AddEventsAsync(db, seed.Trainings, async item => new Training(
+        added += await AddMissingAsync(db,
+            seed.Trainings,
+            await GetExistingEventIdentitiesAsync<Training>(db, cancellationToken),
+            item => BuildSeedIdentity(Required(item.TitleAz, "Təlim"), ParseDate(item.Created)),
+            async item =>
+            {
+                var entity = new Training(
                 Required(item.TitleAz, "Təlim"),
                 Required(item.TitleEn, item.TitleAz, "Training"),
                 Required(item.TitleRu, item.TitleAz, "Тренинг"),
@@ -114,14 +154,23 @@ public static class WordPressDataSeeder
                 Required(item.TextEn, item.TextAz, item.TitleAz),
                 Required(item.TextRu, item.TextAz, item.TitleAz),
                 ParseDate(item.StartDate),
-                ParseDate(item.EndDate)));
+                    ParseDate(item.EndDate));
+                Set(entity, nameof(Event.Created), ParseDate(item.Created));
+                return entity;
+            });
 
-        if (!await db.BusinessForums.AnyAsync(cancellationToken))
-        {
-            foreach (var item in seed.BusinessForums)
+        added += await AddMissingAsync(db,
+            seed.BusinessForums,
+            (await db.BusinessForums
+                .Select(x => x.TitleAz)
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x))
+                .ToHashSet(StringComparer.Ordinal),
+            item => BuildSeedIdentity(Required(item.TitleAz, "Biznes forum")),
+            async item =>
             {
                 var eventDate = ParseDate(item.Created);
-                db.BusinessForums.Add(new BusinessForum(
+                return new BusinessForum(
                     Required(item.TitleAz, "Biznes forum"),
                     Required(item.TitleEn, item.TitleAz, "Business forum"),
                     Required(item.TitleRu, item.TitleAz, "Бизнес форум"),
@@ -131,13 +180,18 @@ public static class WordPressDataSeeder
                     Required(item.TextRu, item.TextAz, item.TitleAz),
                     eventDate,
                     eventDate,
-                    await ToStoredMediaAsync(item.DetailImage)));
-                added++;
-            }
-        }
+                    await ToStoredMediaAsync(item.DetailImage));
+            });
 
-        if (!await db.Directors.AnyAsync(cancellationToken))
-            added += await AddRangeAsync(db, seed.Directors, async x => new Director(
+        added += await AddMissingAsync(db,
+            seed.Directors,
+            (await db.Directors
+                .Select(x => new { x.FullNameAz, x.DutyAz })
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x.FullNameAz, x.DutyAz))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.FullNameAz, "Direktor"), Required(x.DutyAz, "-")),
+            async x => new Director(
                 await ToStoredMediaAsync(x.Image),
                 Required(x.FullNameAz, "Direktor"),
                 Required(x.FullNameEn, x.FullNameAz, "Director"),
@@ -151,8 +205,15 @@ public static class WordPressDataSeeder
                 x.PhoneNumber ?? "",
                 x.Email ?? ""));
 
-        if (!await db.Management.AnyAsync(cancellationToken))
-            added += AddRange(db, seed.Management.Select(x => new Management(
+        added += await AddMissingAsync(db,
+            seed.Management,
+            (await db.Management
+                .Select(x => new { x.FullNameAz, x.CompanyAz })
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x.FullNameAz, x.CompanyAz))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.FullNameAz, "Üzv"), Required(x.CompanyAz, "-")),
+            x => Task.FromResult(new Management(
                 Required(x.FullNameAz, "Üzv"),
                 Required(x.FullNameEn, x.FullNameAz, "Member"),
                 Required(x.FullNameRu, x.FullNameAz, "Член"),
@@ -160,8 +221,18 @@ public static class WordPressDataSeeder
                 Required(x.CompanyEn, x.CompanyAz, "-"),
                 Required(x.CompanyRu, x.CompanyAz, "-"))));
 
-        if (!await db.Committees.AnyAsync(cancellationToken))
-            added += AddRange(db, seed.Committees.Select(x => new Committee(
+        added += await AddMissingAsync(db,
+            seed.Committees,
+            (await db.Committees
+                .Select(x => new { x.NameAz, x.ChairmanAz, x.VicePresidentAz })
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x.NameAz, x.ChairmanAz, x.VicePresidentAz))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(
+                Required(x.NameAz, "Komissiya"),
+                Required(x.ChairmanAz, "-"),
+                Required(x.VicePresidentAz, "-")),
+            x => Task.FromResult(new Committee(
                 Required(x.NameAz, "Komissiya"),
                 Required(x.NameEn, x.NameAz, "Committee"),
                 Required(x.NameRu, x.NameAz, "Комиссия"),
@@ -172,8 +243,15 @@ public static class WordPressDataSeeder
                 Required(x.VicePresidentEn, x.VicePresidentAz, "-"),
                 Required(x.VicePresidentRu, x.VicePresidentAz, "-"))));
 
-        if (!await db.DistrictRepresentatives.AnyAsync(cancellationToken))
-            added += AddRange(db, seed.DistrictRepresentatives.Select(x => new DistrictRepresentatives(
+        added += await AddMissingAsync(db,
+            seed.DistrictRepresentatives,
+            (await db.DistrictRepresentatives
+                .Select(x => new { x.DistrictAz, x.FullNameAz, x.CompanyAz })
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x.DistrictAz, x.FullNameAz, x.CompanyAz))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.DistrictAz, "-"), Required(x.FullNameAz, "-"), Required(x.CompanyAz, "-")),
+            x => Task.FromResult(new DistrictRepresentatives(
                 Required(x.DistrictAz, "-"),
                 Required(x.DistrictEn, x.DistrictAz, "-"),
                 Required(x.DistrictRu, x.DistrictAz, "-"),
@@ -184,8 +262,19 @@ public static class WordPressDataSeeder
                 Required(x.CompanyEn, x.CompanyAz, "-"),
                 Required(x.CompanyRu, x.CompanyAz, "-"))));
 
-        if (!await db.ForeignRepresentatives.AnyAsync(cancellationToken))
-            added += AddRange(db, seed.ForeignRepresentatives.Select(x => new ForeignRepresentatives(
+        added += await AddMissingAsync(db,
+            seed.ForeignRepresentatives,
+            (await db.ForeignRepresentatives
+                .Select(x => new { x.CountryAz, x.FullNameAz, x.CompanyAz, x.DutyAz })
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x.CountryAz, x.FullNameAz, x.CompanyAz, x.DutyAz))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(
+                Required(x.CountryAz, "-"),
+                Required(x.FullNameAz, "-"),
+                Required(x.CompanyAz, "-"),
+                Required(x.DutyAz, "-")),
+            x => Task.FromResult(new ForeignRepresentatives(
                 Required(x.CountryAz, "-"),
                 Required(x.CountryEn, x.CountryAz, "-"),
                 Required(x.CountryRu, x.CountryAz, "-"),
@@ -199,8 +288,15 @@ public static class WordPressDataSeeder
                 Required(x.DutyEn, x.DutyAz, "-"),
                 Required(x.DutyRu, x.DutyAz, "-"))));
 
-        if (!await db.Publications.AnyAsync(cancellationToken))
-            added += await AddRangeAsync(db, seed.Publications, async x => new Publication(
+        added += await AddMissingAsync(db,
+            seed.Publications,
+            (await db.Publications
+                .Select(x => x.TitleAz)
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.TitleAz, "Nəşr")),
+            async x => new Publication(
                 await ToStoredMediaAsync(x.TitleImage),
                 Required(x.TitleAz, "Nəşr"),
                 Required(x.TitleEn, x.TitleAz, "Publication"),
@@ -209,17 +305,45 @@ public static class WordPressDataSeeder
 
         added += await BackfillPublicationMediaAsync(db, seed.Publications, ToStoredMediaAsync, logger, cancellationToken);
 
-        if (!await db.Partners.AnyAsync(cancellationToken))
-            added += await AddRangeAsync(db, seed.Partners, async x => new Partner(await ToStoredMediaAsync(x.Image), Required(x.Site, "#")));
+        added += await AddMissingAsync(db,
+            seed.Partners,
+            (await db.Partners
+                .Select(x => x.Site)
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.Site, "#")),
+            async x => new Partner(await ToStoredMediaAsync(x.Image), Required(x.Site, "#")));
 
-        if (!await db.InternationalSolidarity.AnyAsync(cancellationToken))
-            added += await AddRangeAsync(db, seed.InternationalSolidarity, async x => new InternationalSolidarity(Required(x.Link, "#"), await ToStoredMediaAsync(x.Icon)));
+        added += await AddMissingAsync(db,
+            seed.InternationalSolidarity,
+            (await db.InternationalSolidarity
+                .Select(x => x.Link)
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.Link, "#")),
+            async x => new InternationalSolidarity(Required(x.Link, "#"), await ToStoredMediaAsync(x.Icon)));
 
-        if (!await db.Galleries.AnyAsync(cancellationToken))
-            added += await AddRangeAsync(db, seed.Galleries, async x => new Gallery(await ToStoredMediaAsync(x.Image)));
+        added += await AddMissingAsync(db,
+            seed.Galleries,
+            (await db.Galleries
+                .Select(x => x.ImageUrl.ObjectKey)
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(ToStoredObjectKey(x.Image)),
+            async x => new Gallery(await ToStoredMediaAsync(x.Image)));
 
-        if (!await db.FAQs.AnyAsync(cancellationToken))
-            added += AddRange(db, seed.Faqs.Select(x => new FAQ(
+        added += await AddMissingAsync(db,
+            seed.Faqs,
+            (await db.FAQs
+                .Select(x => new { x.QuestionAz, x.AnswerAz })
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x.QuestionAz, x.AnswerAz))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.QuestionAz, "Sual"), Required(x.AnswerAz, "-")),
+            x => Task.FromResult(new FAQ(
                 Required(x.QuestionAz, "Sual"),
                 Required(x.QuestionEn, x.QuestionAz, "Question"),
                 Required(x.QuestionRu, x.QuestionAz, "Вопрос"),
@@ -227,21 +351,42 @@ public static class WordPressDataSeeder
                 Required(x.AnswerEn, x.AnswerAz, "-"),
                 Required(x.AnswerRu, x.AnswerAz, "-"))));
 
-        if (!await db.Presidents.AnyAsync(cancellationToken) && seed.President is not null)
+        if (seed.President is not null)
         {
-            db.Presidents.Add(new President(await ToStoredMediaAsync(seed.President.Image), Required(seed.President.Text, "President")));
-            added++;
+            added += await AddMissingAsync(db,
+                new[] { seed.President },
+                (await db.Presidents
+                    .Select(x => x.ImageUrl.ObjectKey)
+                    .ToListAsync(cancellationToken))
+                    .Select(x => BuildSeedIdentity(x))
+                    .ToHashSet(StringComparer.Ordinal),
+                x => BuildSeedIdentity(ToStoredObjectKey(x.Image)),
+                async x => new President(await ToStoredMediaAsync(x.Image), Required(x.Text, "President")));
         }
 
-        if (!await db.Services.AnyAsync(cancellationToken))
-            added += await AddRangeAsync(db, seed.Services, async x => new Service(
+        added += await AddMissingAsync(db,
+            seed.Services,
+            (await db.Services
+                .Select(x => x.NameAz)
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.NameAz, "Xidmət")),
+            async x => new Service(
                 await ToStoredMediaAsync(x.Image),
                 Required(x.NameAz, "Xidmət"),
                 Required(x.NameEn, x.NameAz, "Service"),
                 Required(x.NameRu, x.NameAz, "Услуга")));
 
-        if (!await db.UsefulLinks.AnyAsync(cancellationToken))
-            added += AddRange(db, seed.UsefulLinks.Select(x => new UsefulLink(
+        added += await AddMissingAsync(db,
+            seed.UsefulLinks,
+            (await db.UsefulLinks
+                .Select(x => new { x.TitleAz, x.Link })
+                .ToListAsync(cancellationToken))
+                .Select(x => BuildSeedIdentity(x.TitleAz, x.Link))
+                .ToHashSet(StringComparer.Ordinal),
+            x => BuildSeedIdentity(Required(x.TitleAz, "Link"), Required(x.Link, "#")),
+            x => Task.FromResult(new UsefulLink(
                 Required(x.TitleAz, "Link"),
                 Required(x.TitleEn, x.TitleAz, "Link"),
                 Required(x.TitleRu, x.TitleAz, "Link"),
@@ -250,7 +395,7 @@ public static class WordPressDataSeeder
         foreach (var settingSeed in seed.Settings)
         {
             var setting = await db.Settings.FirstOrDefaultAsync(x => x.Key == settingSeed.Key, cancellationToken);
-            if (setting?.ValueType == SettingValueType.Text && string.IsNullOrWhiteSpace(setting.StringValue))
+            if (setting?.ValueType == SettingValueType.Text)
                 setting.UpdateStringValue(settingSeed.Value);
         }
 
@@ -259,40 +404,43 @@ public static class WordPressDataSeeder
             await db.SaveChangesAsync(cancellationToken);
             logger.LogInformation("WordPress seed completed. Added approximately {Count} root records.", added);
         }
+
+        await WriteMarkerAsync(objectStorageService, SeedDataReadyMarker, logger, cancellationToken);
     }
 
-    private static async Task<int> AddEventsAsync<T>(AppDbContext db, IEnumerable<WordPressEventSeed> items, Func<WordPressEventSeed, Task<T>> factory)
-        where T : Event
+    private static async Task<HashSet<string>> GetExistingEventIdentitiesAsync<TEntity>(AppDbContext db, CancellationToken cancellationToken)
+        where TEntity : Event
+    {
+        var values = await db.Set<TEntity>()
+            .Select(x => new { x.TitleAz, x.Created })
+            .ToListAsync(cancellationToken);
+
+        return values
+            .Select(x => BuildSeedIdentity(x.TitleAz, x.Created))
+            .ToHashSet(StringComparer.Ordinal);
+    }
+
+    private static async Task<int> AddMissingAsync<TSeed, TEntity>(
+        AppDbContext db,
+        IEnumerable<TSeed> items,
+        HashSet<string> existing,
+        Func<TSeed, string> identityFactory,
+        Func<TSeed, Task<TEntity>> factory)
+        where TEntity : class
     {
         var count = 0;
         foreach (var item in items)
         {
-            var entity = await factory(item);
-            Set(entity, nameof(Event.Created), ParseDate(item.Created));
-            db.Add(entity);
+            var identity = identityFactory(item);
+            if (existing.Contains(identity))
+                continue;
+
+            db.Set<TEntity>().Add(await factory(item));
+            existing.Add(identity);
             count++;
         }
 
         return count;
-    }
-
-    private static async Task<int> AddRangeAsync<TSeed, TEntity>(AppDbContext db, IEnumerable<TSeed> items, Func<TSeed, Task<TEntity>> factory)
-        where TEntity : class
-    {
-        var list = new List<TEntity>();
-        foreach (var item in items)
-            list.Add(await factory(item));
-
-        db.Set<TEntity>().AddRange(list);
-        return list.Count;
-    }
-
-    private static int AddRange<TEntity>(AppDbContext db, IEnumerable<TEntity> entities)
-        where TEntity : class
-    {
-        var list = entities.ToList();
-        db.Set<TEntity>().AddRange(list);
-        return list.Count;
     }
 
     private static async Task<int> BackfillPublicationMediaAsync(
@@ -339,6 +487,47 @@ public static class WordPressDataSeeder
             logger.LogInformation("WordPress seed backfilled media for {Count} existing publications.", updated);
 
         return updated;
+    }
+
+    private static async Task<bool> MarkerExistsAsync(
+        IObjectStorageService objectStorageService,
+        string markerName,
+        ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var marker = await objectStorageService.GetAsync(markerName, cancellationToken);
+            if (marker is null)
+                return false;
+
+            await marker.Stream.DisposeAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Could not check WordPress seed marker {MarkerName}. Seed will continue.", markerName);
+            return false;
+        }
+    }
+
+    private static async Task WriteMarkerAsync(
+        IObjectStorageService objectStorageService,
+        string markerName,
+        ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var markerText = DateTime.UtcNow.ToString("O");
+            await using var marker = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(markerText));
+            await objectStorageService.UploadAsync(marker, markerName, "text/plain", marker.Length, cancellationToken);
+            logger.LogInformation("WordPress seed marker {MarkerName} was written.", markerName);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Could not write WordPress seed marker {MarkerName}. Seed is idempotent and may retry on next startup.", markerName);
+        }
     }
 
     private static async Task UploadSeedMediaDirectoryAsync(IObjectStorageService objectStorageService, ILogger logger, CancellationToken cancellationToken)
@@ -403,7 +592,7 @@ public static class WordPressDataSeeder
         if (!url.StartsWith(SeedMediaPrefix, StringComparison.OrdinalIgnoreCase))
             return new StoredFile(url);
 
-        var relativePath = url[SeedMediaPrefix.Length..].TrimStart('/');
+        var relativePath = url[SeedMediaPrefix.Length..].Trim().TrimStart('/');
         var objectName = $"{MinioSeedPrefix}{relativePath}";
         var mediaPath = Path.Combine(AppContext.BaseDirectory, SeedMediaPath, relativePath.Replace('/', Path.DirectorySeparatorChar));
 
@@ -469,6 +658,23 @@ public static class WordPressDataSeeder
 
     private static string Required(params string?[] values)
         => values.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x))?.Trim() ?? "-";
+
+    private static string BuildSeedIdentity(string titleAz, DateTime created)
+        => BuildSeedIdentity(titleAz, created.ToString("O"));
+
+    private static string BuildSeedIdentity(params string?[] values)
+        => string.Join('|', values.Select(value => (value ?? string.Empty).Trim().ToUpperInvariant()));
+
+    private static string ToStoredObjectKey(MediaSeed? mediaSeed)
+    {
+        var url = Required(mediaSeed?.Url, FallbackImage);
+
+        if (!url.StartsWith(SeedMediaPrefix, StringComparison.OrdinalIgnoreCase))
+            return url;
+
+        var relativePath = url[SeedMediaPrefix.Length..].Trim().TrimStart('/');
+        return $"{MinioSeedPrefix}{relativePath}";
+    }
 
     private static void Set<T>(T entity, string propertyName, object value)
     {
